@@ -1,6 +1,7 @@
+use crate::application::usecases::{CreatePostUseCase, IncrementDisplayCountUseCase};
 use async_graphql::{Context, Object, Result};
 use std::sync::Arc;
-use crate::application::usecases::{CreatePostUseCase, IncrementDisplayCountUseCase};
+use uuid::Uuid;
 
 #[derive(Default)]
 pub struct MutationRoot;
@@ -20,10 +21,14 @@ impl MutationRoot {
         Ok(true)
     }
 
-    async fn increment_display_count(&self, ctx: &Context<'_>, post_id: i32) -> Result<bool> {
+    async fn increment_display_count(&self, ctx: &Context<'_>, post_id: String) -> Result<bool> {
         let use_case = ctx.data::<Arc<IncrementDisplayCountUseCase>>()?;
 
-        use_case.execute(post_id).await?;
+        // Parse incoming string to UUID before handing to the application layer
+        let post_uuid = Uuid::parse_str(&post_id)
+            .map_err(|e| async_graphql::Error::new(format!("Invalid UUID: {}", e)))?;
+
+        use_case.execute(post_uuid).await?;
 
         Ok(true)
     }

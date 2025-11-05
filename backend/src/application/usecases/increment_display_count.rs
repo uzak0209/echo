@@ -1,11 +1,7 @@
+use uuid::Uuid;
+
+use crate::{application::error::AppError, domain::repositories::PostRepository};
 use std::sync::Arc;
-use crate::{
-    domain::{
-        entities::PostId,
-        repositories::PostRepository,
-    },
-    application::error::AppError,
-};
 
 pub struct IncrementDisplayCountUseCase {
     post_repository: Arc<dyn PostRepository>,
@@ -16,9 +12,7 @@ impl IncrementDisplayCountUseCase {
         Self { post_repository }
     }
 
-    pub async fn execute(&self, post_id: i32) -> Result<bool, AppError> {
-        let post_id = PostId(post_id);
-
+    pub async fn execute(&self, post_id: Uuid) -> Result<bool, AppError> {
         if let Some(mut post) = self.post_repository.find_by_id(post_id).await? {
             post.increment_display();
 

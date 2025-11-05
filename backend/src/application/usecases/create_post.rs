@@ -1,13 +1,12 @@
-use std::sync::Arc;
 use crate::{
-    domain::{
-        entities::{Post, PostId},
-        value_objects::PostContent,
-        repositories::{PostRepository, UserRepository},
-        services::RandomUserService,
-    },
     application::error::AppError,
+    domain::{
+        entities::Post,
+        repositories::{PostRepository, UserRepository},
+        value_objects::PostContent,
+    },
 };
+use std::sync::Arc;
 
 pub struct CreatePostUseCase {
     post_repository: Arc<dyn PostRepository>,
@@ -47,12 +46,7 @@ impl CreatePostUseCase {
         };
 
         // Create new post
-        let post = Post::new(
-            PostId(0), // Will be set by repository
-            user.id.0,
-            post_content,
-            image_url,
-        );
+        let post = Post::new(user.id, post_content, image_url);
 
         self.post_repository.save(&post).await?;
 

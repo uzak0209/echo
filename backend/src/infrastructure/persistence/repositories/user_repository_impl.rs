@@ -1,15 +1,14 @@
 use crate::{
     domain::{
-        entities::{User, UserId},
+        entities::User, error::DomainError, repositories::UserRepository,
         value_objects::DisplayName,
-        repositories::UserRepository,
-        error::DomainError,
     },
     infrastructure::persistence::models::user,
 };
 use async_trait::async_trait;
 use rand::seq::SliceRandom;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, Set};
+use uuid::Uuid;
 
 pub struct UserRepositoryImpl {
     db: DatabaseConnection,
@@ -22,7 +21,7 @@ impl UserRepositoryImpl {
 
     fn model_to_entity(model: user::Model) -> User {
         User {
-            id: UserId(model.id),
+            id: model.id,
             display_name: DisplayName::new(model.display_name),
             avatar_url: model.avatar_url,
             created_at: model.created_at.into(),
@@ -31,11 +30,7 @@ impl UserRepositoryImpl {
 
     fn entity_to_active_model(user: &User) -> user::ActiveModel {
         user::ActiveModel {
-            id: if user.id.0 == 0 {
-                sea_orm::ActiveValue::NotSet
-            } else {
-                Set(user.id.0)
-            },
+            id: Set(user.id),
             display_name: Set(user.display_name.value().to_string()),
             avatar_url: Set(user.avatar_url.clone()),
             created_at: Set(user.created_at.into()),
@@ -45,8 +40,8 @@ impl UserRepositoryImpl {
 
 #[async_trait]
 impl UserRepository for UserRepositoryImpl {
-    async fn find_by_id(&self, id: UserId) -> Result<Option<User>, DomainError> {
-        let model = user::Entity::find_by_id(id.0).one(&self.db).await?;
+    async fn find_by_id(&self, id: Uuid) -> Result<Option<User>, DomainError> {
+        let model = user::Entity::find_by_id(id).one(&self.db).await?;
 
         Ok(model.map(Self::model_to_entity))
     }
@@ -57,16 +52,12 @@ impl UserRepository for UserRepositoryImpl {
         Ok(models.into_iter().map(Self::model_to_entity).collect())
     }
 
-    async fn save(&self, user: &User) -> Result<UserId, DomainError> {
+    async fn save(&self, user: &User) -> Result<Uuid, DomainError> {
         let active_model = Self::entity_to_active_model(user);
 
-        let result = if user.id.0 == 0 {
-            active_model.insert(&self.db).await?
-        } else {
-            active_model.update(&self.db).await?
-        };
+        let result = active_model.insert(&self.db).await?;
 
-        Ok(UserId(result.id))
+        Ok(result.id)
     }
 
     async fn get_random(&self) -> Result<Option<User>, DomainError> {
