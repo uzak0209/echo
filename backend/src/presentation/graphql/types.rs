@@ -1,4 +1,5 @@
 use crate::application::dto::PostDto;
+use crate::application::usecases::{AuthTokens, RefreshedTokens};
 use async_graphql::SimpleObject;
 
 #[derive(SimpleObject)]
@@ -15,6 +16,34 @@ impl From<PostDto> for Post {
             id: dto.id.to_string(),
             content: dto.content,
             image_url: dto.image_url,
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct AuthResponse {
+    pub access_token: String,
+    pub user_id: String,
+}
+
+impl From<AuthTokens> for AuthResponse {
+    fn from(tokens: AuthTokens) -> Self {
+        Self {
+            access_token: tokens.access_token,
+            user_id: tokens.user_id,
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct RefreshResponse {
+    pub access_token: String,
+}
+
+impl From<RefreshedTokens> for RefreshResponse {
+    fn from(tokens: RefreshedTokens) -> Self {
+        Self {
+            access_token: tokens.access_token,
         }
     }
 }

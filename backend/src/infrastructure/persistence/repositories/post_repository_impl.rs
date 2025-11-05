@@ -74,6 +74,26 @@ impl PostRepository for PostRepositoryImpl {
         Ok(posts.into_iter().take(limit).collect())
     }
 
+    async fn create(&self, post: &Post) -> Result<Post, DomainError> {
+        let active_model = Self::entity_to_active_model(post);
+        let result = active_model.insert(&self.db).await?;
+        Self::model_to_entity(result)
+    }
+
+    async fn increment_display_count(&self, id: Uuid) -> Result<Post, DomainError> {
+        let model = post::Entity::find_by_id(id)
+            .one(&self.db)
+            .await?
+            .ok_or_else(|| DomainError::NotFound("Post not found".to_string()))?;
+
+        let mut active_model: post::ActiveModel = model.into();
+        let new_count = active_model.display_count.clone().unwrap() + 1;
+        active_model.display_count = Set(new_count);
+
+        let updated = active_model.update(&self.db).await?;
+        Self::model_to_entity(updated)
+    }
+
     async fn delete(&self, id: Uuid) -> Result<(), DomainError> {
         post::Entity::delete_by_id(id).exec(&self.db).await?;
         Ok(())

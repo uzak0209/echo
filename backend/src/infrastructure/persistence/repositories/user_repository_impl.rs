@@ -6,7 +6,6 @@ use crate::{
     infrastructure::persistence::models::user,
 };
 use async_trait::async_trait;
-use rand::seq::SliceRandom;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, Set};
 use uuid::Uuid;
 
@@ -46,30 +45,21 @@ impl UserRepository for UserRepositoryImpl {
         Ok(model.map(Self::model_to_entity))
     }
 
-    async fn find_all(&self) -> Result<Vec<User>, DomainError> {
-        let models = user::Entity::find().all(&self.db).await?;
-
-        Ok(models.into_iter().map(Self::model_to_entity).collect())
-    }
-
-    async fn save(&self, user: &User) -> Result<Uuid, DomainError> {
-        let active_model = Self::entity_to_active_model(user);
-
+    async fn create_user(
+        &self,
+        display_name: String,
+        avatar_url: Option<String>,
+    ) -> Result<User, DomainError> {
+        let display_name = DisplayName::new(display_name);
+        let avatar_url = avatar_url.unwrap_or_else(|| "https://example.com/default-avatar.jpg".to_string());
+        let user = User::new(display_name, avatar_url);
+        let active_model = Self::entity_to_active_model(&user);
         let result = active_model.insert(&self.db).await?;
-
-        Ok(result.id)
+        Ok(Self::model_to_entity(result))
     }
 
-    async fn get_random(&self) -> Result<Option<User>, DomainError> {
-        let users = self.find_all().await?;
-
-        if users.is_empty() {
-            return Ok(None);
-        }
-
-        let mut rng = rand::thread_rng();
-        let user = users.choose(&mut rng).cloned();
-
-        Ok(user)
+    async fn delete(&self, id: Uuid) -> Result<(), DomainError> {
+        user::Entity::delete_by_id(id).exec(&self.db).await?;
+        Ok(())
     }
 }

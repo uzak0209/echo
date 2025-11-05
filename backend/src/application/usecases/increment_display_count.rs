@@ -13,14 +13,13 @@ impl IncrementDisplayCountUseCase {
     }
 
     pub async fn execute(&self, post_id: Uuid) -> Result<bool, AppError> {
-        if let Some(mut post) = self.post_repository.find_by_id(post_id).await? {
-            post.increment_display();
+        if let Some(post) = self.post_repository.find_by_id(post_id).await? {
+            // Increment display count in repository
+            let updated_post = self.post_repository.increment_display_count(post_id).await?;
 
             // If post is expired (display_count >= 10), delete it
-            if post.is_expired() {
+            if updated_post.is_expired() {
                 self.post_repository.delete(post_id).await?;
-            } else {
-                self.post_repository.save(&post).await?;
             }
 
             Ok(true)

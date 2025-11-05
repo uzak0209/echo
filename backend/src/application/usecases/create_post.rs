@@ -1,7 +1,7 @@
 use crate::{
     application::error::AppError,
     domain::{
-        entities::{Post, User},
+        entities::Post,
         repositories::{PostRepository, UserRepository},
         value_objects::PostContent,
     },
@@ -36,14 +36,14 @@ impl CreatePostUseCase {
         let user = match self.user_repository.find_by_id(user_id).await? {
             Some(user) => user,
             None => {
-                return Err(AppError::UserNotFound);
+                return Err(AppError::not_found("User not found"));
             }
         };
 
         // Create new post
         let post = Post::new(user.id, post_content, image_url);
 
-        self.post_repository.save(&post).await?;
+        self.post_repository.create(&post).await?;
 
         Ok(true)
     }

@@ -4,24 +4,27 @@ import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { CREATE_POST } from '@/lib/graphql/mutations';
 import { GET_TIMELINE } from '@/lib/graphql/queries';
+import { useAuth } from '@/lib/auth-context';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 export function CreatePost() {
   const [content, setContent] = useState('');
+  const { userId } = useAuth();
   const [createPost, { loading }] = useMutation(CREATE_POST, {
     refetchQueries: [{ query: GET_TIMELINE, variables: { limit: 10 } }],
   });
 
   const handleSubmit = async () => {
-    if (!content.trim()) return;
+    if (!content.trim() || !userId) return;
 
     try {
       await createPost({
         variables: {
           content: content.trim(),
           imageUrl: null,
+          userId: userId,
         },
       });
 
