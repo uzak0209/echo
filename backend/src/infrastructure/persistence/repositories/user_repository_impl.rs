@@ -2,6 +2,7 @@ use crate::{
     domain::{
         entities::{DisplayName, User, UserId},
         repositories::UserRepository,
+        error::DomainError,
     },
     infrastructure::persistence::models::user,
 };
@@ -43,22 +44,19 @@ impl UserRepositoryImpl {
 
 #[async_trait]
 impl UserRepository for UserRepositoryImpl {
-    async fn find_by_id(
-        &self,
-        id: UserId,
-    ) -> Result<Option<User>, Box<dyn std::error::Error + Send + Sync>> {
+    async fn find_by_id(&self, id: UserId) -> Result<Option<User>, DomainError> {
         let model = user::Entity::find_by_id(id.0).one(&self.db).await?;
 
         Ok(model.map(Self::model_to_entity))
     }
 
-    async fn find_all(&self) -> Result<Vec<User>, Box<dyn std::error::Error + Send + Sync>> {
+    async fn find_all(&self) -> Result<Vec<User>, DomainError> {
         let models = user::Entity::find().all(&self.db).await?;
 
         Ok(models.into_iter().map(Self::model_to_entity).collect())
     }
 
-    async fn save(&self, user: &User) -> Result<UserId, Box<dyn std::error::Error + Send + Sync>> {
+    async fn save(&self, user: &User) -> Result<UserId, DomainError> {
         let active_model = Self::entity_to_active_model(user);
 
         let result = if user.id.0 == 0 {
@@ -70,7 +68,7 @@ impl UserRepository for UserRepositoryImpl {
         Ok(UserId(result.id))
     }
 
-    async fn get_random(&self) -> Result<Option<User>, Box<dyn std::error::Error + Send + Sync>> {
+    async fn get_random(&self) -> Result<Option<User>, DomainError> {
         let users = self.find_all().await?;
 
         if users.is_empty() {

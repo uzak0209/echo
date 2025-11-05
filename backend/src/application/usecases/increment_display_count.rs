@@ -1,7 +1,10 @@
 use std::sync::Arc;
-use crate::domain::{
-    entities::PostId,
-    repositories::PostRepository,
+use crate::{
+    domain::{
+        entities::PostId,
+        repositories::PostRepository,
+    },
+    application::error::AppError,
 };
 
 pub struct IncrementDisplayCountUseCase {
@@ -13,7 +16,7 @@ impl IncrementDisplayCountUseCase {
         Self { post_repository }
     }
 
-    pub async fn execute(&self, post_id: i32) -> Result<bool, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn execute(&self, post_id: i32) -> Result<bool, AppError> {
         let post_id = PostId(post_id);
 
         if let Some(mut post) = self.post_repository.find_by_id(post_id).await? {

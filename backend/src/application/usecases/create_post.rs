@@ -1,8 +1,11 @@
 use std::sync::Arc;
-use crate::domain::{
-    entities::{Post, PostContent, PostId},
-    repositories::{PostRepository, UserRepository},
-    services::RandomUserService,
+use crate::{
+    domain::{
+        entities::{Post, PostContent, PostId},
+        repositories::{PostRepository, UserRepository},
+        services::RandomUserService,
+    },
+    application::error::AppError,
 };
 
 pub struct CreatePostUseCase {
@@ -25,7 +28,7 @@ impl CreatePostUseCase {
         &self,
         content: String,
         image_url: Option<String>,
-    ) -> Result<bool, Box<dyn std::error::Error + Send + Sync>> {
+    ) -> Result<bool, AppError> {
         // Validate content
         let post_content = PostContent::new(content)?;
 
@@ -38,7 +41,7 @@ impl CreatePostUseCase {
                 self.user_repository
                     .find_by_id(user_id)
                     .await?
-                    .ok_or("Failed to create user")?
+                    .ok_or_else(|| AppError::internal("Failed to create user"))?
             }
         };
 

@@ -4,6 +4,7 @@ use crate::{
     domain::{
         entities::{Post, PostId, PostContent, DisplayCount},
         repositories::PostRepository,
+        error::DomainError,
     },
     infrastructure::persistence::models::post,
 };
@@ -17,7 +18,7 @@ impl PostRepositoryImpl {
         Self { db }
     }
 
-    fn model_to_entity(model: post::Model) -> Result<Post, Box<dyn std::error::Error + Send + Sync>> {
+    fn model_to_entity(model: post::Model) -> Result<Post, DomainError> {
         Ok(Post {
             id: PostId(model.id),
             user_id: model.user_id,
@@ -52,7 +53,7 @@ impl From<i32> for DisplayCount {
 
 #[async_trait]
 impl PostRepository for PostRepositoryImpl {
-    async fn find_by_id(&self, id: PostId) -> Result<Option<Post>, Box<dyn std::error::Error + Send + Sync>> {
+    async fn find_by_id(&self, id: PostId) -> Result<Option<Post>, DomainError> {
         let model = post::Entity::find_by_id(id.0).one(&self.db).await?;
 
         match model {
@@ -61,7 +62,7 @@ impl PostRepository for PostRepositoryImpl {
         }
     }
 
-    async fn find_all(&self) -> Result<Vec<Post>, Box<dyn std::error::Error + Send + Sync>> {
+    async fn find_all(&self) -> Result<Vec<Post>, DomainError> {
         let models = post::Entity::find().all(&self.db).await?;
 
         models
@@ -70,7 +71,7 @@ impl PostRepository for PostRepositoryImpl {
             .collect()
     }
 
-    async fn find_available(&self, limit: usize) -> Result<Vec<Post>, Box<dyn std::error::Error + Send + Sync>> {
+    async fn find_available(&self, limit: usize) -> Result<Vec<Post>, DomainError> {
         let models = post::Entity::find()
             .filter(post::Column::DisplayCount.lt(10))
             .all(&self.db)
@@ -84,7 +85,7 @@ impl PostRepository for PostRepositoryImpl {
         Ok(posts.into_iter().take(limit).collect())
     }
 
-    async fn save(&self, post: &Post) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    async fn save(&self, post: &Post) -> Result<(), DomainError> {
         let active_model = Self::entity_to_active_model(post);
 
         if post.id.0 == 0 {
@@ -96,7 +97,7 @@ impl PostRepository for PostRepositoryImpl {
         Ok(())
     }
 
-    async fn delete(&self, id: PostId) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    async fn delete(&self, id: PostId) -> Result<(), DomainError> {
         post::Entity::delete_by_id(id.0).exec(&self.db).await?;
         Ok(())
     }

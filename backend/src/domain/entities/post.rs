@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use crate::domain::error::ValidationError;
 
 /// Post domain entity
 #[derive(Debug, Clone)]
@@ -18,12 +19,15 @@ pub struct PostId(pub i32);
 pub struct PostContent(String);
 
 impl PostContent {
-    pub fn new(content: String) -> Result<Self, String> {
+    pub fn new(content: String) -> Result<Self, ValidationError> {
         if content.is_empty() {
-            return Err("Content cannot be empty".to_string());
+            return Err(ValidationError::EmptyContent);
         }
         if content.len() > 1000 {
-            return Err("Content too long (max 1000 characters)".to_string());
+            return Err(ValidationError::ContentTooLong {
+                max: 1000,
+                actual: content.len(),
+            });
         }
         Ok(Self(content))
     }

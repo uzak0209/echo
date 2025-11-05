@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use rand::seq::SliceRandom;
 use crate::{
-    application::dto::PostDto,
+    application::{dto::PostDto, error::AppError},
     domain::repositories::PostRepository,
 };
 
@@ -14,7 +14,7 @@ impl GetTimelineUseCase {
         Self { post_repository }
     }
 
-    pub async fn execute(&self, limit: usize) -> Result<Vec<PostDto>, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn execute(&self, limit: usize) -> Result<Vec<PostDto>, AppError> {
         // Get available posts (display_count < 10)
         let mut posts = self.post_repository.find_available(limit).await?;
 
