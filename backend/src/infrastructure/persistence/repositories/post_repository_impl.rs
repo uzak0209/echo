@@ -60,12 +60,6 @@ impl PostRepository for PostRepositoryImpl {
         }
     }
 
-    async fn find_all(&self) -> Result<Vec<Post>, DomainError> {
-        let models = post::Entity::find().all(&self.db).await?;
-
-        models.into_iter().map(Self::model_to_entity).collect()
-    }
-
     async fn find_available(&self, limit: usize) -> Result<Vec<Post>, DomainError> {
         let models = post::Entity::find()
             .filter(post::Column::DisplayCount.lt(10))
@@ -78,14 +72,6 @@ impl PostRepository for PostRepositoryImpl {
             .collect::<Result<Vec<_>, _>>()?;
 
         Ok(posts.into_iter().take(limit).collect())
-    }
-
-    async fn save(&self, post: &Post) -> Result<(), DomainError> {
-        let active_model = Self::entity_to_active_model(post);
-
-        active_model.update(&self.db).await?;
-
-        Ok(())
     }
 
     async fn delete(&self, id: Uuid) -> Result<(), DomainError> {

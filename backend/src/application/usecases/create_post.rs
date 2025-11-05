@@ -1,7 +1,7 @@
 use crate::{
     application::error::AppError,
     domain::{
-        entities::Post,
+        entities::{Post, User},
         repositories::{PostRepository, UserRepository},
         value_objects::PostContent,
     },
@@ -28,20 +28,15 @@ impl CreatePostUseCase {
         &self,
         content: String,
         image_url: Option<String>,
+        user_id: uuid::Uuid,
     ) -> Result<bool, AppError> {
         // Validate content
         let post_content = PostContent::new(content)?;
 
-        // Get or create random user
-        let user = match self.user_repository.get_random().await? {
+        let user = match self.user_repository.find_by_id(user_id).await? {
             Some(user) => user,
             None => {
-                let new_user = RandomUserService::generate_random_user();
-                let user_id = self.user_repository.save(&new_user).await?;
-                self.user_repository
-                    .find_by_id(user_id)
-                    .await?
-                    .ok_or_else(|| AppError::internal("Failed to create user"))?
+                return Err(AppError::UserNotFound);
             }
         };
 

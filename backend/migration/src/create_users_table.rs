@@ -15,6 +15,12 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Users::DisplayName).string().not_null())
                     .col(ColumnDef::new(Users::AvatarUrl).string().not_null())
                     .col(
+                        ColumnDef::new(Users::Valid)
+                            .boolean()
+                            .not_null()
+                            .default(true),
+                    )
+                    .col(
                         ColumnDef::new(Users::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null()
@@ -39,4 +45,5 @@ enum Users {
     DisplayName,
     AvatarUrl,
     CreatedAt,
+    Valid,
 }

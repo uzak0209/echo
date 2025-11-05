@@ -7,4 +7,6 @@ pub trait PostRepository: Send + Sync {
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Post>, DomainError>;
     async fn find_available(&self, limit: usize) -> Result<Vec<Post>, DomainError>;
     async fn create(&self, post: &Post) -> Result<Post, DomainError>;
+    async fn increment_display_count(&self, id: Uuid) -> Result<Post, DomainError>;
+    async fn delete(&self, id: Uuid) -> Result<(), DomainError>;
 }

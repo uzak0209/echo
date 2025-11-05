@@ -16,6 +16,12 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Posts::Content).string().not_null())
                     .col(ColumnDef::new(Posts::ImageUrl).string())
                     .col(
+                        ColumnDef::new(Posts::Valid)
+                            .boolean()
+                            .not_null()
+                            .default(true),
+                    )
+                    .col(
                         ColumnDef::new(Posts::DisplayCount)
                             .integer()
                             .not_null()
@@ -55,6 +61,7 @@ enum Posts {
     ImageUrl,
     DisplayCount,
     CreatedAt,
+    Valid,
 }
 
 #[derive(DeriveIden)]
