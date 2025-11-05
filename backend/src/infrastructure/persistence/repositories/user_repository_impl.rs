@@ -1,6 +1,7 @@
 use crate::{
     domain::{
-        entities::{DisplayName, User, UserId},
+        entities::{User, UserId},
+        value_objects::DisplayName,
         repositories::UserRepository,
         error::DomainError,
     },

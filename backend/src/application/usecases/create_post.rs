@@ -1,7 +1,8 @@
 use std::sync::Arc;
 use crate::{
     domain::{
-        entities::{Post, PostContent, PostId},
+        entities::{Post, PostId},
+        value_objects::PostContent,
         repositories::{PostRepository, UserRepository},
         services::RandomUserService,
     },

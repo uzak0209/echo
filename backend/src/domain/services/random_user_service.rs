@@ -1,4 +1,5 @@
-use crate::domain::entities::{DisplayName, User, UserId};
+use crate::domain::entities::{User, UserId};
+use crate::domain::value_objects::DisplayName;
 use rand::Rng;
 
 /// Domain service for generating random users

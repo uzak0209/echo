@@ -2,7 +2,8 @@ use async_trait::async_trait;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, QueryFilter, ColumnTrait, Set};
 use crate::{
     domain::{
-        entities::{Post, PostId, PostContent, DisplayCount},
+        entities::{Post, PostId},
+        value_objects::{PostContent, DisplayCount},
         repositories::PostRepository,
         error::DomainError,
     },
