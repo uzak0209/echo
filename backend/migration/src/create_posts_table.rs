@@ -11,13 +11,7 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Posts::Table)
                     .if_not_exists()
-                    .col(
-                        ColumnDef::new(Posts::Id)
-                            .integer()
-                            .not_null()
-                            .auto_increment()
-                            .primary_key(),
-                    )
+                    .col(ColumnDef::new(Posts::Id).not_null().uuid().primary_key())
                     .col(ColumnDef::new(Posts::UserId).integer().not_null())
                     .col(ColumnDef::new(Posts::Content).string().not_null())
                     .col(ColumnDef::new(Posts::ImageUrl).string())

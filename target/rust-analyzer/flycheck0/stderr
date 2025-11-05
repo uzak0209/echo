@@ -1,50 +1,12 @@
-   0.124637375s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint: fingerprint error for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: false }/TargetInner { name: "echo-backend", doc: true, ..: with_path("/Users/uzak/Projects/echo/backend/src/main.rs", Edition2021) }
-   0.124653084s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-373bebc4c1d57a41/bin-echo-backend`
-
-Caused by:
-    No such file or directory (os error 2)
-
-Stack backtrace:
-   0: std::backtrace::Backtrace::create
-   1: cargo_util::paths::read_bytes
-   2: cargo_util::paths::read
-   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
-   4: cargo::core::compiler::fingerprint::prepare_target
-   5: cargo::core::compiler::compile
-   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
-   7: cargo::ops::cargo_compile::compile_ws
-   8: cargo::ops::cargo_compile::compile_with_exec
-   9: cargo::ops::cargo_compile::compile
-  10: cargo::commands::check::exec
-  11: <cargo::cli::Exec>::exec
-  12: cargo::main
-  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
-  14: std::rt::lang_start::<()>::{closure#0}
-  15: std::rt::lang_start_internal
-  16: _main
-   0.134709625s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint: fingerprint error for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: true }/TargetInner { name: "echo-backend", doc: true, ..: with_path("/Users/uzak/Projects/echo/backend/src/main.rs", Edition2021) }
-   0.134716292s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-d6a377d7be7f9c4e/test-bin-echo-backend`
-
-Caused by:
-    No such file or directory (os error 2)
-
-Stack backtrace:
-   0: std::backtrace::Backtrace::create
-   1: cargo_util::paths::read_bytes
-   2: cargo_util::paths::read
-   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
-   4: cargo::core::compiler::fingerprint::prepare_target
-   5: cargo::core::compiler::compile
-   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
-   7: cargo::ops::cargo_compile::compile_ws
-   8: cargo::ops::cargo_compile::compile_with_exec
-   9: cargo::ops::cargo_compile::compile
-  10: cargo::commands::check::exec
-  11: <cargo::cli::Exec>::exec
-  12: cargo::main
-  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
-  14: std::rt::lang_start::<()>::{closure#0}
-  15: std::rt::lang_start_internal
-  16: _main
-    Checking echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.56s
+   0.068744584s  INFO prepare_target{force=false package_id=migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration) target="migration"}: cargo::core::compiler::fingerprint: stale: changed "/Users/uzak/Projects/echo/backend/migration/src/main.rs"
+   0.068759209s  INFO prepare_target{force=false package_id=migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration) target="migration"}: cargo::core::compiler::fingerprint:           (vs) "/Users/uzak/Projects/echo/backend/migration/target/debug/.fingerprint/migration-ee72ba1ecb68a304/dep-bin-migration"
+   0.068761834s  INFO prepare_target{force=false package_id=migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration) target="migration"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1762307016, nanos: 185192856 } < FileTime { seconds: 1762307018, nanos: 796473190 }
+   0.068790042s  INFO prepare_target{force=false package_id=migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration) target="migration"}: cargo::core::compiler::fingerprint: fingerprint dirty for migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration)/Check { test: false }/TargetInner { name: "migration", doc: true, ..: with_path("/Users/uzak/Projects/echo/backend/migration/src/main.rs", Edition2021) }
+   0.068794500s  INFO prepare_target{force=false package_id=migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration) target="migration"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/Users/uzak/Projects/echo/backend/migration/target/debug/.fingerprint/migration-ee72ba1ecb68a304/dep-bin-migration", reference_mtime: FileTime { seconds: 1762307016, nanos: 185192856 }, stale: "/Users/uzak/Projects/echo/backend/migration/src/main.rs", stale_mtime: FileTime { seconds: 1762307018, nanos: 796473190 } }))
+   0.069140084s  INFO prepare_target{force=false package_id=migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration) target="migration"}: cargo::core::compiler::fingerprint: stale: changed "/Users/uzak/Projects/echo/backend/migration/src/main.rs"
+   0.069142334s  INFO prepare_target{force=false package_id=migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration) target="migration"}: cargo::core::compiler::fingerprint:           (vs) "/Users/uzak/Projects/echo/backend/migration/target/debug/.fingerprint/migration-cbbe758fa6cc67a2/dep-test-bin-migration"
+   0.069143667s  INFO prepare_target{force=false package_id=migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration) target="migration"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1762307016, nanos: 185201231 } < FileTime { seconds: 1762307018, nanos: 796473190 }
+   0.069164084s  INFO prepare_target{force=false package_id=migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration) target="migration"}: cargo::core::compiler::fingerprint: fingerprint dirty for migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration)/Check { test: true }/TargetInner { name: "migration", doc: true, ..: with_path("/Users/uzak/Projects/echo/backend/migration/src/main.rs", Edition2021) }
+   0.069166750s  INFO prepare_target{force=false package_id=migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration) target="migration"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/Users/uzak/Projects/echo/backend/migration/target/debug/.fingerprint/migration-cbbe758fa6cc67a2/dep-test-bin-migration", reference_mtime: FileTime { seconds: 1762307016, nanos: 185201231 }, stale: "/Users/uzak/Projects/echo/backend/migration/src/main.rs", stale_mtime: FileTime { seconds: 1762307018, nanos: 796473190 } }))
+    Checking migration v0.1.0 (/Users/uzak/Projects/echo/backend/migration)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s
