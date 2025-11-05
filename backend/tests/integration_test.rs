@@ -1,11 +1,13 @@
+use async_trait::async_trait;
 use echo_backend::application::error::AppError;
-use echo_backend::application::usecases::{CreatePostUseCase, GetTimelineUseCase, IncrementDisplayCountUseCase};
+use echo_backend::application::usecases::{
+    CreatePostUseCase, GetTimelineUseCase, IncrementDisplayCountUseCase,
+};
 use echo_backend::domain::entities::post::{Post, PostId};
 use echo_backend::domain::entities::user::UserId;
 use echo_backend::domain::error::DomainError;
 use echo_backend::domain::repositories::{PostRepository, UserRepository};
 use echo_backend::domain::value_objects::{DisplayCount, DisplayName, PostContent};
-use async_trait::async_trait;
 use rstest::*;
 use std::sync::{Arc, Mutex};
 
@@ -91,19 +93,29 @@ struct MockUserRepository;
 
 #[async_trait]
 impl UserRepository for MockUserRepository {
-    async fn find_by_id(&self, _id: UserId) -> Result<Option<echo_backend::domain::entities::user::User>, DomainError> {
+    async fn find_by_id(
+        &self,
+        _id: UserId,
+    ) -> Result<Option<echo_backend::domain::entities::user::User>, DomainError> {
         Ok(None)
     }
 
-    async fn find_all(&self) -> Result<Vec<echo_backend::domain::entities::user::User>, DomainError> {
+    async fn find_all(
+        &self,
+    ) -> Result<Vec<echo_backend::domain::entities::user::User>, DomainError> {
         Ok(vec![])
     }
 
-    async fn save(&self, _user: &echo_backend::domain::entities::user::User) -> Result<UserId, DomainError> {
+    async fn save(
+        &self,
+        _user: &echo_backend::domain::entities::user::User,
+    ) -> Result<UserId, DomainError> {
         Ok(UserId(1))
     }
 
-    async fn get_random(&self) -> Result<Option<echo_backend::domain::entities::user::User>, DomainError> {
+    async fn get_random(
+        &self,
+    ) -> Result<Option<echo_backend::domain::entities::user::User>, DomainError> {
         use echo_backend::domain::entities::user::User;
 
         Ok(Some(User::new(
@@ -166,7 +178,10 @@ async fn test_create_post_with_image(
 
     let posts = mock_post_repo.find_all().await.unwrap();
     assert_eq!(posts.len(), 1);
-    assert_eq!(posts[0].image_url, Some("https://example.com/image.jpg".to_string()));
+    assert_eq!(
+        posts[0].image_url,
+        Some("https://example.com/image.jpg".to_string())
+    );
 }
 
 #[rstest]
@@ -218,9 +233,18 @@ async fn test_get_timeline_with_posts(
     // Create some posts first
     let create_use_case = CreatePostUseCase::new(mock_post_repo.clone(), mock_user_repo);
 
-    create_use_case.execute("Post 1".to_string(), None).await.unwrap();
-    create_use_case.execute("Post 2".to_string(), None).await.unwrap();
-    create_use_case.execute("Post 3".to_string(), None).await.unwrap();
+    create_use_case
+        .execute("Post 1".to_string(), None)
+        .await
+        .unwrap();
+    create_use_case
+        .execute("Post 2".to_string(), None)
+        .await
+        .unwrap();
+    create_use_case
+        .execute("Post 3".to_string(), None)
+        .await
+        .unwrap();
 
     let get_timeline_use_case = GetTimelineUseCase::new(mock_post_repo);
     let result = get_timeline_use_case.execute(10).await;
@@ -262,7 +286,10 @@ async fn test_increment_display_count_success(
 ) {
     // Create a post first
     let create_use_case = CreatePostUseCase::new(mock_post_repo.clone(), mock_user_repo);
-    create_use_case.execute("Test post".to_string(), None).await.unwrap();
+    create_use_case
+        .execute("Test post".to_string(), None)
+        .await
+        .unwrap();
 
     let posts = mock_post_repo.find_all().await.unwrap();
     let post_id = posts[0].id;
@@ -286,7 +313,10 @@ async fn test_increment_display_count_deletes_after_10(
     mock_user_repo: Arc<dyn UserRepository>,
 ) {
     let create_use_case = CreatePostUseCase::new(mock_post_repo.clone(), mock_user_repo);
-    create_use_case.execute("Test post".to_string(), None).await.unwrap();
+    create_use_case
+        .execute("Test post".to_string(), None)
+        .await
+        .unwrap();
 
     let posts = mock_post_repo.find_all().await.unwrap();
     let post_id = posts[0].id;

@@ -6,9 +6,11 @@ import { useMutation } from '@apollo/client';
 import { INCREMENT_DISPLAY_COUNT } from '@/lib/graphql/mutations';
 
 interface Post {
-  id: number;
+  id: string;
   content: string;
   imageUrl?: string | null;
+  authorName: string;
+  authorAvatar: string;
 }
 
 interface PostCardProps {
@@ -28,6 +30,14 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <Card className="w-full">
       <CardContent className="pt-6">
+        <div className="flex items-center gap-3 mb-4">
+          <img
+            src={post.authorAvatar}
+            alt={post.authorName}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <span className="font-semibold text-sm">{post.authorName}</span>
+        </div>
         {post.imageUrl && (
           <img
             src={post.imageUrl}

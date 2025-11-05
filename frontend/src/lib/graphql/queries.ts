@@ -6,6 +6,8 @@ export const GET_TIMELINE = gql`
       id
       content
       imageUrl
+      authorName
+      authorAvatar
     }
   }
 `;

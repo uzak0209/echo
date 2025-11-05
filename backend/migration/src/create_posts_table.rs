@@ -12,7 +12,7 @@ impl MigrationTrait for Migration {
                     .table(Posts::Table)
                     .if_not_exists()
                     .col(ColumnDef::new(Posts::Id).not_null().uuid().primary_key())
-                    .col(ColumnDef::new(Posts::UserId).integer().not_null())
+                    .col(ColumnDef::new(Posts::UserId).uuid().not_null())
                     .col(ColumnDef::new(Posts::Content).string().not_null())
                     .col(ColumnDef::new(Posts::ImageUrl).string())
                     .col(

@@ -6,9 +6,11 @@ import { PostCard } from './PostCard';
 import { Button } from './ui/button';
 
 interface Post {
-  id: number;
+  id: string;
   content: string;
   imageUrl?: string | null;
+  authorName: string;
+  authorAvatar: string;
 }
 
 export function Timeline() {

@@ -8,6 +8,8 @@ pub struct Post {
     pub id: String,
     pub content: String,
     pub image_url: Option<String>,
+    pub author_name: String,
+    pub author_avatar: String,
 }
 
 impl From<PostDto> for Post {
@@ -16,6 +18,8 @@ impl From<PostDto> for Post {
             id: dto.id.to_string(),
             content: dto.content,
             image_url: dto.image_url,
+            author_name: dto.author_name,
+            author_avatar: dto.author_avatar,
         }
     }
 }

@@ -27,7 +27,7 @@ pub fn build_schema(db: DatabaseConnection, jwt_secret: String) -> AppSchema {
     let user_repo = Arc::new(UserRepositoryImpl::new(db.clone()));
 
     // Create use cases
-    let get_timeline_use_case = Arc::new(GetTimelineUseCase::new(post_repo.clone()));
+    let get_timeline_use_case = Arc::new(GetTimelineUseCase::new(post_repo.clone(), user_repo.clone()));
     let create_post_use_case =
         Arc::new(CreatePostUseCase::new(post_repo.clone(), user_repo.clone()));
     let increment_display_count_use_case =
