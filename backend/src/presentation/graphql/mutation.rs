@@ -1,5 +1,5 @@
 use crate::application::usecases::{
-    CreatePostUseCase, CreateUserUseCase, IncrementDisplayCountUseCase, RefreshTokenUseCase,
+    CreatePostUseCase, CreateUserUseCase, EchoPostUseCase, IncrementDisplayCountUseCase, RefreshTokenUseCase,
 };
 use crate::presentation::graphql::types::{AuthResponse, RefreshResponse};
 use async_graphql::{Context, Object, Result};
@@ -63,6 +63,18 @@ impl MutationRoot {
 
     async fn increment_display_count(&self, ctx: &Context<'_>, post_id: String) -> Result<bool> {
         let use_case = ctx.data::<Arc<IncrementDisplayCountUseCase>>()?;
+
+        // Parse incoming string to UUID before handing to the application layer
+        let post_uuid = Uuid::parse_str(&post_id)
+            .map_err(|e| async_graphql::Error::new(format!("Invalid UUID: {}", e)))?;
+
+        use_case.execute(post_uuid).await?;
+
+        Ok(true)
+    }
+
+    async fn echo_post(&self, ctx: &Context<'_>, post_id: String) -> Result<bool> {
+        let use_case = ctx.data::<Arc<EchoPostUseCase>>()?;
 
         // Parse incoming string to UUID before handing to the application layer
         let post_uuid = Uuid::parse_str(&post_id)

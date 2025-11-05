@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use rand::seq::SliceRandom;
+use uuid::Uuid;
 use crate::{
     application::{dto::PostDto, error::AppError},
     domain::repositories::{PostRepository, UserRepository},
@@ -21,9 +22,9 @@ impl GetTimelineUseCase {
         }
     }
 
-    pub async fn execute(&self, limit: usize) -> Result<Vec<PostDto>, AppError> {
-        // Get available posts (display_count < 10)
-        let mut posts = self.post_repository.find_available(limit).await?;
+    pub async fn execute(&self, limit: usize, exclude_user_id: Option<Uuid>) -> Result<Vec<PostDto>, AppError> {
+        // Get available posts (display_count < 10), excluding own posts
+        let mut posts = self.post_repository.find_available(limit, exclude_user_id).await?;
 
         // Shuffle randomly
         let mut rng = rand::thread_rng();

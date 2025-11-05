@@ -10,6 +10,7 @@ pub struct Post {
     pub content: PostContent,
     pub image_url: Option<String>,
     pub display_count: DisplayCount,
+    pub echo_count: i32,
     pub created_at: DateTime<Utc>,
 }
 
@@ -21,6 +22,7 @@ impl Post {
             content,
             image_url,
             display_count: DisplayCount::new(),
+            echo_count: 0,
             created_at: Utc::now(),
         }
     }

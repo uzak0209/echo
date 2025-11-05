@@ -1,6 +1,6 @@
 use crate::{
     application::error::AppError,
-    domain::repositories::UserRepository,
+    domain::{repositories::UserRepository, services::PersonaGenerator},
     infrastructure::auth::JwtService,
 };
 use std::sync::Arc;
@@ -30,10 +30,13 @@ impl CreateUserUseCase {
         display_name: String,
         avatar_url: Option<String>,
     ) -> Result<AuthTokens, AppError> {
+        // Generate random avatar if not provided
+        let final_avatar_url = avatar_url.unwrap_or_else(|| PersonaGenerator::generate_avatar());
+
         // Create new user
         let user = self
             .user_repository
-            .create_user(display_name, avatar_url)
+            .create_user(display_name, Some(final_avatar_url))
             .await?;
 
         // Generate tokens
