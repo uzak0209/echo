@@ -137,8 +137,6 @@ impl ReactionRepository for ReactionRepositoryImpl {
         use crate::infrastructure::persistence::models::post;
         use sea_orm::JoinType;
 
-        // Join reactions with posts to find reactions on posts by this user
-        // Then get the most recent one
         let model = reaction::Entity::find()
             .join(JoinType::InnerJoin, reaction::Relation::Post.def())
             .filter(post::Column::UserId.eq(user_id))

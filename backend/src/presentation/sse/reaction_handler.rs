@@ -1,9 +1,11 @@
 use axum::{
     extract::State,
     http::{header, HeaderMap, StatusCode},
-    response::{sse::{Event, KeepAlive, Sse}, IntoResponse, Response},
+    response::{
+        sse::{Event, KeepAlive, Sse},
+        IntoResponse, Response,
+    },
 };
-use futures::stream::Stream;
 use std::convert::Infallible;
 use std::sync::Arc;
 use tokio_stream::wrappers::BroadcastStream;
@@ -12,19 +14,15 @@ use uuid::Uuid;
 
 use crate::infrastructure::{auth::JwtService, sse::ReactionStreamManager};
 
-/// ヘッダーからユーザーIDを抽出して検証
 fn extract_user_id(headers: &HeaderMap, jwt_service: &JwtService) -> Result<Uuid, Response> {
-    // Method 1: Authorization header (for Fetch API)
     if let Some(auth_header) = headers.get(header::AUTHORIZATION) {
         return extract_from_bearer_token(auth_header, jwt_service);
     }
 
-    // Method 2: Cookie with refresh token (for standard EventSource)
     if let Some(cookie_header) = headers.get(header::COOKIE) {
         return extract_from_cookie(cookie_header, jwt_service);
     }
 
-    // No authentication method provided
     Err((
         StatusCode::UNAUTHORIZED,
         "Missing authentication (Authorization header or refresh_token cookie)",
@@ -73,7 +71,9 @@ fn extract_from_cookie(
 
     let claims = jwt_service
         .verify_refresh_token(refresh_token)
-        .map_err(|_| (StatusCode::UNAUTHORIZED, "Invalid or expired refresh token").into_response())?;
+        .map_err(|_| {
+            (StatusCode::UNAUTHORIZED, "Invalid or expired refresh token").into_response()
+        })?;
 
     Uuid::parse_str(&claims.sub)
         .map_err(|_| (StatusCode::UNAUTHORIZED, "Invalid user ID in refresh token").into_response())
@@ -101,17 +101,21 @@ pub async fn reaction_events_handler(
     let stream = BroadcastStream::new(receiver);
 
     // Map events to SSE format
-    let sse_stream = stream.map(|result| {
-        match result {
-            Ok(event) => {
-                // Serialize event to JSON
-                serde_json::to_string(&event).ok().map(|json| {
-                    Ok::<_, Infallible>(Event::default().data(json))
-                })
+    let sse_stream = stream
+        .map(|result| {
+            match result {
+                Ok(event) => {
+                    // Serialize event to JSON
+                    serde_json::to_string(&event)
+                        .ok()
+                        .map(|json| Ok::<_, Infallible>(Event::default().data(json)))
+                }
+                Err(_) => None, // Ignore lagged messages
             }
-            Err(_) => None, // Ignore lagged messages
-        }
-    }).filter_map(|opt| opt);
+        })
+        .filter_map(|opt| opt);
 
-    Sse::new(sse_stream).keep_alive(KeepAlive::default()).into_response()
+    Sse::new(sse_stream)
+        .keep_alive(KeepAlive::default())
+        .into_response()
 }

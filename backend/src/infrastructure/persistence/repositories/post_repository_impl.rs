@@ -81,19 +81,6 @@ impl PostRepository for PostRepositoryImpl {
         Ok(posts.into_iter().take(limit).collect())
     }
 
-    async fn find_by_user_id(&self, user_id: Uuid) -> Result<Vec<Post>, DomainError> {
-        let models = post::Entity::find()
-            .filter(post::Column::UserId.eq(user_id))
-            .filter(post::Column::Valid.eq(true))
-            .all(&self.db)
-            .await?;
-
-        models
-            .into_iter()
-            .map(Self::model_to_entity)
-            .collect::<Result<Vec<_>, _>>()
-    }
-
     async fn create(&self, post: &Post) -> Result<Post, DomainError> {
         let active_model = Self::entity_to_active_model(post);
         let result = active_model.insert(&self.db).await?;
@@ -117,10 +104,5 @@ impl PostRepository for PostRepositoryImpl {
 
         let updated = active_model.update(&self.db).await?;
         Self::model_to_entity(updated)
-    }
-
-    async fn delete(&self, id: Uuid) -> Result<(), DomainError> {
-        post::Entity::delete_by_id(id).exec(&self.db).await?;
-        Ok(())
     }
 }

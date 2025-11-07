@@ -68,9 +68,6 @@ impl MutationRoot {
 
         let refreshed_tokens = use_case.execute(refresh_token).await?;
 
-        // Store new refresh token in context for HTTP layer to set as cookie
-        ctx.insert_http_header("X-Refresh-Token", refreshed_tokens.refresh_token.clone());
-
         Ok(refreshed_tokens.into())
     }
 
