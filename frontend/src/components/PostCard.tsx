@@ -1,9 +1,12 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { INCREMENT_DISPLAY_COUNT } from '@/lib/graphql/mutations';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ADD_REACTION, REMOVE_REACTION } from '@/lib/graphql/mutations';
+import { ReactionType, REACTION_EMOJIS } from '@/lib/types/reaction';
+import { useAuth } from '@/lib/auth-context';
 
 interface Post {
   id: string;
@@ -18,14 +21,46 @@ interface PostCardProps {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const [incrementDisplayCount] = useMutation(INCREMENT_DISPLAY_COUNT);
+  const { userId } = useAuth();
+  const [selectedReaction, setSelectedReaction] = useState<ReactionType | null>(null);
+  const [addReaction] = useMutation(ADD_REACTION);
+  const [removeReaction] = useMutation(REMOVE_REACTION);
 
-  useEffect(() => {
-    // Increment display count when post is viewed
-    incrementDisplayCount({
-      variables: { postId: post.id },
-    });
-  }, [post.id, incrementDisplayCount]);
+  const handleReactionClick = async (reactionType: ReactionType) => {
+    if (!userId) {
+      console.error('User not authenticated');
+      return;
+    }
+
+    try {
+      if (selectedReaction === reactionType) {
+        // Remove reaction if clicking the same button
+        await removeReaction({
+          variables: {
+            postId: post.id,
+            userId,
+            reactionType,
+          },
+        });
+        setSelectedReaction(null);
+      } else {
+        // Add new reaction (backend handles removing old one if exists)
+        await addReaction({
+          variables: {
+            postId: post.id,
+            userId,
+            reactionType,
+          },
+        });
+        setSelectedReaction(reactionType);
+      }
+    } catch (error) {
+      console.error('Failed to update reaction:', error);
+    }
+  };
+
+  // Note: Display count is automatically incremented on the backend
+  // when the timeline is fetched, so no need to increment here
 
   return (
     <Card className="w-full">
@@ -45,7 +80,22 @@ export function PostCard({ post }: PostCardProps) {
             className="w-full h-48 object-cover rounded-md mb-4"
           />
         )}
-        <p className="text-base">{post.content}</p>
+        <p className="text-base mb-4">{post.content}</p>
+
+        {/* Reaction Buttons */}
+        <div className="flex gap-2 flex-wrap">
+          {Object.values(ReactionType).map((reactionType) => (
+            <Button
+              key={reactionType}
+              variant={selectedReaction === reactionType ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleReactionClick(reactionType)}
+              className="text-lg"
+            >
+              {REACTION_EMOJIS[reactionType]}
+            </Button>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

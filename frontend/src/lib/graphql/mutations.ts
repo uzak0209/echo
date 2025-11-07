@@ -28,3 +28,15 @@ export const INCREMENT_DISPLAY_COUNT = gql`
     incrementDisplayCount(postId: $postId)
   }
 `;
+
+export const ADD_REACTION = gql`
+  mutation AddReaction($postId: String!, $userId: String!, $reactionType: ReactionTypeGql!) {
+    addReaction(postId: $postId, userId: $userId, reactionType: $reactionType)
+  }
+`;
+
+export const REMOVE_REACTION = gql`
+  mutation RemoveReaction($postId: String!, $userId: String!, $reactionType: ReactionTypeGql!) {
+    removeReaction(postId: $postId, userId: $userId, reactionType: $reactionType)
+  }
+`;

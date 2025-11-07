@@ -5,6 +5,8 @@ import { CreatePost } from '@/components/CreatePost';
 import { Timeline } from '@/components/Timeline';
 import { Login } from '@/components/Login';
 import { Button } from '@/components/ui/button';
+import { ReactionNotification } from '@/components/ReactionNotification';
+import { UserProfile } from '@/components/UserProfile';
 
 export default function Home() {
   const { isAuthenticated, logout } = useAuth();
@@ -15,6 +17,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background">
+      {/* Real-time reaction notifications via SSE */}
+      <ReactionNotification />
+
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <header className="mb-8 flex justify-between items-start">
           <div>
@@ -29,6 +34,7 @@ export default function Home() {
         </header>
 
         <div className="space-y-8">
+          <UserProfile />
           <CreatePost />
           <Timeline />
         </div>

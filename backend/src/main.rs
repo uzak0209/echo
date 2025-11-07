@@ -13,12 +13,13 @@ use axum::{
     Router,
 };
 use sea_orm::{Database, DatabaseConnection};
-use std::env;
+use std::{env, sync::Arc};
 use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
 struct AppState {
     schema: presentation::graphql::schema::AppSchema,
+    stream_manager: Arc<infrastructure::sse::ReactionStreamManager>,
 }
 
 async fn graphql_handler(
@@ -89,10 +90,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Connect to database
     let db: DatabaseConnection = Database::connect(&database_url).await?;
 
-    // Build GraphQL schema (DI is handled inside build_schema)
-    let schema = presentation::build_schema(db, jwt_secret);
+    // Create SSE stream manager
+    let stream_manager = Arc::new(infrastructure::sse::ReactionStreamManager::new());
 
-    let state = AppState { schema };
+    // Create JWT service
+    let jwt_service = Arc::new(infrastructure::auth::JwtService::new(&jwt_secret));
+
+    // Build GraphQL schema (DI is handled inside build_schema)
+    let schema = presentation::build_schema(db, jwt_secret, stream_manager.clone());
+
+    let state = AppState {
+        schema,
+        stream_manager: stream_manager.clone(),
+    };
 
     // Configure CORS
     let cors = CorsLayer::new()
@@ -109,11 +119,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/graphql", post(graphql_handler))
         .route("/", get(graphql_playground))
-        .layer(cors)
-        .with_state(state);
+        .with_state(state.clone())
+        .route("/api/reactions/events",
+            get(presentation::sse::reaction_events_handler)
+                .with_state((stream_manager.clone(), jwt_service.clone())))
+        .layer(cors);
 
     println!("GraphQL Playground: http://localhost:{}", port);
     println!("GraphQL Endpoint: http://localhost:{}/graphql", port);
+    println!("SSE Endpoint: http://localhost:{}/api/reactions/events (requires Authorization: Bearer <token>)", port);
 
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
         .await?;

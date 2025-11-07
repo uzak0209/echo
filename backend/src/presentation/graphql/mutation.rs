@@ -1,7 +1,9 @@
 use crate::application::usecases::{
-    CreatePostUseCase, CreateUserUseCase, EchoPostUseCase, IncrementDisplayCountUseCase, RefreshTokenUseCase,
+    AddReactionUseCase, CreatePostUseCase, CreateUserUseCase, EchoPostUseCase,
+    IncrementDisplayCountUseCase, LoginUseCase, RefreshTokenUseCase, RemoveReactionUseCase,
+    SignupUseCase,
 };
-use crate::presentation::graphql::types::{AuthResponse, RefreshResponse};
+use crate::presentation::graphql::types::{AuthResponse, ReactionTypeGql, RefreshResponse};
 use async_graphql::{Context, Object, Result};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -11,6 +13,36 @@ pub struct MutationRoot;
 
 #[Object]
 impl MutationRoot {
+    async fn signup(
+        &self,
+        ctx: &Context<'_>,
+        email: String,
+        password: String,
+        display_name: String,
+        avatar_url: Option<String>,
+    ) -> Result<AuthResponse> {
+        let use_case = ctx.data::<Arc<SignupUseCase>>()?;
+
+        let tokens = use_case
+            .execute(email, password, display_name, avatar_url)
+            .await?;
+
+        // Store refresh token in context for HTTP layer to set as cookie
+        ctx.insert_http_header("X-Refresh-Token", tokens.refresh_token.clone());
+
+        Ok(tokens.into())
+    }
+
+    async fn login(&self, ctx: &Context<'_>, email: String, password: String) -> Result<AuthResponse> {
+        let use_case = ctx.data::<Arc<LoginUseCase>>()?;
+
+        let tokens = use_case.execute(email, password).await?;
+
+        // Store refresh token in context for HTTP layer to set as cookie
+        ctx.insert_http_header("X-Refresh-Token", tokens.refresh_token.clone());
+
+        Ok(tokens.into())
+    }
     async fn create_user(
         &self,
         ctx: &Context<'_>,
@@ -81,6 +113,50 @@ impl MutationRoot {
             .map_err(|e| async_graphql::Error::new(format!("Invalid UUID: {}", e)))?;
 
         use_case.execute(post_uuid).await?;
+
+        Ok(true)
+    }
+
+    async fn add_reaction(
+        &self,
+        ctx: &Context<'_>,
+        post_id: String,
+        user_id: String,
+        reaction_type: ReactionTypeGql,
+    ) -> Result<bool> {
+        let use_case = ctx.data::<Arc<AddReactionUseCase>>()?;
+
+        let post_uuid = Uuid::parse_str(&post_id)
+            .map_err(|e| async_graphql::Error::new(format!("Invalid post UUID: {}", e)))?;
+
+        let user_uuid = Uuid::parse_str(&user_id)
+            .map_err(|e| async_graphql::Error::new(format!("Invalid user UUID: {}", e)))?;
+
+        use_case
+            .execute(post_uuid, user_uuid, reaction_type.into())
+            .await?;
+
+        Ok(true)
+    }
+
+    async fn remove_reaction(
+        &self,
+        ctx: &Context<'_>,
+        post_id: String,
+        user_id: String,
+        reaction_type: ReactionTypeGql,
+    ) -> Result<bool> {
+        let use_case = ctx.data::<Arc<RemoveReactionUseCase>>()?;
+
+        let post_uuid = Uuid::parse_str(&post_id)
+            .map_err(|e| async_graphql::Error::new(format!("Invalid post UUID: {}", e)))?;
+
+        let user_uuid = Uuid::parse_str(&user_id)
+            .map_err(|e| async_graphql::Error::new(format!("Invalid user UUID: {}", e)))?;
+
+        use_case
+            .execute(post_uuid, user_uuid, reaction_type.into())
+            .await?;
 
         Ok(true)
     }

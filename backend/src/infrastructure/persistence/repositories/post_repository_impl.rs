@@ -65,6 +65,7 @@ impl PostRepository for PostRepositoryImpl {
 
     async fn find_available(&self, limit: usize, exclude_user_id: Option<Uuid>) -> Result<Vec<Post>, DomainError> {
         let mut query = post::Entity::find()
+            .filter(post::Column::Valid.eq(true))
             .filter(post::Column::DisplayCount.lt(10));
 
         // Exclude posts from specific user (don't show own posts)
@@ -82,6 +83,19 @@ impl PostRepository for PostRepositoryImpl {
         Ok(posts.into_iter().take(limit).collect())
     }
 
+    async fn find_by_user_id(&self, user_id: Uuid) -> Result<Vec<Post>, DomainError> {
+        let models = post::Entity::find()
+            .filter(post::Column::UserId.eq(user_id))
+            .filter(post::Column::Valid.eq(true))
+            .all(&self.db)
+            .await?;
+
+        models
+            .into_iter()
+            .map(Self::model_to_entity)
+            .collect::<Result<Vec<_>, _>>()
+    }
+
     async fn create(&self, post: &Post) -> Result<Post, DomainError> {
         let active_model = Self::entity_to_active_model(post);
         let result = active_model.insert(&self.db).await?;
@@ -97,6 +111,11 @@ impl PostRepository for PostRepositoryImpl {
         let mut active_model: post::ActiveModel = model.into();
         let new_count = active_model.display_count.clone().unwrap() + 1;
         active_model.display_count = Set(new_count);
+
+        // If display count reaches 10, mark as invalid (expired)
+        if new_count >= 10 {
+            active_model.valid = Set(false);
+        }
 
         let updated = active_model.update(&self.db).await?;
         Self::model_to_entity(updated)

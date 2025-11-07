@@ -8,6 +8,9 @@ pub struct Model {
     pub id: Uuid,
     pub display_name: String,
     pub avatar_url: String,
+    pub email: Option<String>,
+    pub password_hash: Option<String>,
+    pub valid: bool,
     pub created_at: DateTimeUtc,
 }
 

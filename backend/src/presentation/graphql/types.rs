@@ -1,6 +1,7 @@
 use crate::application::dto::PostDto;
-use crate::application::usecases::{AuthTokens, RefreshedTokens};
-use async_graphql::SimpleObject;
+use crate::application::usecases::{AuthTokens, LoginTokens, RefreshedTokens, ReactionCount, SignupTokens};
+use crate::domain::entities::ReactionType;
+use async_graphql::{Enum, SimpleObject};
 
 #[derive(SimpleObject)]
 pub struct Post {
@@ -39,6 +40,24 @@ impl From<AuthTokens> for AuthResponse {
     }
 }
 
+impl From<LoginTokens> for AuthResponse {
+    fn from(tokens: LoginTokens) -> Self {
+        Self {
+            access_token: tokens.access_token,
+            user_id: tokens.user_id,
+        }
+    }
+}
+
+impl From<SignupTokens> for AuthResponse {
+    fn from(tokens: SignupTokens) -> Self {
+        Self {
+            access_token: tokens.access_token,
+            user_id: tokens.user_id,
+        }
+    }
+}
+
 #[derive(SimpleObject)]
 pub struct RefreshResponse {
     pub access_token: String,
@@ -48,6 +67,54 @@ impl From<RefreshedTokens> for RefreshResponse {
     fn from(tokens: RefreshedTokens) -> Self {
         Self {
             access_token: tokens.access_token,
+        }
+    }
+}
+
+#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+pub enum ReactionTypeGql {
+    Surprise,
+    Empathy,
+    Laugh,
+    Sad,
+    Confused,
+}
+
+impl From<ReactionTypeGql> for ReactionType {
+    fn from(gql: ReactionTypeGql) -> Self {
+        match gql {
+            ReactionTypeGql::Surprise => ReactionType::Surprise,
+            ReactionTypeGql::Empathy => ReactionType::Empathy,
+            ReactionTypeGql::Laugh => ReactionType::Laugh,
+            ReactionTypeGql::Sad => ReactionType::Sad,
+            ReactionTypeGql::Confused => ReactionType::Confused,
+        }
+    }
+}
+
+impl From<ReactionType> for ReactionTypeGql {
+    fn from(domain: ReactionType) -> Self {
+        match domain {
+            ReactionType::Surprise => ReactionTypeGql::Surprise,
+            ReactionType::Empathy => ReactionTypeGql::Empathy,
+            ReactionType::Laugh => ReactionTypeGql::Laugh,
+            ReactionType::Sad => ReactionTypeGql::Sad,
+            ReactionType::Confused => ReactionTypeGql::Confused,
+        }
+    }
+}
+
+#[derive(SimpleObject)]
+pub struct ReactionCountGql {
+    pub reaction_type: ReactionTypeGql,
+    pub count: i32,
+}
+
+impl From<ReactionCount> for ReactionCountGql {
+    fn from(count: ReactionCount) -> Self {
+        Self {
+            reaction_type: count.reaction_type.into(),
+            count: count.count as i32,
         }
     }
 }

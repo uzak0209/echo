@@ -13,6 +13,12 @@ pub enum ValidationError {
     InvalidInput(String),
 }
 
+impl ValidationError {
+    pub fn new(msg: String) -> Self {
+        Self::InvalidInput(msg)
+    }
+}
+
 /// ドメイン層の一般的なエラー
 #[derive(Debug, Error)]
 pub enum DomainError {
@@ -30,4 +36,10 @@ pub enum DomainError {
 
     #[error("Unknown domain error: {0}")]
     Unknown(String),
+}
+
+impl DomainError {
+    pub fn validation(msg: String) -> Self {
+        Self::Validation(ValidationError::new(msg))
+    }
 }

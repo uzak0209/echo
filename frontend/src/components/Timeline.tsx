@@ -16,7 +16,6 @@ interface Post {
 export function Timeline() {
   const { data, loading, error, refetch } = useQuery(GET_TIMELINE, {
     variables: { limit: 10 },
-    pollInterval: 5000, // Auto-refresh every 5 seconds
   });
 
   if (loading) {
