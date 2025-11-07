@@ -1,8 +1,8 @@
 use crate::application::usecases::{
-    AddReactionUseCase, CreatePostUseCase, CreateUserUseCase, IncrementDisplayCountUseCase,
+    AddReactionUseCase, CreatePostUseCase, IncrementDisplayCountUseCase,
     LoginUseCase, RefreshTokenUseCase, RemoveReactionUseCase, SignupUseCase,
 };
-use crate::presentation::graphql::types::{AuthResponse, ReactionTypeGql, RefreshResponse};
+use crate::presentation::graphql::types::{AuthResponse, CreatePostInput, ReactionTypeGql, RefreshResponse};
 use async_graphql::{Context, Object, Result};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -61,8 +61,7 @@ impl MutationRoot {
     async fn create_post(
         &self,
         ctx: &Context<'_>,
-        content: String,
-        image_url: Option<String>,
+        input: CreatePostInput,
     ) -> Result<bool> {
         let use_case = ctx.data::<Arc<CreatePostUseCase>>()?;
 
@@ -70,7 +69,7 @@ impl MutationRoot {
         let user_id = ctx.data::<Uuid>()
             .map_err(|_| async_graphql::Error::new("Unauthorized: No valid access token"))?;
 
-        use_case.execute(content, image_url, *user_id).await?;
+        use_case.execute(input.content, input.image_url, *user_id).await?;
 
         Ok(true)
     }

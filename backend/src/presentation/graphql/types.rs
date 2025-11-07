@@ -1,8 +1,9 @@
 use crate::application::dto::PostDto;
 use crate::application::usecases::{AuthTokens, LoginTokens, RefreshedTokens, SignupTokens};
 use crate::domain::entities::ReactionType;
-use async_graphql::{Enum, SimpleObject};
+use async_graphql::{Enum, InputObject, SimpleObject};
 
+/// GraphQL output type for Post (response)
 #[derive(SimpleObject)]
 pub struct Post {
     // Expose the UUID as a string in the GraphQL layer.
@@ -23,6 +24,13 @@ impl From<PostDto> for Post {
             author_avatar: dto.author_avatar,
         }
     }
+}
+
+/// GraphQL input type for creating a Post (request)
+#[derive(InputObject)]
+pub struct CreatePostInput {
+    pub content: String,
+    pub image_url: Option<String>,
 }
 
 #[derive(SimpleObject)]

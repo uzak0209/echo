@@ -1,13 +1,12 @@
-mod domain;
 mod application;
+mod domain;
 mod infrastructure;
 mod presentation;
 
-use async_graphql::http::{GraphQLPlaygroundConfig, playground_source};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     extract::State,
-    http::{header, HeaderMap, Method, StatusCode},
+    http::{header, HeaderMap, Method},
     response::{Html, IntoResponse, Response},
     routing::{get, post},
     Router,
@@ -81,10 +80,9 @@ async fn graphql_handler(
                 token_str,
                 30 * 24 * 60 * 60 // 30 days in seconds
             );
-            http_response.headers_mut().insert(
-                header::SET_COOKIE,
-                cookie.parse().unwrap(),
-            );
+            http_response
+                .headers_mut()
+                .insert(header::SET_COOKIE, cookie.parse().unwrap());
         }
     }
 
@@ -92,11 +90,9 @@ async fn graphql_handler(
 }
 
 async fn graphql_playground() -> impl IntoResponse {
-    Html(
-        async_graphql::http::playground_source(
-            async_graphql::http::GraphQLPlaygroundConfig::new("/graphql"),
-        ),
-    )
+    Html(async_graphql::http::playground_source(
+        async_graphql::http::GraphQLPlaygroundConfig::new("/graphql"),
+    ))
 }
 
 #[tokio::main]
@@ -127,13 +123,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Configure CORS
     let cors = CorsLayer::new()
-        .allow_origin("http://localhost:3000".parse::<axum::http::HeaderValue>().unwrap())
+        .allow_origin(
+            "http://localhost:3000"
+                .parse::<axum::http::HeaderValue>()
+                .unwrap(),
+        )
         .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
-        .allow_headers([
-            header::CONTENT_TYPE,
-            header::AUTHORIZATION,
-            header::ACCEPT,
-        ])
+        .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION, header::ACCEPT])
         .allow_credentials(true);
 
     // Build router
@@ -141,17 +137,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/graphql", post(graphql_handler))
         .route("/", get(graphql_playground))
         .with_state(state.clone())
-        .route("/api/reactions/events",
+        .route(
+            "/api/reactions/events",
             get(presentation::sse::reaction_events_handler)
-                .with_state((stream_manager.clone(), jwt_service)))
+                .with_state((stream_manager.clone(), jwt_service)),
+        )
         .layer(cors);
 
     println!("GraphQL Playground: http://localhost:{}", port);
     println!("GraphQL Endpoint: http://localhost:{}/graphql", port);
     println!("SSE Endpoint: http://localhost:{}/api/reactions/events (requires Authorization: Bearer <token>)", port);
 
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
-        .await?;
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
 
     axum::serve(listener, app).await?;
 
