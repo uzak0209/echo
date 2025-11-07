@@ -37,8 +37,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setAccessToken(data.signup.accessToken);
           setUserId(data.signup.userId);
 
-          // Store userId in localStorage for persistence
+          // Store both accessToken and userId in localStorage for persistence
           if (typeof window !== 'undefined') {
+            localStorage.setItem('accessToken', data.signup.accessToken);
             localStorage.setItem('userId', data.signup.userId);
           }
         }
@@ -61,8 +62,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setAccessToken(data.login.accessToken);
           setUserId(data.login.userId);
 
-          // Store userId in localStorage for persistence
+          // Store both accessToken and userId in localStorage for persistence
           if (typeof window !== 'undefined') {
+            localStorage.setItem('accessToken', data.login.accessToken);
             localStorage.setItem('userId', data.login.userId);
           }
         }
@@ -85,8 +87,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setAccessToken(data.createUser.accessToken);
           setUserId(data.createUser.userId);
 
-          // Store userId in localStorage for persistence
+          // Store both accessToken and userId in localStorage for persistence
           if (typeof window !== 'undefined') {
+            localStorage.setItem('accessToken', data.createUser.accessToken);
             localStorage.setItem('userId', data.createUser.userId);
           }
         }
@@ -104,6 +107,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (data?.refreshToken) {
         setAccessToken(data.refreshToken.accessToken);
+
+        // Store new access token in localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('accessToken', data.refreshToken.accessToken);
+        }
       }
     } catch (error) {
       console.error('Token refresh failed:', error);
@@ -116,19 +124,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAccessToken(null);
     setUserId(null);
 
-    // Clear localStorage
+    // Clear both accessToken and userId from localStorage
     if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken');
       localStorage.removeItem('userId');
     }
   }, []);
 
-  // Try to refresh token on mount if userId exists in localStorage
+  // Try to restore accessToken and userId from localStorage on mount
   useEffect(() => {
-    const storedUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+    if (typeof window !== 'undefined') {
+      const storedAccessToken = localStorage.getItem('accessToken');
+      const storedUserId = localStorage.getItem('userId');
 
-    if (storedUserId && !accessToken) {
-      setUserId(storedUserId);
-      refreshAccessToken();
+      if (storedAccessToken && storedUserId) {
+        setAccessToken(storedAccessToken);
+        setUserId(storedUserId);
+      } else if (storedUserId && !storedAccessToken) {
+        // If we have userId but no access token, try to refresh
+        setUserId(storedUserId);
+        refreshAccessToken();
+      }
     }
   }, []);
 

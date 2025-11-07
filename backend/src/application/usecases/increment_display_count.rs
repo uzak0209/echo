@@ -15,12 +15,10 @@ impl IncrementDisplayCountUseCase {
     pub async fn execute(&self, post_id: Uuid) -> Result<bool, AppError> {
         // Check if post exists first
         if let Some(_post) = self.post_repository.find_by_id(post_id).await? {
-            // Increment display count in repository
-            // The repository will automatically set valid=false when display_count >= 10
-            let _updated_post = self.post_repository.increment_display_count(post_id).await?;
-
-            // Note: We no longer delete posts, just mark them as invalid (valid=false)
-            // This allows for potential recovery or analytics
+            let _updated_post = self
+                .post_repository
+                .increment_display_count(post_id)
+                .await?;
 
             Ok(true)
         } else {

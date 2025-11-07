@@ -36,8 +36,8 @@ export const REFRESH_TOKEN = gql`
 `;
 
 export const CREATE_POST = gql`
-  mutation CreatePost($content: String!, $imageUrl: String, $userId: String!) {
-    createPost(content: $content, imageUrl: $imageUrl, userId: $userId)
+  mutation CreatePost($input: CreatePostInput!) {
+    createPost(input: $input)
   }
 `;
 
@@ -48,13 +48,13 @@ export const INCREMENT_DISPLAY_COUNT = gql`
 `;
 
 export const ADD_REACTION = gql`
-  mutation AddReaction($postId: String!, $userId: String!, $reactionType: ReactionTypeGql!) {
-    addReaction(postId: $postId, userId: $userId, reactionType: $reactionType)
+  mutation AddReaction($postId: String!, $reactionType: ReactionTypeGql!) {
+    addReaction(postId: $postId, reactionType: $reactionType)
   }
 `;
 
 export const REMOVE_REACTION = gql`
-  mutation RemoveReaction($postId: String!, $userId: String!, $reactionType: ReactionTypeGql!) {
-    removeReaction(postId: $postId, userId: $userId, reactionType: $reactionType)
+  mutation RemoveReaction($postId: String!, $reactionType: ReactionTypeGql!) {
+    removeReaction(postId: $postId, reactionType: $reactionType)
   }
 `;

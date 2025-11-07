@@ -35,7 +35,6 @@ pub fn build_schema(
     // Create use cases
     let get_timeline_use_case = Arc::new(GetTimelineUseCase::new(
         post_repo.clone(),
-        user_repo.clone(),
     ));
     let create_post_use_case =
         Arc::new(CreatePostUseCase::new(post_repo.clone(), user_repo.clone()));

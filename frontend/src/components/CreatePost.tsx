@@ -22,9 +22,10 @@ export function CreatePost() {
     try {
       await createPost({
         variables: {
-          content: content.trim(),
-          imageUrl: null,
-          userId: userId,
+          input: {
+            content: content.trim(),
+            imageUrl: null,
+          },
         },
       });
 

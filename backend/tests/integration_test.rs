@@ -13,12 +13,21 @@ use uuid::Uuid;
 #[derive(Clone)]
 struct MockPostRepository {
     posts: Arc<Mutex<Vec<Post>>>,
+    users: Arc<Mutex<Vec<echo_backend::domain::entities::user::User>>>,
 }
 
 impl MockPostRepository {
     fn new() -> Self {
         Self {
             posts: Arc::new(Mutex::new(Vec::new())),
+            users: Arc::new(Mutex::new(Vec::new())),
+        }
+    }
+
+    fn with_users(users: Arc<Mutex<Vec<echo_backend::domain::entities::user::User>>>) -> Self {
+        Self {
+            posts: Arc::new(Mutex::new(Vec::new())),
+            users,
         }
     }
 
@@ -48,6 +57,37 @@ impl PostRepository for MockPostRepository {
             .cloned()
             .collect();
         Ok(available)
+    }
+
+    async fn find_available_with_users(
+        &self,
+        limit: usize,
+        exclude_user_id: Option<Uuid>,
+    ) -> Result<Vec<(Post, echo_backend::domain::entities::user::User)>, DomainError> {
+        let posts = self.posts.lock().unwrap();
+        let users = self.users.lock().unwrap();
+
+        let mut results = Vec::new();
+        for post in posts.iter() {
+            if post.is_expired() {
+                continue;
+            }
+
+            if let Some(excluded_id) = exclude_user_id {
+                if post.user_id == excluded_id {
+                    continue;
+                }
+            }
+
+            if let Some(user) = users.iter().find(|u| u.id == post.user_id) {
+                results.push((post.clone(), user.clone()));
+                if results.len() >= limit {
+                    break;
+                }
+            }
+        }
+
+        Ok(results)
     }
 
     async fn create(&self, post: &Post) -> Result<Post, DomainError> {
@@ -267,11 +307,10 @@ async fn test_create_post_with_too_long_content() {
 #[tokio::test]
 async fn test_get_timeline_empty() {
     let mock_post_repo = Arc::new(MockPostRepository::new());
-    let mock_user_repo = Arc::new(MockUserRepository::new());
+    let _mock_user_repo = Arc::new(MockUserRepository::new());
 
     let use_case = GetTimelineUseCase::new(
         mock_post_repo as Arc<dyn PostRepository>,
-        mock_user_repo as Arc<dyn UserRepository>,
     );
 
     let result = use_case.execute(10, None).await;
@@ -283,8 +322,8 @@ async fn test_get_timeline_empty() {
 
 #[tokio::test]
 async fn test_get_timeline_with_posts() {
-    let mock_post_repo = Arc::new(MockPostRepository::new());
     let mock_user_repo = Arc::new(MockUserRepository::new());
+    let mock_post_repo = Arc::new(MockPostRepository::with_users(mock_user_repo.users.clone()));
 
     let user = mock_user_repo
         .create_user("TestUser".to_string(), None)
@@ -312,7 +351,6 @@ async fn test_get_timeline_with_posts() {
 
     let get_timeline_use_case = GetTimelineUseCase::new(
         mock_post_repo as Arc<dyn PostRepository>,
-        mock_user_repo as Arc<dyn UserRepository>,
     );
     let result = get_timeline_use_case.execute(10, None).await;
 
@@ -323,8 +361,8 @@ async fn test_get_timeline_with_posts() {
 
 #[tokio::test]
 async fn test_get_timeline_respects_limit() {
-    let mock_post_repo = Arc::new(MockPostRepository::new());
     let mock_user_repo = Arc::new(MockUserRepository::new());
+    let mock_post_repo = Arc::new(MockPostRepository::with_users(mock_user_repo.users.clone()));
 
     let user = mock_user_repo
         .create_user("TestUser".to_string(), None)
@@ -345,7 +383,6 @@ async fn test_get_timeline_respects_limit() {
 
     let get_timeline_use_case = GetTimelineUseCase::new(
         mock_post_repo as Arc<dyn PostRepository>,
-        mock_user_repo as Arc<dyn UserRepository>,
     );
     let result = get_timeline_use_case.execute(3, None).await;
 
