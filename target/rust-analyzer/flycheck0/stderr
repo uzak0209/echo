@@ -1,19 +1,5 @@
-   0.101462417s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint: stale: changed "/Users/uzak/Projects/echo/backend/src/application/usecases/get_timeline.rs"
-   0.101491167s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint:           (vs) "/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-dc77f2278f6f3f89/dep-lib-echo_backend"
-   0.101493708s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1762320042, nanos: 884153893 } < FileTime { seconds: 1762337420, nanos: 841867504 }
-   0.101760542s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint: fingerprint dirty for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: false }/TargetInner { ..: lib_target("echo_backend", ["lib"], "/Users/uzak/Projects/echo/backend/src/lib.rs", Edition2021) }
-   0.101777708s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-dc77f2278f6f3f89/dep-lib-echo_backend", reference_mtime: FileTime { seconds: 1762320042, nanos: 884153893 }, stale: "/Users/uzak/Projects/echo/backend/src/application/usecases/get_timeline.rs", stale_mtime: FileTime { seconds: 1762337420, nanos: 841867504 } }))
-   0.129662750s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint: stale: changed "/Users/uzak/Projects/echo/backend/src/domain/services/mod.rs"
-   0.129669500s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint:           (vs) "/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-13540084009c8ec9/dep-test-lib-echo_backend"
-   0.129671042s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1762320042, nanos: 884203310 } < FileTime { seconds: 1762327967, nanos: 697552092 }
-   0.129835458s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint: fingerprint dirty for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: true }/TargetInner { ..: lib_target("echo_backend", ["lib"], "/Users/uzak/Projects/echo/backend/src/lib.rs", Edition2021) }
-   0.129841958s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-13540084009c8ec9/dep-test-lib-echo_backend", reference_mtime: FileTime { seconds: 1762320042, nanos: 884203310 }, stale: "/Users/uzak/Projects/echo/backend/src/domain/services/mod.rs", stale_mtime: FileTime { seconds: 1762327967, nanos: 697552092 } }))
-   0.131679750s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint: fingerprint dirty for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: false }/TargetInner { name: "echo-backend", doc: true, ..: with_path("/Users/uzak/Projects/echo/backend/src/main.rs", Edition2021) }
-   0.131683750s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { name: "echo_backend" })
-   0.132467292s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint: fingerprint dirty for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: true }/TargetInner { name: "echo-backend", doc: true, ..: with_path("/Users/uzak/Projects/echo/backend/src/main.rs", Edition2021) }
-   0.132471083s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { name: "echo_backend" })
-   0.133042083s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="integration_test"}: cargo::core::compiler::fingerprint: fingerprint error for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: true }/TargetInner { kind: "test", name: "integration_test", benched: false, ..: with_path("/Users/uzak/Projects/echo/backend/tests/integration_test.rs", Edition2021) }
-   0.133045250s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="integration_test"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-2218b9e2c21506d8/test-integration-test-integration_test`
+   0.112066667s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint: fingerprint error for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: false }/TargetInner { ..: lib_target("echo_backend", ["lib"], "/Users/uzak/Projects/echo/backend/src/lib.rs", Edition2021) }
+   0.112108125s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-593d1041c4b3af09/lib-echo_backend`
 
 Caused by:
     No such file or directory (os error 2)
@@ -36,6 +22,458 @@ Stack backtrace:
   14: std::rt::lang_start::<()>::{closure#0}
   15: std::rt::lang_start_internal
   16: _main
+   0.131543042s  INFO prepare_target{force=false package_id=async-graphql-axum v7.0.17 target="async_graphql_axum"}: cargo::core::compiler::fingerprint: fingerprint error for async-graphql-axum v7.0.17/Check { test: false }/TargetInner { ..: lib_target("async_graphql_axum", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/lib.rs", Edition2024) }
+   0.131548125s  INFO prepare_target{force=false package_id=async-graphql-axum v7.0.17 target="async_graphql_axum"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/async-graphql-axum-4d5f6513c598c7b8/lib-async_graphql_axum`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   8: cargo::ops::cargo_compile::compile_ws
+   9: cargo::ops::cargo_compile::compile_with_exec
+  10: cargo::ops::cargo_compile::compile
+  11: cargo::commands::check::exec
+  12: <cargo::cli::Exec>::exec
+  13: cargo::main
+  14: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  15: std::rt::lang_start::<()>::{closure#0}
+  16: std::rt::lang_start_internal
+  17: _main
+   0.136688500s  INFO prepare_target{force=false package_id=tokio-stream v0.1.17 target="tokio_stream"}: cargo::core::compiler::fingerprint: fingerprint error for tokio-stream v0.1.17/Check { test: false }/TargetInner { ..: lib_target("tokio_stream", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-stream-0.1.17/src/lib.rs", Edition2021) }
+   0.136694000s  INFO prepare_target{force=false package_id=tokio-stream v0.1.17 target="tokio_stream"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/tokio-stream-755d4ce5d6b95619/lib-tokio_stream`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   9: cargo::ops::cargo_compile::compile_ws
+  10: cargo::ops::cargo_compile::compile_with_exec
+  11: cargo::ops::cargo_compile::compile
+  12: cargo::commands::check::exec
+  13: <cargo::cli::Exec>::exec
+  14: cargo::main
+  15: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  16: std::rt::lang_start::<()>::{closure#0}
+  17: std::rt::lang_start_internal
+  18: _main
+   0.137045000s  INFO prepare_target{force=false package_id=tokio-util v0.7.17 target="tokio_util"}: cargo::core::compiler::fingerprint: fingerprint error for tokio-util v0.7.17/Check { test: false }/TargetInner { ..: lib_target("tokio_util", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-util-0.7.17/src/lib.rs", Edition2021) }
+   0.137048625s  INFO prepare_target{force=false package_id=tokio-util v0.7.17 target="tokio_util"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/tokio-util-8bedeb2fa3d22b4d/lib-tokio_util`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  10: cargo::ops::cargo_compile::compile_ws
+  11: cargo::ops::cargo_compile::compile_with_exec
+  12: cargo::ops::cargo_compile::compile
+  13: cargo::commands::check::exec
+  14: <cargo::cli::Exec>::exec
+  15: cargo::main
+  16: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  17: std::rt::lang_start::<()>::{closure#0}
+  18: std::rt::lang_start_internal
+  19: _main
+   0.137412792s  INFO prepare_target{force=false package_id=bcrypt v0.15.1 target="bcrypt"}: cargo::core::compiler::fingerprint: fingerprint error for bcrypt v0.15.1/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("bcrypt", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bcrypt-0.15.1/src/lib.rs", Edition2021) }
+   0.137416000s  INFO prepare_target{force=false package_id=bcrypt v0.15.1 target="bcrypt"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/bcrypt-f51e4c4c4e0ae37f/lib-bcrypt`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   8: cargo::ops::cargo_compile::compile_ws
+   9: cargo::ops::cargo_compile::compile_with_exec
+  10: cargo::ops::cargo_compile::compile
+  11: cargo::commands::check::exec
+  12: <cargo::cli::Exec>::exec
+  13: cargo::main
+  14: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  15: std::rt::lang_start::<()>::{closure#0}
+  16: std::rt::lang_start_internal
+  17: _main
+   0.137675625s  INFO prepare_target{force=false package_id=blowfish v0.9.1 target="blowfish"}: cargo::core::compiler::fingerprint: fingerprint error for blowfish v0.9.1/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("blowfish", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blowfish-0.9.1/src/lib.rs", Edition2021) }
+   0.137678250s  INFO prepare_target{force=false package_id=blowfish v0.9.1 target="blowfish"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/blowfish-477d426abcf6b2d8/lib-blowfish`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   9: cargo::ops::cargo_compile::compile_ws
+  10: cargo::ops::cargo_compile::compile_with_exec
+  11: cargo::ops::cargo_compile::compile
+  12: cargo::commands::check::exec
+  13: <cargo::cli::Exec>::exec
+  14: cargo::main
+  15: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  16: std::rt::lang_start::<()>::{closure#0}
+  17: std::rt::lang_start_internal
+  18: _main
+   0.138110584s  INFO prepare_target{force=false package_id=cipher v0.4.4 target="cipher"}: cargo::core::compiler::fingerprint: fingerprint error for cipher v0.4.4/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("cipher", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cipher-0.4.4/src/lib.rs", Edition2021) }
+   0.138114000s  INFO prepare_target{force=false package_id=cipher v0.4.4 target="cipher"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/cipher-d302a9a2b020b42f/lib-cipher`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  10: cargo::ops::cargo_compile::compile_ws
+  11: cargo::ops::cargo_compile::compile_with_exec
+  12: cargo::ops::cargo_compile::compile
+  13: cargo::commands::check::exec
+  14: <cargo::cli::Exec>::exec
+  15: cargo::main
+  16: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  17: std::rt::lang_start::<()>::{closure#0}
+  18: std::rt::lang_start_internal
+  19: _main
+   0.138488167s  INFO prepare_target{force=false package_id=inout v0.1.4 target="inout"}: cargo::core::compiler::fingerprint: fingerprint error for inout v0.1.4/Check { test: false }/TargetInner { ..: lib_target("inout", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/lib.rs", Edition2021) }
+   0.138490625s  INFO prepare_target{force=false package_id=inout v0.1.4 target="inout"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/inout-e3031b4f85a5cdf8/lib-inout`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: cargo::core::compiler::compile
+  10: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  11: cargo::ops::cargo_compile::compile_ws
+  12: cargo::ops::cargo_compile::compile_with_exec
+  13: cargo::ops::cargo_compile::compile
+  14: cargo::commands::check::exec
+  15: <cargo::cli::Exec>::exec
+  16: cargo::main
+  17: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  18: std::rt::lang_start::<()>::{closure#0}
+  19: std::rt::lang_start_internal
+  20: _main
+   0.141377250s  INFO prepare_target{force=false package_id=sea-orm v1.1.17 target="sea_orm"}: cargo::core::compiler::fingerprint: fingerprint error for sea-orm v1.1.17/Check { test: false }/TargetInner { ..: lib_target("sea_orm", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sea-orm-1.1.17/src/lib.rs", Edition2021) }
+   0.141380042s  INFO prepare_target{force=false package_id=sea-orm v1.1.17 target="sea_orm"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/sea-orm-1b5edf28bdf6bf87/lib-sea_orm`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   8: cargo::ops::cargo_compile::compile_ws
+   9: cargo::ops::cargo_compile::compile_with_exec
+  10: cargo::ops::cargo_compile::compile
+  11: cargo::commands::check::exec
+  12: <cargo::cli::Exec>::exec
+  13: cargo::main
+  14: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  15: std::rt::lang_start::<()>::{closure#0}
+  16: std::rt::lang_start_internal
+  17: _main
+   0.143485542s  INFO prepare_target{force=false package_id=sea-query-binder v0.7.0 target="sea_query_binder"}: cargo::core::compiler::fingerprint: fingerprint error for sea-query-binder v0.7.0/Check { test: false }/TargetInner { ..: lib_target("sea_query_binder", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sea-query-binder-0.7.0/src/lib.rs", Edition2021) }
+   0.143491792s  INFO prepare_target{force=false package_id=sea-query-binder v0.7.0 target="sea_query_binder"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/sea-query-binder-d7277d2d8f019fea/lib-sea_query_binder`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   9: cargo::ops::cargo_compile::compile_ws
+  10: cargo::ops::cargo_compile::compile_with_exec
+  11: cargo::ops::cargo_compile::compile
+  12: cargo::commands::check::exec
+  13: <cargo::cli::Exec>::exec
+  14: cargo::main
+  15: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  16: std::rt::lang_start::<()>::{closure#0}
+  17: std::rt::lang_start_internal
+  18: _main
+   0.143844250s  INFO prepare_target{force=false package_id=sqlx v0.8.6 target="sqlx"}: cargo::core::compiler::fingerprint: fingerprint error for sqlx v0.8.6/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("sqlx", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.8.6/src/lib.rs", Edition2021) }
+   0.143847625s  INFO prepare_target{force=false package_id=sqlx v0.8.6 target="sqlx"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/sqlx-d797947ed74ae8fa/lib-sqlx`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  10: cargo::ops::cargo_compile::compile_ws
+  11: cargo::ops::cargo_compile::compile_with_exec
+  12: cargo::ops::cargo_compile::compile
+  13: cargo::commands::check::exec
+  14: <cargo::cli::Exec>::exec
+  15: cargo::main
+  16: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  17: std::rt::lang_start::<()>::{closure#0}
+  18: std::rt::lang_start_internal
+  19: _main
+   0.144087084s  INFO prepare_target{force=false package_id=sqlx-core v0.8.6 target="sqlx_core"}: cargo::core::compiler::fingerprint: fingerprint error for sqlx-core v0.8.6/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("sqlx_core", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-core-0.8.6/src/lib.rs", Edition2021) }
+   0.144090084s  INFO prepare_target{force=false package_id=sqlx-core v0.8.6 target="sqlx_core"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/sqlx-core-fdf78b049fe789d5/lib-sqlx_core`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: cargo::core::compiler::compile
+  10: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  11: cargo::ops::cargo_compile::compile_ws
+  12: cargo::ops::cargo_compile::compile_with_exec
+  13: cargo::ops::cargo_compile::compile
+  14: cargo::commands::check::exec
+  15: <cargo::cli::Exec>::exec
+  16: cargo::main
+  17: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  18: std::rt::lang_start::<()>::{closure#0}
+  19: std::rt::lang_start_internal
+  20: _main
+   0.148558750s  INFO prepare_target{force=false package_id=sqlx-postgres v0.8.6 target="sqlx_postgres"}: cargo::core::compiler::fingerprint: fingerprint error for sqlx-postgres v0.8.6/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("sqlx_postgres", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-postgres-0.8.6/src/lib.rs", Edition2021) }
+   0.148562209s  INFO prepare_target{force=false package_id=sqlx-postgres v0.8.6 target="sqlx_postgres"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/sqlx-postgres-973832aa8a13c36b/lib-sqlx_postgres`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: cargo::core::compiler::compile
+  10: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  11: cargo::ops::cargo_compile::compile_ws
+  12: cargo::ops::cargo_compile::compile_with_exec
+  13: cargo::ops::cargo_compile::compile
+  14: cargo::commands::check::exec
+  15: <cargo::cli::Exec>::exec
+  16: cargo::main
+  17: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  18: std::rt::lang_start::<()>::{closure#0}
+  19: std::rt::lang_start_internal
+  20: _main
+   0.152879542s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint: fingerprint error for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: true }/TargetInner { ..: lib_target("echo_backend", ["lib"], "/Users/uzak/Projects/echo/backend/src/lib.rs", Edition2021) }
+   0.152883625s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo_backend"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-0cd3fcb9a9ec6861/test-lib-echo_backend`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::main
+  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  14: std::rt::lang_start::<()>::{closure#0}
+  15: std::rt::lang_start_internal
+  16: _main
+   0.154282042s  INFO prepare_target{force=false package_id=tokio-test v0.4.4 target="tokio_test"}: cargo::core::compiler::fingerprint: fingerprint error for tokio-test v0.4.4/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("tokio_test", ["lib"], "/Users/uzak/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-test-0.4.4/src/lib.rs", Edition2021) }
+   0.154284750s  INFO prepare_target{force=false package_id=tokio-test v0.4.4 target="tokio_test"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/tokio-test-76996497f73de8c7/lib-tokio_test`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   8: cargo::ops::cargo_compile::compile_ws
+   9: cargo::ops::cargo_compile::compile_with_exec
+  10: cargo::ops::cargo_compile::compile
+  11: cargo::commands::check::exec
+  12: <cargo::cli::Exec>::exec
+  13: cargo::main
+  14: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  15: std::rt::lang_start::<()>::{closure#0}
+  16: std::rt::lang_start_internal
+  17: _main
+   0.154480834s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint: fingerprint error for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: false }/TargetInner { name: "echo-backend", doc: true, ..: with_path("/Users/uzak/Projects/echo/backend/src/main.rs", Edition2021) }
+   0.154484500s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-7bad00052936d634/bin-echo-backend`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::main
+  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  14: std::rt::lang_start::<()>::{closure#0}
+  15: std::rt::lang_start_internal
+  16: _main
+   0.155056709s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint: fingerprint error for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: true }/TargetInner { name: "echo-backend", doc: true, ..: with_path("/Users/uzak/Projects/echo/backend/src/main.rs", Edition2021) }
+   0.155059417s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="echo-backend"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-bd9757ae566ba150/test-bin-echo-backend`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::main
+  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  14: std::rt::lang_start::<()>::{closure#0}
+  15: std::rt::lang_start_internal
+  16: _main
+   0.155663125s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="integration_test"}: cargo::core::compiler::fingerprint: fingerprint error for echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)/Check { test: true }/TargetInner { kind: "test", name: "integration_test", benched: false, ..: with_path("/Users/uzak/Projects/echo/backend/tests/integration_test.rs", Edition2021) }
+   0.155666459s  INFO prepare_target{force=false package_id=echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend) target="integration_test"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/uzak/Projects/echo/backend/target/debug/.fingerprint/echo-backend-e26da706548fa2ee/test-integration-test-integration_test`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: std::backtrace::Backtrace::create
+   1: cargo_util::paths::read_bytes
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::main
+  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  14: std::rt::lang_start::<()>::{closure#0}
+  15: std::rt::lang_start_internal
+  16: _main
+    Checking tokio-util v0.7.17
+    Checking inout v0.1.4
+    Checking cipher v0.4.4
+    Checking tokio-stream v0.1.17
+    Checking blowfish v0.9.1
+    Checking bcrypt v0.15.1
+    Checking sqlx-core v0.8.6
+    Checking async-graphql-axum v7.0.17
+    Checking tokio-test v0.4.4
+    Checking sqlx-postgres v0.8.6
+    Checking sqlx v0.8.6
+    Checking sea-query-binder v0.7.0
+    Checking sea-orm v1.1.17
     Checking echo-backend v0.1.0 (/Users/uzak/Projects/echo/backend)
 error: could not compile `echo-backend` (test "integration_test") due to 38 previous errors; 2 warnings emitted
 warning: build failed, waiting for other jobs to finish...
