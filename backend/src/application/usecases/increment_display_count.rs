@@ -1,8 +1,7 @@
+use uuid::Uuid;
+
+use crate::{application::error::AppError, domain::repositories::PostRepository};
 use std::sync::Arc;
-use crate::domain::{
-    entities::PostId,
-    repositories::PostRepository,
-};
 
 pub struct IncrementDisplayCountUseCase {
     post_repository: Arc<dyn PostRepository>,
@@ -13,18 +12,15 @@ impl IncrementDisplayCountUseCase {
         Self { post_repository }
     }
 
-    pub async fn execute(&self, post_id: i32) -> Result<bool, Box<dyn std::error::Error + Send + Sync>> {
-        let post_id = PostId(post_id);
+    pub async fn execute(&self, post_id: Uuid) -> Result<bool, AppError> {
+        // Check if post exists first
+        if let Some(_post) = self.post_repository.find_by_id(post_id).await? {
+            // Increment display count in repository
+            // The repository will automatically set valid=false when display_count >= 10
+            let _updated_post = self.post_repository.increment_display_count(post_id).await?;
 
-        if let Some(mut post) = self.post_repository.find_by_id(post_id).await? {
-            post.increment_display();
-
-            // If post is expired (display_count >= 10), delete it
-            if post.is_expired() {
-                self.post_repository.delete(post_id).await?;
-            } else {
-                self.post_repository.save(&post).await?;
-            }
+            // Note: We no longer delete posts, just mark them as invalid (valid=false)
+            // This allows for potential recovery or analytics
 
             Ok(true)
         } else {

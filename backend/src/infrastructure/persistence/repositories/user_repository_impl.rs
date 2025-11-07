@@ -1,13 +1,13 @@
 use crate::{
     domain::{
-        entities::{DisplayName, User, UserId},
-        repositories::UserRepository,
+        entities::User, error::DomainError, repositories::UserRepository,
+        value_objects::DisplayName,
     },
     infrastructure::persistence::models::user,
 };
 use async_trait::async_trait;
-use rand::seq::SliceRandom;
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, Set};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
+use uuid::Uuid;
 
 pub struct UserRepositoryImpl {
     db: DatabaseConnection,
@@ -20,22 +20,21 @@ impl UserRepositoryImpl {
 
     fn model_to_entity(model: user::Model) -> User {
         User {
-            id: UserId(model.id),
+            id: model.id,
             display_name: DisplayName::new(model.display_name),
             avatar_url: model.avatar_url,
+            password_hash: model.password_hash,
             created_at: model.created_at.into(),
         }
     }
 
     fn entity_to_active_model(user: &User) -> user::ActiveModel {
         user::ActiveModel {
-            id: if user.id.0 == 0 {
-                sea_orm::ActiveValue::NotSet
-            } else {
-                Set(user.id.0)
-            },
+            id: Set(user.id),
             display_name: Set(user.display_name.value().to_string()),
             avatar_url: Set(user.avatar_url.clone()),
+            password_hash: Set(user.password_hash.clone()),
+            valid: Set(true),
             created_at: Set(user.created_at.into()),
         }
     }
@@ -43,43 +42,50 @@ impl UserRepositoryImpl {
 
 #[async_trait]
 impl UserRepository for UserRepositoryImpl {
-    async fn find_by_id(
-        &self,
-        id: UserId,
-    ) -> Result<Option<User>, Box<dyn std::error::Error + Send + Sync>> {
-        let model = user::Entity::find_by_id(id.0).one(&self.db).await?;
+    async fn find_by_id(&self, id: Uuid) -> Result<Option<User>, DomainError> {
+        let model = user::Entity::find_by_id(id).one(&self.db).await?;
 
         Ok(model.map(Self::model_to_entity))
     }
 
-    async fn find_all(&self) -> Result<Vec<User>, Box<dyn std::error::Error + Send + Sync>> {
-        let models = user::Entity::find().all(&self.db).await?;
+    async fn find_by_username(&self, username: &str) -> Result<Option<User>, DomainError> {
+        let model = user::Entity::find()
+            .filter(user::Column::DisplayName.eq(username))
+            .one(&self.db)
+            .await?;
 
-        Ok(models.into_iter().map(Self::model_to_entity).collect())
+        Ok(model.map(Self::model_to_entity))
     }
 
-    async fn save(&self, user: &User) -> Result<UserId, Box<dyn std::error::Error + Send + Sync>> {
-        let active_model = Self::entity_to_active_model(user);
-
-        let result = if user.id.0 == 0 {
-            active_model.insert(&self.db).await?
-        } else {
-            active_model.update(&self.db).await?
-        };
-
-        Ok(UserId(result.id))
+    async fn create_user(
+        &self,
+        display_name: String,
+        avatar_url: Option<String>,
+    ) -> Result<User, DomainError> {
+        let display_name = DisplayName::new(display_name);
+        let avatar_url = avatar_url.unwrap_or_else(|| "https://example.com/default-avatar.jpg".to_string());
+        let user = User::new(display_name, avatar_url);
+        let active_model = Self::entity_to_active_model(&user);
+        let result = active_model.insert(&self.db).await?;
+        Ok(Self::model_to_entity(result))
     }
 
-    async fn get_random(&self) -> Result<Option<User>, Box<dyn std::error::Error + Send + Sync>> {
-        let users = self.find_all().await?;
+    async fn create_user_with_credentials(
+        &self,
+        display_name: String,
+        avatar_url: Option<String>,
+        password_hash: String,
+    ) -> Result<User, DomainError> {
+        let display_name = DisplayName::new(display_name);
+        let avatar_url = avatar_url.unwrap_or_else(|| "https://example.com/default-avatar.jpg".to_string());
+        let user = User::new_with_credentials(display_name, avatar_url, password_hash);
+        let active_model = Self::entity_to_active_model(&user);
+        let result = active_model.insert(&self.db).await?;
+        Ok(Self::model_to_entity(result))
+    }
 
-        if users.is_empty() {
-            return Ok(None);
-        }
-
-        let mut rng = rand::thread_rng();
-        let user = users.choose(&mut rng).cloned();
-
-        Ok(user)
+    async fn delete(&self, id: Uuid) -> Result<(), DomainError> {
+        user::Entity::delete_by_id(id).exec(&self.db).await?;
+        Ok(())
     }
 }

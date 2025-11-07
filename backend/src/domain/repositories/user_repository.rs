@@ -1,10 +1,21 @@
+use crate::domain::{entities::User, error::DomainError};
 use async_trait::async_trait;
-use crate::domain::entities::{User, UserId};
+use uuid::Uuid;
 
 #[async_trait]
 pub trait UserRepository: Send + Sync {
-    async fn find_by_id(&self, id: UserId) -> Result<Option<User>, Box<dyn std::error::Error + Send + Sync>>;
-    async fn find_all(&self) -> Result<Vec<User>, Box<dyn std::error::Error + Send + Sync>>;
-    async fn save(&self, user: &User) -> Result<UserId, Box<dyn std::error::Error + Send + Sync>>;
-    async fn get_random(&self) -> Result<Option<User>, Box<dyn std::error::Error + Send + Sync>>;
+    async fn find_by_id(&self, id: Uuid) -> Result<Option<User>, DomainError>;
+    async fn find_by_username(&self, username: &str) -> Result<Option<User>, DomainError>;
+    async fn create_user(
+        &self,
+        display_name: String,
+        avatar_url: Option<String>,
+    ) -> Result<User, DomainError>;
+    async fn create_user_with_credentials(
+        &self,
+        display_name: String,
+        avatar_url: Option<String>,
+        password_hash: String,
+    ) -> Result<User, DomainError>;
+    async fn delete(&self, id: Uuid) -> Result<(), DomainError>;
 }

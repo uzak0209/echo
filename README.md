@@ -202,6 +202,72 @@ npm run build
 npm run start
 ```
 
-## ライセンス
+トークンの仕組み
 
-MIT
+  1. トークンの種類と有効期限
+
+  jwt.rs:6-7
+  - アクセストークン: 15分間有効
+  - リフレッシュトークン: 30日間有効
+
+  両トークンとも TokenType で区別され、JWTのペイロードに含まれます。
+
+  2. トークン発行フロー
+
+  初回ユーザー登録時 (createUser mutation)
+
+  1. ユーザーを作成 → create_user.rs:37-40
+  2. アクセストークン + リフレッシュトークンを生成 → create_user.rs:43-50
+  3. GraphQLレスポンスでアクセストークンのみ返却 → types.rs:28-31
+  4. リフレッシュトークンはHTTPヘッダー経由でCookieに保存 → mutation.rs:25
+
+  3. リフレッシュフロー
+
+  refreshToken mutation 実行時
+
+  1. HTTPレイヤーがCookieからリフレッシュトークンを抽出 → main.rs:30-38
+  2. GraphQLコンテキストに注入 → main.rs:42-44
+  3. RefreshTokenUseCaseがリフレッシュトークンを検証 → refresh_token.rs:24-27
+  4. 新しいアクセストークン + 新しいリフレッシュトークンを両方発行 → refresh_token.rs:34-42
+  5. 新リフレッシュトークンをHTTPヘッダー経由でCookie更新 → mutation.rs:41
+  6. GraphQLレスポンスで新アクセストークンを返却 → types.rs:43-45
+
+  4. Cookie管理
+
+  main.rs:56-68
+  refresh_token=<token>;
+  HttpOnly;           // JavaScriptからアクセス不可
+  Secure;             // HTTPS必須
+  SameSite=Strict;    // CSRF対策
+  Max-Age=2592000;    // 30日
+  Path=/
+
+  セキュリティ上の強み
+
+  ✅ リフレッシュトークンはHTTPOnly Cookie → XSS攻撃で盗まれない✅ アクセストークンは短命(15分) → 漏洩しても影響範囲が小さい✅
+  トークンタイプを厳密に検証 → verify_access_token / verify_refresh_token で分離✅ リフレッシュ時に両方のトークンを更新 →
+  トークンローテーション実装済み
+
+  フロントエンドでの利用方法
+
+  // 1. ユーザー登録
+  const { data } = await client.mutate({
+    mutation: CREATE_USER,
+    variables: { displayName: "太郎" }
+  });
+  // data.createUser.access_token を保存
+  // refresh_token は自動でCookieに保存される
+
+  // 2. API呼び出し時
+  headers: {
+    'Authorization': `Bearer ${accessToken}`
+  }
+
+  // 3. アクセストークン期限切れ時
+  const { data } = await client.mutate({
+    mutation: REFRESH_TOKEN
+    // Cookieは自動送信される
+  });
+  // 新しい access_token を取得
+
+

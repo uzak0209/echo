@@ -1,3 +1,3 @@
-pub mod random_user_service;
+mod persona_generator;
 
-pub use random_user_service::RandomUserService;
+pub use persona_generator::PersonaGenerator;

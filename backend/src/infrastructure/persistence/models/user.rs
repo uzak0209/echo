@@ -5,9 +5,11 @@ use serde::{Deserialize, Serialize};
 #[sea_orm(table_name = "users")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
+    pub id: Uuid,
     pub display_name: String,
     pub avatar_url: String,
+    pub password_hash: Option<String>,
+    pub valid: bool,
     pub created_at: DateTimeUtc,
 }
 

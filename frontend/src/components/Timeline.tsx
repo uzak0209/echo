@@ -6,15 +6,16 @@ import { PostCard } from './PostCard';
 import { Button } from './ui/button';
 
 interface Post {
-  id: number;
+  id: string;
   content: string;
   imageUrl?: string | null;
+  authorName: string;
+  authorAvatar: string;
 }
 
 export function Timeline() {
   const { data, loading, error, refetch } = useQuery(GET_TIMELINE, {
     variables: { limit: 10 },
-    pollInterval: 5000, // Auto-refresh every 5 seconds
   });
 
   if (loading) {

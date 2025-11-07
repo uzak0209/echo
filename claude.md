@@ -9,7 +9,7 @@ Claude – 承認欲求ゼロの気軽SNS
 
 「いいね」やフォローなどの承認機能は一切なし
 
-名前・プロフィール画像はランダム
+ユーザー名は自由に設定可能、プロフィール画像はランダム
 
 投稿は10回表示されたら自動削除
 
@@ -54,33 +54,44 @@ SeaORM + GraphQL 設計ポイント
 #[sea_orm(table_name = "posts")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
+    pub id: Uuid,
+    pub user_id: Uuid,
     pub content: String,
     pub image_url: Option<String>,
     pub display_count: i32,
+    pub valid: bool,
     pub created_at: DateTimeUtc,
 }
 
 
-ユーザーテーブル（匿名）
+ユーザーテーブル
 
 #[derive(Clone, Debug, DeriveEntityModel)]
 #[sea_orm(table_name = "users")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
-    pub display_name: String,
-    pub avatar_url: String,
+    pub id: Uuid,
+    pub display_name: String,  // ユーザー名（ユニーク、ログインIDとして使用）
+    pub avatar_url: String,     // ランダム生成
+    pub password_hash: Option<String>,
+    pub valid: bool,
     pub created_at: DateTimeUtc,
 }
 
 
 GraphQL スキーマ例
 
+type User {
+    id: ID!
+    displayName: String!  # ユーザー名（ユニーク）
+    avatarUrl: String!    # ランダム生成
+}
+
 type Post {
     id: ID!
     content: String!
     imageUrl: String
+    displayCount: Int!
 }
 
 type Query {
@@ -88,6 +99,11 @@ type Query {
 }
 
 type Mutation {
+    # 認証
+    register(username: String!, password: String!): String!  # JWT token
+    login(username: String!, password: String!): String!     # JWT token
+
+    # 投稿
     createPost(content: String!, imageUrl: String): Boolean!
 }
 
@@ -97,4 +113,11 @@ timeline はランダム表示
 投稿は 10回表示 で自動削除
 
 💡 この構成なら Web と Android 両方のクライアントから 同じ GraphQL API を通じて投稿・閲覧が可能
+
+認証
+
+- ユーザー名（display_name）とパスワードによるシンプルな認証
+- パスワードはbcryptでハッシュ化
+- JWTトークンによるセッション管理
+
 承認欲求ゼロの匿名 SNS 体験をハッカソンで実装できます
