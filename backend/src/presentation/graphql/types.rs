@@ -1,5 +1,5 @@
 use crate::application::dto::PostDto;
-use crate::application::usecases::{AuthTokens, LoginTokens, RefreshedTokens, ReactionCount, SignupTokens};
+use crate::application::usecases::{AuthTokens, LoginTokens, RefreshedTokens, SignupTokens};
 use crate::domain::entities::ReactionType;
 use async_graphql::{Enum, SimpleObject};
 
@@ -100,21 +100,6 @@ impl From<ReactionType> for ReactionTypeGql {
             ReactionType::Laugh => ReactionTypeGql::Laugh,
             ReactionType::Sad => ReactionTypeGql::Sad,
             ReactionType::Confused => ReactionTypeGql::Confused,
-        }
-    }
-}
-
-#[derive(SimpleObject)]
-pub struct ReactionCountGql {
-    pub reaction_type: ReactionTypeGql,
-    pub count: i32,
-}
-
-impl From<ReactionCount> for ReactionCountGql {
-    fn from(count: ReactionCount) -> Self {
-        Self {
-            reaction_type: count.reaction_type.into(),
-            count: count.count as i32,
         }
     }
 }

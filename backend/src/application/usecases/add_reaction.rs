@@ -1,6 +1,9 @@
 use crate::{
     application::error::AppError,
-    domain::{entities::ReactionType, repositories::{PostRepository, ReactionRepository}},
+    domain::{
+        entities::ReactionType,
+        repositories::{PostRepository, ReactionRepository},
+    },
     infrastructure::sse::ReactionStreamManager,
 };
 use std::sync::Arc;
@@ -33,7 +36,7 @@ impl AddReactionUseCase {
     ) -> Result<bool, AppError> {
         // Add reaction to database
         self.reaction_repository
-            .add_reaction(post_id, user_id, reaction_type.clone())
+            .add_reaction(post_id, user_id, reaction_type)
             .await?;
 
         // Get post author to send SSE event
