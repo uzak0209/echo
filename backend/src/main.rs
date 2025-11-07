@@ -20,6 +20,7 @@ use tower_http::cors::CorsLayer;
 struct AppState {
     schema: presentation::graphql::schema::AppSchema,
     stream_manager: Arc<infrastructure::sse::ReactionStreamManager>,
+    jwt_service: Arc<infrastructure::auth::JwtService>,
 }
 
 async fn graphql_handler(
@@ -38,10 +39,29 @@ async fn graphql_handler(
                 .map(|c| c.trim().strip_prefix("refresh_token=").unwrap().to_string())
         });
 
-    // Build request with refresh token in context if available
+    // Extract access token from Authorization header
+    let access_token = headers
+        .get(header::AUTHORIZATION)
+        .and_then(|v| v.to_str().ok())
+        .and_then(|auth| auth.strip_prefix("Bearer "))
+        .map(|t| t.to_string());
+
+    // Build request with tokens and user claims in context
     let mut request = req.into_inner();
+
+    // Add refresh token if available
     if let Some(token) = refresh_token {
         request = request.data(token);
+    }
+
+    // Verify access token and add user_id to context
+    if let Some(token) = access_token {
+        if let Ok(claims) = state.jwt_service.verify_access_token(&token) {
+            // Add user_id to context
+            if let Ok(user_id) = uuid::Uuid::parse_str(&claims.sub) {
+                request = request.data(user_id);
+            }
+        }
     }
 
     // Execute GraphQL request
@@ -102,6 +122,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let state = AppState {
         schema,
         stream_manager: stream_manager.clone(),
+        jwt_service: jwt_service.clone(),
     };
 
     // Configure CORS
@@ -122,7 +143,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_state(state.clone())
         .route("/api/reactions/events",
             get(presentation::sse::reaction_events_handler)
-                .with_state((stream_manager.clone(), jwt_service.clone())))
+                .with_state((stream_manager.clone(), jwt_service)))
         .layer(cors);
 
     println!("GraphQL Playground: http://localhost:{}", port);
