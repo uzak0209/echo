@@ -27,7 +27,6 @@ impl PostRepositoryImpl {
             content: PostContent::new(model.content)?,
             image_url: model.image_url,
             display_count: model.display_count.into(),
-            echo_count: model.echo_count,
             created_at: model.created_at.into(),
         })
     }
@@ -40,7 +39,6 @@ impl PostRepositoryImpl {
             image_url: Set(post.image_url.clone()),
             valid: Set(true),
             display_count: Set(post.display_count.value()),
-            echo_count: Set(post.echo_count),
             created_at: Set(post.created_at.into()),
         }
     }
@@ -116,20 +114,6 @@ impl PostRepository for PostRepositoryImpl {
         if new_count >= 10 {
             active_model.valid = Set(false);
         }
-
-        let updated = active_model.update(&self.db).await?;
-        Self::model_to_entity(updated)
-    }
-
-    async fn increment_echo_count(&self, id: Uuid) -> Result<Post, DomainError> {
-        let model = post::Entity::find_by_id(id)
-            .one(&self.db)
-            .await?
-            .ok_or_else(|| DomainError::NotFound("Post not found".to_string()))?;
-
-        let mut active_model: post::ActiveModel = model.into();
-        let new_count = active_model.echo_count.clone().unwrap() + 1;
-        active_model.echo_count = Set(new_count);
 
         let updated = active_model.update(&self.db).await?;
         Self::model_to_entity(updated)

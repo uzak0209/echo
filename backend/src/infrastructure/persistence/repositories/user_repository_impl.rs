@@ -23,7 +23,6 @@ impl UserRepositoryImpl {
             id: model.id,
             display_name: DisplayName::new(model.display_name),
             avatar_url: model.avatar_url,
-            email: model.email,
             password_hash: model.password_hash,
             created_at: model.created_at.into(),
         }
@@ -34,7 +33,6 @@ impl UserRepositoryImpl {
             id: Set(user.id),
             display_name: Set(user.display_name.value().to_string()),
             avatar_url: Set(user.avatar_url.clone()),
-            email: Set(user.email.clone()),
             password_hash: Set(user.password_hash.clone()),
             valid: Set(true),
             created_at: Set(user.created_at.into()),
@@ -50,9 +48,9 @@ impl UserRepository for UserRepositoryImpl {
         Ok(model.map(Self::model_to_entity))
     }
 
-    async fn find_by_email(&self, email: &str) -> Result<Option<User>, DomainError> {
+    async fn find_by_username(&self, username: &str) -> Result<Option<User>, DomainError> {
         let model = user::Entity::find()
-            .filter(user::Column::Email.eq(email))
+            .filter(user::Column::DisplayName.eq(username))
             .one(&self.db)
             .await?;
 
@@ -76,12 +74,11 @@ impl UserRepository for UserRepositoryImpl {
         &self,
         display_name: String,
         avatar_url: Option<String>,
-        email: String,
         password_hash: String,
     ) -> Result<User, DomainError> {
         let display_name = DisplayName::new(display_name);
         let avatar_url = avatar_url.unwrap_or_else(|| "https://example.com/default-avatar.jpg".to_string());
-        let user = User::new_with_credentials(display_name, avatar_url, email, password_hash);
+        let user = User::new_with_credentials(display_name, avatar_url, password_hash);
         let active_model = Self::entity_to_active_model(&user);
         let result = active_model.insert(&self.db).await?;
         Ok(Self::model_to_entity(result))

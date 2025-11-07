@@ -28,14 +28,13 @@ impl SignupUseCase {
 
     pub async fn execute(
         &self,
-        email: String,
+        username: String,
         password: String,
-        display_name: String,
         avatar_url: Option<String>,
     ) -> Result<SignupTokens, AppError> {
         // Check if user already exists
-        if let Some(_) = self.user_repository.find_by_email(&email).await? {
-            return Err(AppError::validation("Email already registered"));
+        if let Some(_) = self.user_repository.find_by_username(&username).await? {
+            return Err(AppError::validation("Username already registered"));
         }
 
         // Hash password
@@ -48,7 +47,7 @@ impl SignupUseCase {
         // Create user
         let user = self
             .user_repository
-            .create_user_with_credentials(display_name, Some(final_avatar_url), email, password_hash)
+            .create_user_with_credentials(username, Some(final_avatar_url), password_hash)
             .await?;
 
         // Generate tokens

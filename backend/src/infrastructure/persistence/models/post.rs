@@ -11,7 +11,6 @@ pub struct Model {
     pub image_url: Option<String>,
     pub valid: bool,
     pub display_count: i32,
-    pub echo_count: i32,
     pub created_at: DateTimeUtc,
 }
 

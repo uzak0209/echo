@@ -26,11 +26,11 @@ impl LoginUseCase {
         }
     }
 
-    pub async fn execute(&self, email: String, password: String) -> Result<LoginTokens, AppError> {
-        // Find user by email
+    pub async fn execute(&self, username: String, password: String) -> Result<LoginTokens, AppError> {
+        // Find user by username
         let user = self
             .user_repository
-            .find_by_email(&email)
+            .find_by_username(&username)
             .await?
             .ok_or_else(|| AppError::not_found("User not found"))?;
 

@@ -28,12 +28,6 @@ impl MigrationTrait for Migration {
                             .default(0),
                     )
                     .col(
-                        ColumnDef::new(Posts::EchoCount)
-                            .integer()
-                            .not_null()
-                            .default(0),
-                    )
-                    .col(
                         ColumnDef::new(Posts::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null()
@@ -66,7 +60,6 @@ enum Posts {
     Content,
     ImageUrl,
     DisplayCount,
-    EchoCount,
     CreatedAt,
     Valid,
 }

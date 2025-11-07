@@ -12,7 +12,7 @@ impl MigrationTrait for Migration {
                     .table(Users::Table)
                     .if_not_exists()
                     .col(ColumnDef::new(Users::Id).uuid().not_null().primary_key())
-                    .col(ColumnDef::new(Users::DisplayName).string().not_null())
+                    .col(ColumnDef::new(Users::DisplayName).string().not_null().unique_key())
                     .col(ColumnDef::new(Users::AvatarUrl).string().not_null())
                     .col(
                         ColumnDef::new(Users::Valid)

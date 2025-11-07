@@ -10,7 +10,6 @@ impl MigrationTrait for Migration {
             .alter_table(
                 Table::alter()
                     .table(Users::Table)
-                    .add_column(ColumnDef::new(Users::Email).string().unique_key())
                     .add_column(ColumnDef::new(Users::PasswordHash).string())
                     .to_owned(),
             )
@@ -22,7 +21,6 @@ impl MigrationTrait for Migration {
             .alter_table(
                 Table::alter()
                     .table(Users::Table)
-                    .drop_column(Users::Email)
                     .drop_column(Users::PasswordHash)
                     .to_owned(),
             )
@@ -33,6 +31,5 @@ impl MigrationTrait for Migration {
 #[derive(DeriveIden)]
 enum Users {
     Table,
-    Email,
     PasswordHash,
 }
