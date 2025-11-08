@@ -13,14 +13,14 @@ impl QueryRoot {
         &self,
         ctx: &Context<'_>,
         limit: i32,
-        user_id: Option<String>,
     ) -> Result<Vec<Post>> {
         let use_case = ctx.data::<Arc<GetTimelineUseCase>>()?;
 
-        // Parse user_id if provided to exclude own posts
-        let exclude_user_id = user_id.and_then(|id| Uuid::parse_str(&id).ok());
+        // Get user_id from JWT context to automatically exclude own posts
+        let user_id = ctx.data::<Uuid>()
+            .map_err(|_| async_graphql::Error::new("Unauthorized: No valid access token"))?;
 
-        let posts = use_case.execute(limit as usize, exclude_user_id).await?;
+        let posts = use_case.execute(limit as usize, Some(*user_id)).await?;
 
         Ok(posts.into_iter().map(Post::from).collect())
     }
