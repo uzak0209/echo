@@ -3,11 +3,22 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@apollo/client';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/lib/auth-context';
 import { useReaction } from '@/lib/reaction-context';
 import { GET_USER_LATEST_REACTION } from '@/lib/graphql/queries';
 import { Button } from '@/components/ui/button';
 import { REACTION_EMOJIS, ReactionType } from '@/lib/types/reaction';
+
+// Dynamic import to prevent SSR issues with Three.js
+const MascotAvatar = dynamic(() => import('@/components/MascotAvatar').then(mod => ({ default: mod.MascotAvatar })), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <p className="text-muted-foreground">Loading your mascot...</p>
+    </div>
+  ),
+});
 
 export default function AvatarPage() {
   const { isAuthenticated, userId, displayName, avatarUrl } = useAuth();
@@ -79,17 +90,13 @@ export default function AvatarPage() {
         {/* Avatar display */}
         <div className="flex flex-col items-center gap-8">
           <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Your Avatar
+            Your Mascot
           </h1>
 
-          {/* Large avatar with reaction animation */}
-          <div className="relative">
-            <div className="w-64 h-64 rounded-full overflow-hidden border-8 border-white shadow-2xl transition-transform duration-500 hover:scale-105">
-              <img
-                src={avatarUrl}
-                alt={displayName}
-                className="w-full h-full object-cover"
-              />
+          {/* 3D Mascot Avatar */}
+          <div className="relative w-full max-w-md">
+            <div className="w-full aspect-square bg-white/80 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden">
+              <MascotAvatar userId={userId || ''} expression={latestReaction} />
             </div>
 
             {/* Reaction emoji overlay with animation */}
