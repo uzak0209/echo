@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@apollo/client';
 import { useAuth } from '@/lib/auth-context';
-import { useReactionStream } from '@/lib/hooks/useReactionStream';
+import { useReaction } from '@/lib/reaction-context';
 import { GET_USER_LATEST_REACTION } from '@/lib/graphql/queries';
 import { Button } from '@/components/ui/button';
 import { REACTION_EMOJIS, ReactionType } from '@/lib/types/reaction';
@@ -13,7 +13,7 @@ export default function AvatarPage() {
   const { isAuthenticated, userId, displayName, avatarUrl } = useAuth();
   const router = useRouter();
   const [latestReaction, setLatestReaction] = useState<string | null>(null);
-  const { latestReaction: sseReaction } = useReactionStream();
+  const { latestReaction: sseReaction } = useReaction();
 
   // Fetch initial latest reaction
   const { data: reactionData } = useQuery(GET_USER_LATEST_REACTION, {

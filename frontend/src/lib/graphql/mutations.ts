@@ -5,6 +5,7 @@ export const GENERATE_SSE_TOKEN = gql`
       generateSseToken
     }
 `;
+
 export const SIGNUP = gql`
   mutation Signup($username: String!, $password: String!, $avatarUrl: String) {
     signup(username: $username, password: $password, avatarUrl: $avatarUrl) {

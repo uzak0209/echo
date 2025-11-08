@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useReactionStream } from '@/lib/hooks/useReactionStream';
+import { useReaction } from '@/lib/reaction-context';
 import { Card, CardContent } from '@/components/ui/card';
 import { REACTION_EMOJIS, ReactionType } from '@/lib/types/reaction';
 
@@ -10,7 +10,7 @@ import { REACTION_EMOJIS, ReactionType } from '@/lib/types/reaction';
  * Shows a toast-like notification when a reaction is received
  */
 export function ReactionNotification() {
-  const { latestReaction, isConnected, error } = useReactionStream();
+  const { latestReaction, isConnected, error } = useReaction();
   const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
