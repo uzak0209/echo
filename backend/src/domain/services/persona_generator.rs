@@ -10,16 +10,39 @@ impl PersonaGenerator {
         "4f46e5", "7c2d12", "be123c", "9f1239", "a21caf",
     ];
 
+    const AVATAR_STYLES: &'static [&'static str] = &[
+        "avataaars",      // イラスト風の顔
+        "bottts",         // ロボット
+        "personas",       // 多様な人物
+        "lorelei",        // キャラクター風
+        "pixel-art",      // ピクセルアート
+        "identicon",      // 幾何学パターン
+        "initials",       // イニシャル
+        "thumbs",         // 親指キャラクター
+        "fun-emoji",      // 絵文字風
+        "adventurer",     // 冒険者風
+    ];
+
     /// ランダムなアバターURLを生成（DiceBear API使用）
     pub fn generate_avatar() -> String {
         let mut rng = rand::thread_rng();
         let seed = uuid::Uuid::new_v4().to_string();
         let color = Self::AVATAR_COLORS[rng.gen_range(0..Self::AVATAR_COLORS.len())];
+        let style = Self::AVATAR_STYLES[rng.gen_range(0..Self::AVATAR_STYLES.len())];
 
-        // DiceBear Avatars API - Identicon style
+        // ランダムにflipやrotateを追加して、さらにバリエーションを増やす
+        let flip = if rng.gen_bool(0.3) { "&flip=true" } else { "" };
+        let rotate = match rng.gen_range(0..4) {
+            1 => "&rotate=90",
+            2 => "&rotate=180",
+            3 => "&rotate=270",
+            _ => "",
+        };
+
+        // DiceBear Avatars API - ランダムなスタイルで生成
         format!(
-            "https://api.dicebear.com/7.x/identicon/svg?seed={}&backgroundColor={}",
-            seed, color
+            "https://api.dicebear.com/7.x/{}/svg?seed={}&backgroundColor={}{}{}",
+            style, seed, color, flip, rotate
         )
     }
 }

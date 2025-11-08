@@ -4,9 +4,10 @@ use std::sync::Arc;
 
 use crate::{
     application::usecases::{
-        AddReactionUseCase, CreatePostUseCase, CreateUserUseCase, GetTimelineUseCase,
-        GetUserLatestReactionUseCase, IncrementDisplayCountUseCase, LoginUseCase,
-        RefreshTokenUseCase, RemoveReactionUseCase, SignupUseCase,
+        AddReactionUseCase, CreatePostUseCase, CreateUserUseCase, GenerateSseTokenUseCase,
+        GetTimelineUseCase, GetUserExpressionStateUseCase, GetUserLatestReactionUseCase,
+        IncrementDisplayCountUseCase, LoginUseCase, RefreshTokenUseCase, RemoveReactionUseCase,
+        SignupUseCase,
     },
     infrastructure::{
         auth::JwtService,
@@ -55,6 +56,9 @@ pub fn build_schema(
     let remove_reaction_use_case = Arc::new(RemoveReactionUseCase::new(reaction_repo.clone()));
     let get_user_latest_reaction_use_case =
         Arc::new(GetUserLatestReactionUseCase::new(reaction_repo.clone()));
+    let get_user_expression_state_use_case =
+        Arc::new(GetUserExpressionStateUseCase::new(reaction_repo.clone()));
+    let generate_sse_token_use_case = Arc::new(GenerateSseTokenUseCase::new(jwt_service.clone()));
 
     Schema::build(QueryRoot, MutationRoot, EmptySubscription)
         .data(get_timeline_use_case)
@@ -67,5 +71,7 @@ pub fn build_schema(
         .data(add_reaction_use_case)
         .data(remove_reaction_use_case)
         .data(get_user_latest_reaction_use_case)
+        .data(get_user_expression_state_use_case)
+        .data(generate_sse_token_use_case)
         .finish()
 }

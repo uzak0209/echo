@@ -1,5 +1,5 @@
 use crate::application::usecases::{
-    AddReactionUseCase, CreatePostUseCase, IncrementDisplayCountUseCase,
+    AddReactionUseCase, CreatePostUseCase, GenerateSseTokenUseCase, IncrementDisplayCountUseCase,
     LoginUseCase, RefreshTokenUseCase, RemoveReactionUseCase, SignupUseCase,
 };
 use crate::presentation::graphql::types::{AuthResponse, CreatePostInput, ReactionTypeGql, RefreshResponse};
@@ -128,5 +128,17 @@ impl MutationRoot {
             .await?;
 
         Ok(true)
+    }
+
+    async fn generate_sse_token(&self, ctx: &Context<'_>) -> Result<String> {
+        let use_case = ctx.data::<Arc<GenerateSseTokenUseCase>>()?;
+
+        // Get user_id from JWT context
+        let user_id = ctx.data::<Uuid>()
+            .map_err(|_| async_graphql::Error::new("Unauthorized: No valid access token"))?;
+
+        let sse_token = use_case.execute(*user_id).await?;
+
+        Ok(sse_token)
     }
 }

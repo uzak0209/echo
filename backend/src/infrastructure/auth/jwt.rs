@@ -5,6 +5,7 @@ use uuid::Uuid;
 
 const ACCESS_TOKEN_EXPIRATION_MINUTES: i64 = 15;
 const REFRESH_TOKEN_EXPIRATION_DAYS: i64 = 30;
+const SSE_TOKEN_EXPIRATION_SECONDS: i64 = 60; // SSE専用トークン: 1分
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -19,6 +20,7 @@ pub struct Claims {
 pub enum TokenType {
     Access,
     Refresh,
+    Sse, // SSE接続専用の短命トークン
 }
 
 pub struct JwtService {
@@ -80,6 +82,30 @@ impl JwtService {
     pub fn verify_refresh_token(&self, token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
         let claims = self.verify_token(token)?;
         if claims.token_type != TokenType::Refresh {
+            return Err(jsonwebtoken::errors::Error::from(
+                jsonwebtoken::errors::ErrorKind::InvalidToken,
+            ));
+        }
+        Ok(claims)
+    }
+
+    pub fn generate_sse_token(&self, user_id: Uuid) -> Result<String, jsonwebtoken::errors::Error> {
+        let now = Utc::now();
+        let exp = now + Duration::seconds(SSE_TOKEN_EXPIRATION_SECONDS);
+
+        let claims = Claims {
+            sub: user_id.to_string(),
+            exp: exp.timestamp(),
+            iat: now.timestamp(),
+            token_type: TokenType::Sse,
+        };
+
+        encode(&Header::default(), &claims, &self.encoding_key)
+    }
+
+    pub fn verify_sse_token(&self, token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
+        let claims = self.verify_token(token)?;
+        if claims.token_type != TokenType::Sse {
             return Err(jsonwebtoken::errors::Error::from(
                 jsonwebtoken::errors::ErrorKind::InvalidToken,
             ));

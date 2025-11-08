@@ -31,4 +31,7 @@ pub trait ReactionRepository: Send + Sync {
 
     /// Get the latest reaction across all posts by a specific user (for displaying on user's avatar)
     async fn get_latest_reaction_for_user(&self, user_id: Uuid) -> Result<Option<Reaction>, DomainError>;
+
+    /// Get cumulative reaction counts that a user has received on all their posts (for 3D model expression)
+    async fn get_user_received_reaction_counts(&self, user_id: Uuid) -> Result<Vec<(ReactionType, i64)>, DomainError>;
 }

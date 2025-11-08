@@ -130,6 +130,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
         .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION, header::ACCEPT])
+        .expose_headers([header::CONTENT_TYPE, header::SET_COOKIE])
         .allow_credentials(true);
 
     // Build router
@@ -146,7 +147,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("GraphQL Playground: http://localhost:{}", port);
     println!("GraphQL Endpoint: http://localhost:{}/graphql", port);
-    println!("SSE Endpoint: http://localhost:{}/api/reactions/events (requires Authorization: Bearer <token>)", port);
+    println!("SSE Endpoint: http://localhost:{}/api/reactions/events", port);
+    println!("  Auth: Authorization: Bearer <token> (preferred) | ?token=<token> (Safari/EventSource fallback)");
 
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
 
