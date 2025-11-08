@@ -34,7 +34,7 @@ export default function TimelinePage() {
 					</div>
 					<div className="flex gap-2">
 						<Button variant="outline" onClick={() => router.push('/avatar')}>
-							Avatar
+							Mascot
 						</Button>
 						<Button variant="outline" onClick={logout}>
 							Logout

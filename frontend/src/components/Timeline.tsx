@@ -16,6 +16,7 @@ interface Post {
 export function Timeline() {
   const { data, loading, error, refetch } = useQuery(GET_TIMELINE, {
     variables: { limit: 10 },
+    fetchPolicy: 'network-only', // Always fetch from server, not cache
   });
 
   if (loading) {
@@ -27,14 +28,17 @@ export function Timeline() {
   }
 
   if (error) {
+    console.error('Timeline error:', error);
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-        <p className="text-destructive">Error loading timeline</p>
+        <p className="text-destructive">Error loading timeline: {error.message}</p>
       </div>
     );
   }
 
   const posts: Post[] = data?.timeline || [];
+
+  console.log('Timeline data:', data, 'Posts:', posts);
 
   return (
     <div className="space-y-4">
