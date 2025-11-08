@@ -1,13 +1,13 @@
 use async_graphql::{EmptySubscription, Schema};
-use std::sync::Arc;
 use sea_orm::DatabaseConnection;
+use std::sync::Arc;
 
 use crate::{
     application::usecases::{
-        AddReactionUseCase, CreatePostUseCase, CreateUserUseCase,
-        GetMyPostsUseCase, GetPostReactionsUseCase, GetTimelineUseCase,
-        GetUserLatestReactionUseCase, IncrementDisplayCountUseCase, LoginUseCase,
-        RefreshTokenUseCase, RemoveReactionUseCase, SignupUseCase,
+        AddReactionUseCase, CreatePostUseCase, CreateUserUseCase, GenerateSseTokenUseCase,
+        GetTimelineUseCase, GetUserExpressionStateUseCase, GetUserLatestReactionUseCase,
+        IncrementDisplayCountUseCase, LoginUseCase, RefreshTokenUseCase, RemoveReactionUseCase,
+        SignupUseCase,
     },
     infrastructure::{
         auth::JwtService,
@@ -34,13 +34,17 @@ pub fn build_schema(
     let reaction_repo = Arc::new(ReactionRepositoryImpl::new(db.clone()));
 
     // Create use cases
-    let get_timeline_use_case = Arc::new(GetTimelineUseCase::new(post_repo.clone(), user_repo.clone()));
+    let get_timeline_use_case = Arc::new(GetTimelineUseCase::new(
+        post_repo.clone(),
+    ));
     let create_post_use_case =
         Arc::new(CreatePostUseCase::new(post_repo.clone(), user_repo.clone()));
     let increment_display_count_use_case =
         Arc::new(IncrementDisplayCountUseCase::new(post_repo.clone()));
-    let create_user_use_case =
-        Arc::new(CreateUserUseCase::new(user_repo.clone(), jwt_service.clone()));
+    let create_user_use_case = Arc::new(CreateUserUseCase::new(
+        user_repo.clone(),
+        jwt_service.clone(),
+    ));
     let refresh_token_use_case = Arc::new(RefreshTokenUseCase::new(jwt_service.clone()));
     let login_use_case = Arc::new(LoginUseCase::new(user_repo.clone(), jwt_service.clone()));
     let signup_use_case = Arc::new(SignupUseCase::new(user_repo.clone(), jwt_service.clone()));
@@ -50,13 +54,11 @@ pub fn build_schema(
         stream_manager,
     ));
     let remove_reaction_use_case = Arc::new(RemoveReactionUseCase::new(reaction_repo.clone()));
-    let get_post_reactions_use_case = Arc::new(GetPostReactionsUseCase::new(reaction_repo.clone()));
-    let get_my_posts_use_case = Arc::new(GetMyPostsUseCase::new(
-        post_repo.clone(),
-        user_repo.clone(),
-        reaction_repo.clone(),
-    ));
-    let get_user_latest_reaction_use_case = Arc::new(GetUserLatestReactionUseCase::new(reaction_repo.clone()));
+    let get_user_latest_reaction_use_case =
+        Arc::new(GetUserLatestReactionUseCase::new(reaction_repo.clone()));
+    let get_user_expression_state_use_case =
+        Arc::new(GetUserExpressionStateUseCase::new(reaction_repo.clone()));
+    let generate_sse_token_use_case = Arc::new(GenerateSseTokenUseCase::new(jwt_service.clone()));
 
     Schema::build(QueryRoot, MutationRoot, EmptySubscription)
         .data(get_timeline_use_case)
@@ -68,8 +70,8 @@ pub fn build_schema(
         .data(signup_use_case)
         .data(add_reaction_use_case)
         .data(remove_reaction_use_case)
-        .data(get_post_reactions_use_case)
-        .data(get_my_posts_use_case)
         .data(get_user_latest_reaction_use_case)
+        .data(get_user_expression_state_use_case)
+        .data(generate_sse_token_use_case)
         .finish()
 }

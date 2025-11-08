@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { useAuth } from '@/lib/auth-context';
-import { useReactionStream } from '@/lib/hooks/useReactionStream';
+import { useReaction } from '@/lib/reaction-context';
 import { GET_USER_LATEST_REACTION } from '@/lib/graphql/queries';
 import { UserAvatar } from './UserAvatar';
 import { Card, CardContent } from './ui/card';
@@ -14,7 +14,7 @@ import { Card, CardContent } from './ui/card';
  */
 export function UserProfile() {
   const { userId } = useAuth();
-  const { latestReaction: sseReaction } = useReactionStream();
+  const { latestReaction: sseReaction } = useReaction();
   const [latestReaction, setLatestReaction] = useState<string | null>(null);
 
   // Fetch initial latest reaction

@@ -38,7 +38,6 @@ export function PostCard({ post }: PostCardProps) {
         await removeReaction({
           variables: {
             postId: post.id,
-            userId,
             reactionType,
           },
         });
@@ -48,7 +47,6 @@ export function PostCard({ post }: PostCardProps) {
         await addReaction({
           variables: {
             postId: post.id,
-            userId,
             reactionType,
           },
         });

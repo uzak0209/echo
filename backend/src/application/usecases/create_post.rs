@@ -33,6 +33,7 @@ impl CreatePostUseCase {
         // Validate content
         let post_content = PostContent::new(content)?;
 
+        // Verify user exists
         let user = match self.user_repository.find_by_id(user_id).await? {
             Some(user) => user,
             None => {

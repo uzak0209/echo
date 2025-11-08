@@ -1,9 +1,8 @@
 use crate::application::usecases::{
-    AddReactionUseCase, CreatePostUseCase, CreateUserUseCase,
-    IncrementDisplayCountUseCase, LoginUseCase, RefreshTokenUseCase, RemoveReactionUseCase,
-    SignupUseCase,
+    AddReactionUseCase, CreatePostUseCase, GenerateSseTokenUseCase, IncrementDisplayCountUseCase,
+    LoginUseCase, RefreshTokenUseCase, RemoveReactionUseCase, SignupUseCase,
 };
-use crate::presentation::graphql::types::{AuthResponse, ReactionTypeGql, RefreshResponse};
+use crate::presentation::graphql::types::{AuthResponse, CreatePostInput, ReactionTypeGql, RefreshResponse};
 use async_graphql::{Context, Object, Result};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -22,9 +21,7 @@ impl MutationRoot {
     ) -> Result<AuthResponse> {
         let use_case = ctx.data::<Arc<SignupUseCase>>()?;
 
-        let tokens = use_case
-            .execute(username, password, avatar_url)
-            .await?;
+        let tokens = use_case.execute(username, password, avatar_url).await?;
 
         // Store refresh token in context for HTTP layer to set as cookie
         ctx.insert_http_header("X-Refresh-Token", tokens.refresh_token.clone());
@@ -32,7 +29,12 @@ impl MutationRoot {
         Ok(tokens.into())
     }
 
-    async fn login(&self, ctx: &Context<'_>, username: String, password: String) -> Result<AuthResponse> {
+    async fn login(
+        &self,
+        ctx: &Context<'_>,
+        username: String,
+        password: String,
+    ) -> Result<AuthResponse> {
         let use_case = ctx.data::<Arc<LoginUseCase>>()?;
 
         let tokens = use_case.execute(username, password).await?;
@@ -41,21 +43,6 @@ impl MutationRoot {
         ctx.insert_http_header("X-Refresh-Token", tokens.refresh_token.clone());
 
         Ok(tokens.into())
-    }
-    async fn create_user(
-        &self,
-        ctx: &Context<'_>,
-        display_name: String,
-        avatar_url: Option<String>,
-    ) -> Result<AuthResponse> {
-        let use_case = ctx.data::<Arc<CreateUserUseCase>>()?;
-
-        let auth_tokens = use_case.execute(display_name, avatar_url).await?;
-
-        // Store refresh token in context for HTTP layer to set as cookie
-        ctx.insert_http_header("X-Refresh-Token", auth_tokens.refresh_token.clone());
-
-        Ok(auth_tokens.into())
     }
 
     async fn refresh_token(&self, ctx: &Context<'_>) -> Result<RefreshResponse> {
@@ -68,26 +55,21 @@ impl MutationRoot {
 
         let refreshed_tokens = use_case.execute(refresh_token).await?;
 
-        // Store new refresh token in context for HTTP layer to set as cookie
-        ctx.insert_http_header("X-Refresh-Token", refreshed_tokens.refresh_token.clone());
-
         Ok(refreshed_tokens.into())
     }
 
     async fn create_post(
         &self,
         ctx: &Context<'_>,
-        content: String,
-        image_url: Option<String>,
-        user_id: String,
+        input: CreatePostInput,
     ) -> Result<bool> {
         let use_case = ctx.data::<Arc<CreatePostUseCase>>()?;
 
-        // Parse incoming string to UUID before handing to the application layer
-        let user_uuid = Uuid::parse_str(&user_id)
-            .map_err(|e| async_graphql::Error::new(format!("Invalid UUID: {}", e)))?;
+        // Get user_id from JWT context
+        let user_id = ctx.data::<Uuid>()
+            .map_err(|_| async_graphql::Error::new("Unauthorized: No valid access token"))?;
 
-        use_case.execute(content, image_url, user_uuid).await?;
+        use_case.execute(input.content, input.image_url, *user_id).await?;
 
         Ok(true)
     }
@@ -108,19 +90,19 @@ impl MutationRoot {
         &self,
         ctx: &Context<'_>,
         post_id: String,
-        user_id: String,
         reaction_type: ReactionTypeGql,
     ) -> Result<bool> {
         let use_case = ctx.data::<Arc<AddReactionUseCase>>()?;
 
+        // Get user_id from JWT context
+        let user_id = ctx.data::<Uuid>()
+            .map_err(|_| async_graphql::Error::new("Unauthorized: No valid access token"))?;
+
         let post_uuid = Uuid::parse_str(&post_id)
             .map_err(|e| async_graphql::Error::new(format!("Invalid post UUID: {}", e)))?;
 
-        let user_uuid = Uuid::parse_str(&user_id)
-            .map_err(|e| async_graphql::Error::new(format!("Invalid user UUID: {}", e)))?;
-
         use_case
-            .execute(post_uuid, user_uuid, reaction_type.into())
+            .execute(post_uuid, *user_id, reaction_type.into())
             .await?;
 
         Ok(true)
@@ -130,21 +112,33 @@ impl MutationRoot {
         &self,
         ctx: &Context<'_>,
         post_id: String,
-        user_id: String,
         reaction_type: ReactionTypeGql,
     ) -> Result<bool> {
         let use_case = ctx.data::<Arc<RemoveReactionUseCase>>()?;
 
+        // Get user_id from JWT context
+        let user_id = ctx.data::<Uuid>()
+            .map_err(|_| async_graphql::Error::new("Unauthorized: No valid access token"))?;
+
         let post_uuid = Uuid::parse_str(&post_id)
             .map_err(|e| async_graphql::Error::new(format!("Invalid post UUID: {}", e)))?;
 
-        let user_uuid = Uuid::parse_str(&user_id)
-            .map_err(|e| async_graphql::Error::new(format!("Invalid user UUID: {}", e)))?;
-
         use_case
-            .execute(post_uuid, user_uuid, reaction_type.into())
+            .execute(post_uuid, *user_id, reaction_type.into())
             .await?;
 
         Ok(true)
+    }
+
+    async fn generate_sse_token(&self, ctx: &Context<'_>) -> Result<String> {
+        let use_case = ctx.data::<Arc<GenerateSseTokenUseCase>>()?;
+
+        // Get user_id from JWT context
+        let user_id = ctx.data::<Uuid>()
+            .map_err(|_| async_graphql::Error::new("Unauthorized: No valid access token"))?;
+
+        let sse_token = use_case.execute(*user_id).await?;
+
+        Ok(sse_token)
     }
 }

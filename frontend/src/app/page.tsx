@@ -1,44 +1,24 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { CreatePost } from '@/components/CreatePost';
-import { Timeline } from '@/components/Timeline';
-import { Login } from '@/components/Login';
-import { Button } from '@/components/ui/button';
-import { ReactionNotification } from '@/components/ReactionNotification';
-import { UserProfile } from '@/components/UserProfile';
 
 export default function Home() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
-  if (!isAuthenticated) {
-    return <Login />;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/timeline');
+    } else {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   return (
-    <main className="min-h-screen bg-background">
-      {/* Real-time reaction notifications via SSE */}
-      <ReactionNotification />
-
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <header className="mb-8 flex justify-between items-start">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">Echo</h1>
-            <p className="text-muted-foreground">
-              A validation-free social network. Post your thoughts without worrying about likes or follows.
-            </p>
-          </div>
-          <Button variant="outline" onClick={logout}>
-            Logout
-          </Button>
-        </header>
-
-        <div className="space-y-8">
-          <UserProfile />
-          <CreatePost />
-          <Timeline />
-        </div>
-      </div>
-    </main>
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-muted-foreground">Loading...</p>
+    </div>
   );
 }

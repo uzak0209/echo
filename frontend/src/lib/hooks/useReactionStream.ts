@@ -2,13 +2,15 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../auth-context';
+import { useMutation } from '@apollo/client';
+import { GENERATE_SSE_TOKEN } from '../graphql/mutations';
 
 export interface ReactionEvent {
-  post_id: string;
-  reactor_user_id: string;
-  reaction_type: string;
-  timestamp: number;
-  latest_reaction_for_author: string;
+	post_id: string;
+	reactor_user_id: string;
+	reaction_type: string;
+	timestamp: number;
+	latest_reaction_for_author: string;
 }
 
 /**
@@ -17,66 +19,71 @@ export interface ReactionEvent {
  * Uses refresh_token from cookie for authentication
  */
 export function useReactionStream() {
-  const { isAuthenticated } = useAuth();
-  const [latestReaction, setLatestReaction] = useState<ReactionEvent | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+	const { isAuthenticated } = useAuth();
+	const [latestReaction, setLatestReaction] = useState<ReactionEvent | null>(null);
+	const [isConnected, setIsConnected] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [generateSSEToken] = useMutation(GENERATE_SSE_TOKEN);
 
-  useEffect(() => {
-    console.log('[useReactionStream] isAuthenticated:', isAuthenticated);
+	useEffect(() => {
+		console.log('[useReactionStream] isAuthenticated:', isAuthenticated);
 
-    if (!isAuthenticated) {
-      console.log('[useReactionStream] Not authenticated, skipping SSE connection');
-      setIsConnected(false);
-      return;
-    }
+		// 未ログインならSSEを張らない
+		if (!isAuthenticated) return;
 
-    console.log('[useReactionStream] Attempting to connect to SSE...');
+		let eventSource: EventSource | null = null;
 
-    // Create EventSource connection
-    // refresh_token cookie is automatically sent by the browser
-    const eventSource = new EventSource('http://localhost:8000/api/reactions/events', {
-      withCredentials: true,
-    });
+		// 非同期処理をラップする
+		(async () => {
+			try {
+				const { data } = await generateSSEToken();
+				const sseToken = data?.generateSseToken;
+				if (!sseToken) {
+					console.error('Failed to obtain SSE token');
+					setError('トークンの生成に失敗しました');
+					return;
+				}
 
-    eventSource.onopen = () => {
-      console.log('SSE connection established');
-      setIsConnected(true);
-      setError(null);
-    };
+				const url = `http://localhost:8000/api/reactions/events?token=${sseToken}`;
+				eventSource = new EventSource(url);
 
-    eventSource.onmessage = (event) => {
-      try {
-        const data: ReactionEvent = JSON.parse(event.data);
-        console.log('Received reaction event:', data);
-        setLatestReaction(data);
-      } catch (err) {
-        console.error('Failed to parse SSE event:', err);
-      }
-    };
+				eventSource.onopen = () => {
+					console.log('[useReactionStream] SSE connection opened');
+					setIsConnected(true);
+					setError(null);
+				};
 
-    eventSource.onerror = (err) => {
-      console.error('SSE connection error:', err);
-      setIsConnected(false);
-      setError('SSE connection failed');
-      eventSource.close();
-    };
+				eventSource.onmessage = (event) => {
+					const parsed = JSON.parse(event.data);
+					setLatestReaction(parsed);
+				};
 
-    // Cleanup on unmount
-    return () => {
-      console.log('Closing SSE connection');
-      eventSource.close();
-    };
-  }, [isAuthenticated]);
+				eventSource.onerror = (err) => {
+					console.error('[useReactionStream] SSE error:', err);
+					setIsConnected(false);
+					setError('SSE 接続エラーが発生しました');
+					eventSource?.close();
+				};
+			} catch (err) {
+				console.error('Error initializing SSE:', err);
+				setError('SSE 初期化中にエラー');
+			}
+		})();
 
-  const clearLatestReaction = useCallback(() => {
-    setLatestReaction(null);
-  }, []);
+		return () => {
+			console.log('[useReactionStream] Cleaning up...');
+			if (eventSource) eventSource.close();
+		};
+	}, [isAuthenticated, generateSSEToken]);
 
-  return {
-    latestReaction,
-    isConnected,
-    error,
-    clearLatestReaction,
-  };
+	const clearLatestReaction = useCallback(() => {
+		setLatestReaction(null);
+	}, []);
+
+	return {
+		latestReaction,
+		isConnected,
+		error,
+		clearLatestReaction,
+	};
 }

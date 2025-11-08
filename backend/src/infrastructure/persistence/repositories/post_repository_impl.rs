@@ -1,11 +1,11 @@
 use crate::{
     domain::{
-        entities::Post,
+        entities::{Post, User},
         error::DomainError,
         repositories::PostRepository,
-        value_objects::{DisplayCount, PostContent},
+        value_objects::{DisplayCount, DisplayName, PostContent},
     },
-    infrastructure::persistence::models::post,
+    infrastructure::persistence::models::{post, user},
 };
 use async_trait::async_trait;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
@@ -29,6 +29,16 @@ impl PostRepositoryImpl {
             display_count: model.display_count.into(),
             created_at: model.created_at.into(),
         })
+    }
+
+    fn user_model_to_entity(model: user::Model) -> User {
+        User {
+            id: model.id,
+            display_name: DisplayName::new(model.display_name),
+            avatar_url: model.avatar_url,
+            password_hash: model.password_hash,
+            created_at: model.created_at.into(),
+        }
     }
 
     fn entity_to_active_model(post: &Post) -> post::ActiveModel {
@@ -81,17 +91,31 @@ impl PostRepository for PostRepositoryImpl {
         Ok(posts.into_iter().take(limit).collect())
     }
 
-    async fn find_by_user_id(&self, user_id: Uuid) -> Result<Vec<Post>, DomainError> {
-        let models = post::Entity::find()
-            .filter(post::Column::UserId.eq(user_id))
+    async fn find_available_with_users(&self, limit: usize, exclude_user_id: Option<Uuid>) -> Result<Vec<(Post, User)>, DomainError> {
+        let mut query = post::Entity::find()
+            .find_also_related(user::Entity)
             .filter(post::Column::Valid.eq(true))
-            .all(&self.db)
-            .await?;
+            .filter(post::Column::DisplayCount.lt(10));
 
-        models
+        // Exclude posts from specific user (don't show own posts)
+        if let Some(user_id) = exclude_user_id {
+            query = query.filter(post::Column::UserId.ne(user_id));
+        }
+
+        let models = query.all(&self.db).await?;
+
+        let results: Vec<(Post, User)> = models
             .into_iter()
-            .map(Self::model_to_entity)
-            .collect::<Result<Vec<_>, _>>()
+            .filter_map(|(post_model, user_model_opt)| {
+                let user_model = user_model_opt?;
+                let post = Self::model_to_entity(post_model).ok()?;
+                let user = Self::user_model_to_entity(user_model);
+                Some((post, user))
+            })
+            .take(limit)
+            .collect();
+
+        Ok(results)
     }
 
     async fn create(&self, post: &Post) -> Result<Post, DomainError> {
@@ -117,10 +141,5 @@ impl PostRepository for PostRepositoryImpl {
 
         let updated = active_model.update(&self.db).await?;
         Self::model_to_entity(updated)
-    }
-
-    async fn delete(&self, id: Uuid) -> Result<(), DomainError> {
-        post::Entity::delete_by_id(id).exec(&self.db).await?;
-        Ok(())
     }
 }

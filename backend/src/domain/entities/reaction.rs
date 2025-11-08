@@ -2,13 +2,13 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 /// Reaction types for posts
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
 pub enum ReactionType {
-    Surprise,    // 驚き
-    Empathy,     // 共感
-    Laugh,       // 笑い
-    Sad,         // 悲しい
-    Confused,    // 首を傾げる
+    Surprise, // 驚き
+    Empathy,  // 共感
+    Laugh,    // 笑い
+    Sad,      // 悲しい
+    Confused, // 首を傾げる
 }
 
 impl ReactionType {
@@ -46,7 +46,7 @@ impl ReactionType {
 }
 
 /// Reaction domain entity
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Reaction {
     pub id: Uuid,
     pub post_id: Uuid,
@@ -82,11 +82,20 @@ mod tests {
 
     #[test]
     fn test_reaction_type_from_str() {
-        assert_eq!(ReactionType::from_str("surprise"), Some(ReactionType::Surprise));
-        assert_eq!(ReactionType::from_str("empathy"), Some(ReactionType::Empathy));
+        assert_eq!(
+            ReactionType::from_str("surprise"),
+            Some(ReactionType::Surprise)
+        );
+        assert_eq!(
+            ReactionType::from_str("empathy"),
+            Some(ReactionType::Empathy)
+        );
         assert_eq!(ReactionType::from_str("laugh"), Some(ReactionType::Laugh));
         assert_eq!(ReactionType::from_str("sad"), Some(ReactionType::Sad));
-        assert_eq!(ReactionType::from_str("confused"), Some(ReactionType::Confused));
+        assert_eq!(
+            ReactionType::from_str("confused"),
+            Some(ReactionType::Confused)
+        );
         assert_eq!(ReactionType::from_str("invalid"), None);
     }
 

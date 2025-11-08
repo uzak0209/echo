@@ -1,8 +1,9 @@
 use crate::application::dto::PostDto;
-use crate::application::usecases::{AuthTokens, LoginTokens, RefreshedTokens, ReactionCount, SignupTokens};
+use crate::application::usecases::{AuthTokens, ExpressionState, LoginTokens, RefreshedTokens, SignupTokens};
 use crate::domain::entities::ReactionType;
-use async_graphql::{Enum, SimpleObject};
+use async_graphql::{Enum, InputObject, SimpleObject};
 
+/// GraphQL output type for Post (response)
 #[derive(SimpleObject)]
 pub struct Post {
     // Expose the UUID as a string in the GraphQL layer.
@@ -23,6 +24,13 @@ impl From<PostDto> for Post {
             author_avatar: dto.author_avatar,
         }
     }
+}
+
+/// GraphQL input type for creating a Post (request)
+#[derive(InputObject)]
+pub struct CreatePostInput {
+    pub content: String,
+    pub image_url: Option<String>,
 }
 
 #[derive(SimpleObject)]
@@ -104,17 +112,40 @@ impl From<ReactionType> for ReactionTypeGql {
     }
 }
 
+/// Reaction count by type for expression state
 #[derive(SimpleObject)]
-pub struct ReactionCountGql {
+pub struct ReactionCount {
     pub reaction_type: ReactionTypeGql,
-    pub count: i32,
+    pub count: i64,
 }
 
-impl From<ReactionCount> for ReactionCountGql {
-    fn from(count: ReactionCount) -> Self {
+/// User's 3D model expression state based on reactions received
+#[derive(SimpleObject)]
+pub struct UserExpressionState {
+    /// Dominant expression type based on most received reactions
+    pub dominant_expression: Option<ReactionTypeGql>,
+    /// Intensity level (0.0 to 1.0) based on total reaction count
+    pub intensity: f32,
+    /// Breakdown of reaction counts by type
+    pub reaction_counts: Vec<ReactionCount>,
+    /// Total number of reactions received
+    pub total_reactions: i64,
+}
+
+impl From<ExpressionState> for UserExpressionState {
+    fn from(state: ExpressionState) -> Self {
         Self {
-            reaction_type: count.reaction_type.into(),
-            count: count.count as i32,
+            dominant_expression: state.dominant_expression.map(|r| r.into()),
+            intensity: state.intensity,
+            reaction_counts: state
+                .reaction_counts
+                .into_iter()
+                .map(|(reaction_type, count)| ReactionCount {
+                    reaction_type: reaction_type.into(),
+                    count,
+                })
+                .collect(),
+            total_reactions: state.total_reactions,
         }
     }
 }

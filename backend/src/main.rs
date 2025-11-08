@@ -1,13 +1,12 @@
-mod domain;
 mod application;
+mod domain;
 mod infrastructure;
 mod presentation;
 
-use async_graphql::http::{GraphQLPlaygroundConfig, playground_source};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     extract::State,
-    http::{header, HeaderMap, Method, StatusCode},
+    http::{header, HeaderMap, Method},
     response::{Html, IntoResponse, Response},
     routing::{get, post},
     Router,
@@ -20,6 +19,7 @@ use tower_http::cors::CorsLayer;
 struct AppState {
     schema: presentation::graphql::schema::AppSchema,
     stream_manager: Arc<infrastructure::sse::ReactionStreamManager>,
+    jwt_service: Arc<infrastructure::auth::JwtService>,
 }
 
 async fn graphql_handler(
@@ -38,10 +38,29 @@ async fn graphql_handler(
                 .map(|c| c.trim().strip_prefix("refresh_token=").unwrap().to_string())
         });
 
-    // Build request with refresh token in context if available
+    // Extract access token from Authorization header
+    let access_token = headers
+        .get(header::AUTHORIZATION)
+        .and_then(|v| v.to_str().ok())
+        .and_then(|auth| auth.strip_prefix("Bearer "))
+        .map(|t| t.to_string());
+
+    // Build request with tokens and user claims in context
     let mut request = req.into_inner();
+
+    // Add refresh token if available
     if let Some(token) = refresh_token {
         request = request.data(token);
+    }
+
+    // Verify access token and add user_id to context
+    if let Some(token) = access_token {
+        if let Ok(claims) = state.jwt_service.verify_access_token(&token) {
+            // Add user_id to context
+            if let Ok(user_id) = uuid::Uuid::parse_str(&claims.sub) {
+                request = request.data(user_id);
+            }
+        }
     }
 
     // Execute GraphQL request
@@ -61,10 +80,9 @@ async fn graphql_handler(
                 token_str,
                 30 * 24 * 60 * 60 // 30 days in seconds
             );
-            http_response.headers_mut().insert(
-                header::SET_COOKIE,
-                cookie.parse().unwrap(),
-            );
+            http_response
+                .headers_mut()
+                .insert(header::SET_COOKIE, cookie.parse().unwrap());
         }
     }
 
@@ -72,11 +90,9 @@ async fn graphql_handler(
 }
 
 async fn graphql_playground() -> impl IntoResponse {
-    Html(
-        async_graphql::http::playground_source(
-            async_graphql::http::GraphQLPlaygroundConfig::new("/graphql"),
-        ),
-    )
+    Html(async_graphql::http::playground_source(
+        async_graphql::http::GraphQLPlaygroundConfig::new("/graphql"),
+    ))
 }
 
 #[tokio::main]
@@ -102,17 +118,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let state = AppState {
         schema,
         stream_manager: stream_manager.clone(),
+        jwt_service: jwt_service.clone(),
     };
 
     // Configure CORS
     let cors = CorsLayer::new()
-        .allow_origin("http://localhost:3000".parse::<axum::http::HeaderValue>().unwrap())
+        .allow_origin(
+            "http://localhost:3000"
+                .parse::<axum::http::HeaderValue>()
+                .unwrap(),
+        )
         .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
-        .allow_headers([
-            header::CONTENT_TYPE,
-            header::AUTHORIZATION,
-            header::ACCEPT,
-        ])
+        .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION, header::ACCEPT])
+        .expose_headers([header::CONTENT_TYPE, header::SET_COOKIE])
         .allow_credentials(true);
 
     // Build router
@@ -120,17 +138,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/graphql", post(graphql_handler))
         .route("/", get(graphql_playground))
         .with_state(state.clone())
-        .route("/api/reactions/events",
+        .route(
+            "/api/reactions/events",
             get(presentation::sse::reaction_events_handler)
-                .with_state((stream_manager.clone(), jwt_service.clone())))
+                .with_state((stream_manager.clone(), jwt_service)),
+        )
         .layer(cors);
 
     println!("GraphQL Playground: http://localhost:{}", port);
     println!("GraphQL Endpoint: http://localhost:{}/graphql", port);
-    println!("SSE Endpoint: http://localhost:{}/api/reactions/events (requires Authorization: Bearer <token>)", port);
+    println!("SSE Endpoint: http://localhost:{}/api/reactions/events", port);
+    println!("  Auth: Authorization: Bearer <token> (preferred) | ?token=<token> (Safari/EventSource fallback)");
 
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
-        .await?;
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
 
     axum::serve(listener, app).await?;
 
