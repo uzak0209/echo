@@ -58,3 +58,9 @@ export const REMOVE_REACTION = gql`
     removeReaction(postId: $postId, reactionType: $reactionType)
   }
 `;
+
+export const UPDATE_AVATAR = gql`
+  mutation UpdateAvatar($avatarUrl: String!) {
+    updateAvatar(avatarUrl: $avatarUrl)
+  }
+`;

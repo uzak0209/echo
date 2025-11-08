@@ -7,6 +7,8 @@ import { SIGNUP, LOGIN, CREATE_USER, REFRESH_TOKEN } from './graphql/mutations';
 interface AuthContextType {
   accessToken: string | null;
   userId: string | null;
+  displayName: string | null;
+  avatarUrl: string | null;
   login: (username: string, password: string) => Promise<void>;
   signup: (username: string, password: string) => Promise<void>;
   createAnonymousUser: (displayName: string, avatarUrl?: string) => Promise<void>;
@@ -20,6 +22,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const [signupMutation] = useMutation(SIGNUP);
   const [loginMutation] = useMutation(LOGIN);
@@ -36,11 +40,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data?.signup) {
           setAccessToken(data.signup.accessToken);
           setUserId(data.signup.userId);
+          setDisplayName(username);
 
-          // Store both accessToken and userId in localStorage for persistence
+          // Generate random avatar for new user
+          const randomAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+          setAvatarUrl(randomAvatar);
+
+          // Store in localStorage for persistence
           if (typeof window !== 'undefined') {
             localStorage.setItem('accessToken', data.signup.accessToken);
             localStorage.setItem('userId', data.signup.userId);
+            localStorage.setItem('displayName', username);
+            localStorage.setItem('avatarUrl', randomAvatar);
           }
         }
       } catch (error) {
@@ -61,11 +72,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data?.login) {
           setAccessToken(data.login.accessToken);
           setUserId(data.login.userId);
+          setDisplayName(username);
 
-          // Store both accessToken and userId in localStorage for persistence
+          // Use existing avatar or generate new one
+          const storedAvatar = typeof window !== 'undefined' ? localStorage.getItem('avatarUrl') : null;
+          const avatar = storedAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+          setAvatarUrl(avatar);
+
+          // Store in localStorage for persistence
           if (typeof window !== 'undefined') {
             localStorage.setItem('accessToken', data.login.accessToken);
             localStorage.setItem('userId', data.login.userId);
+            localStorage.setItem('displayName', username);
+            localStorage.setItem('avatarUrl', avatar);
           }
         }
       } catch (error) {
@@ -123,26 +142,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = useCallback(() => {
     setAccessToken(null);
     setUserId(null);
+    setDisplayName(null);
+    setAvatarUrl(null);
 
-    // Clear both accessToken and userId from localStorage
+    // Clear all auth data from localStorage
     if (typeof window !== 'undefined') {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('userId');
+      localStorage.removeItem('displayName');
+      localStorage.removeItem('avatarUrl');
     }
   }, []);
 
-  // Try to restore accessToken and userId from localStorage on mount
+  // Try to restore auth data from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedAccessToken = localStorage.getItem('accessToken');
       const storedUserId = localStorage.getItem('userId');
+      const storedDisplayName = localStorage.getItem('displayName');
+      const storedAvatarUrl = localStorage.getItem('avatarUrl');
 
       if (storedAccessToken && storedUserId) {
         setAccessToken(storedAccessToken);
         setUserId(storedUserId);
+        setDisplayName(storedDisplayName);
+        setAvatarUrl(storedAvatarUrl);
       } else if (storedUserId && !storedAccessToken) {
         // If we have userId but no access token, try to refresh
         setUserId(storedUserId);
+        setDisplayName(storedDisplayName);
+        setAvatarUrl(storedAvatarUrl);
         refreshAccessToken();
       }
     }
@@ -153,6 +182,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         accessToken,
         userId,
+        displayName,
+        avatarUrl,
         login,
         signup,
         createAnonymousUser,
