@@ -11,6 +11,7 @@
   "dependencies": {
     "@apollo/client": "^3.11.0",
     "@pixiv/three-vrm": "^3.4.4",
+    "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.0.2",
     "@react-three/drei": "^10.7.6",
