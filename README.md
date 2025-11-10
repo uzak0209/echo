@@ -424,6 +424,59 @@ npm run codegen
 
 ## SSE（Server-Sent Events）でリアルタイムリアクション通知
 
+### SSE接続フロー
+
+このプロジェクトでは、投稿者が自分の投稿へのリアクションをリアルタイムで受け取るためにSSEを使用しています。
+
+```mermaid
+sequenceDiagram
+    participant Frontend as Frontend<br/>(Next.js)
+    participant GraphQL as Backend GraphQL<br/>(Rust + async-graphql)
+    participant SSE as SSE Handler<br/>(Axum)
+    participant Manager as ReactionStreamManager<br/>(broadcast channel)
+    participant OtherUser as 他のユーザー
+
+    Note over Frontend,Manager: 1. 認証フェーズ
+    Frontend->>GraphQL: login mutation
+    GraphQL-->>Frontend: JWT token + refresh token (Cookie)
+
+    Note over Frontend,Manager: 2. SSEトークン生成
+    Frontend->>GraphQL: generateSseToken mutation<br/>(Authorization: Bearer <JWT>)
+    GraphQL-->>Frontend: SSE token (60秒有効)
+
+    Note over Frontend,Manager: 3. SSE接続確立
+    Frontend->>SSE: GET /api/reactions/events?token=<sse_token>
+    SSE->>SSE: トークン検証 & ユーザーID抽出
+    SSE->>Manager: subscribe(user_id)
+    Manager->>Manager: broadcast channel作成/取得
+    Manager-->>SSE: broadcast::Receiver
+    SSE-->>Frontend: SSE connection open
+    SSE-->>Frontend: keepalive (定期送信)
+
+    Note over Frontend,Manager: 4. リアクション発生時
+    OtherUser->>GraphQL: addReaction mutation<br/>(postId, reactionType)
+    GraphQL->>GraphQL: 投稿者ID取得
+    GraphQL->>Manager: broadcast_reaction(<br/>  post_author_id,<br/>  post_id,<br/>  reactor_user_id,<br/>  reaction_type<br/>)
+    Manager->>Manager: ReactionEvent生成
+    Manager->>SSE: broadcast::send(event)
+    SSE-->>Frontend: SSE data event<br/>{post_id, reaction_type, ...}
+    Frontend->>Frontend: アバターに表情を表示
+
+    Note over Frontend,Manager: 5. 接続維持・再接続
+    Frontend->>Frontend: 55秒後にタイマー発火
+    Frontend->>Frontend: SSE接続をクローズ
+    Frontend->>GraphQL: generateSseToken mutation (再取得)
+    GraphQL-->>Frontend: 新しいSSE token
+    Frontend->>SSE: 新しいtokenで再接続
+```
+
+**主要コンポーネント:**
+
+- **Frontend (`useReactionStream.ts`)**: EventSource APIによるSSE接続管理、自動再接続
+- **Backend SSE Handler (`reaction_handler.rs`)**: SSEエンドポイント、短命トークン検証
+- **ReactionStreamManager (`reaction_stream.rs`)**: ユーザーごとのbroadcast channel管理、イベント配信
+- **GraphQL Mutation (`add_reaction.rs`)**: リアクション追加時にSSEストリームへイベント送信
+
 ### エンドポイント
 
 ```
