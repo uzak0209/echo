@@ -17,5 +17,10 @@ pub trait UserRepository: Send + Sync {
         avatar_url: Option<String>,
         password_hash: String,
     ) -> Result<User, DomainError>;
+    async fn update_refresh_token(
+        &self,
+        user_id: Uuid,
+        refresh_token: Option<String>,
+    ) -> Result<(), DomainError>;
     async fn delete(&self, id: Uuid) -> Result<(), DomainError>;
 }

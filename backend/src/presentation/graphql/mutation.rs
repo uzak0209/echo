@@ -1,6 +1,6 @@
 use crate::application::usecases::{
     AddReactionUseCase, CreatePostUseCase, GenerateSseTokenUseCase, IncrementDisplayCountUseCase,
-    LoginUseCase, RefreshTokenUseCase, RemoveReactionUseCase, SignupUseCase,
+    LoginUseCase, LogoutUseCase, RefreshTokenUseCase, RemoveReactionUseCase, SignupUseCase,
 };
 use crate::presentation::graphql::types::{AuthResponse, CreatePostInput, ReactionTypeGql, RefreshResponse};
 use async_graphql::{Context, Object, Result};
@@ -56,6 +56,21 @@ impl MutationRoot {
         let refreshed_tokens = use_case.execute(refresh_token).await?;
 
         Ok(refreshed_tokens.into())
+    }
+
+    async fn logout(&self, ctx: &Context<'_>) -> Result<bool> {
+        let use_case = ctx.data::<Arc<LogoutUseCase>>()?;
+
+        // Get user_id from JWT context
+        let user_id = ctx.data::<Uuid>()
+            .map_err(|_| async_graphql::Error::new("Unauthorized: No valid access token"))?;
+
+        use_case.execute(*user_id).await?;
+
+        // Signal to HTTP layer to clear refresh token cookie
+        ctx.insert_http_header("X-Clear-Refresh-Token", "true");
+
+        Ok(true)
     }
 
     async fn create_post(

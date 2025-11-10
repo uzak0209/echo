@@ -9,6 +9,7 @@ pub struct User {
     pub display_name: DisplayName,
     pub avatar_url: String,
     pub password_hash: Option<String>,
+    pub refresh_token: Option<String>,
     pub created_at: DateTime<Utc>,
 }
 
@@ -19,6 +20,7 @@ impl User {
             display_name,
             avatar_url,
             password_hash: None,
+            refresh_token: None,
             created_at: Utc::now(),
         }
     }
@@ -33,6 +35,7 @@ impl User {
             display_name,
             avatar_url,
             password_hash: Some(password_hash),
+            refresh_token: None,
             created_at: Utc::now(),
         }
     }

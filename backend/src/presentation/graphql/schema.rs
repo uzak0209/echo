@@ -6,7 +6,7 @@ use crate::{
     application::usecases::{
         AddReactionUseCase, CreatePostUseCase, CreateUserUseCase, GenerateSseTokenUseCase,
         GetTimelineUseCase, GetUserLatestReactionUseCase,
-        IncrementDisplayCountUseCase, LoginUseCase, RefreshTokenUseCase, RemoveReactionUseCase,
+        IncrementDisplayCountUseCase, LoginUseCase, LogoutUseCase, RefreshTokenUseCase, RemoveReactionUseCase,
         SignupUseCase,
     },
     infrastructure::{
@@ -45,9 +45,10 @@ pub fn build_schema(
         user_repo.clone(),
         jwt_service.clone(),
     ));
-    let refresh_token_use_case = Arc::new(RefreshTokenUseCase::new(jwt_service.clone()));
+    let refresh_token_use_case = Arc::new(RefreshTokenUseCase::new(user_repo.clone(), jwt_service.clone()));
     let login_use_case = Arc::new(LoginUseCase::new(user_repo.clone(), jwt_service.clone()));
     let signup_use_case = Arc::new(SignupUseCase::new(user_repo.clone(), jwt_service.clone()));
+    let logout_use_case = Arc::new(LogoutUseCase::new(user_repo.clone()));
     let add_reaction_use_case = Arc::new(AddReactionUseCase::new(
         reaction_repo.clone(),
         post_repo.clone(),
@@ -66,6 +67,7 @@ pub fn build_schema(
         .data(refresh_token_use_case)
         .data(login_use_case)
         .data(signup_use_case)
+        .data(logout_use_case)
         .data(add_reaction_use_case)
         .data(remove_reaction_use_case)
         .data(get_user_latest_reaction_use_case)

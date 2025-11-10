@@ -4,6 +4,7 @@ mod create_posts_table;
 mod create_users_table;
 mod add_user_credentials;
 mod create_reactions_table;
+mod add_refresh_token_to_users;
 
 pub struct Migrator;
 
@@ -15,6 +16,7 @@ impl MigratorTrait for Migrator {
             Box::new(create_posts_table::Migration),
             Box::new(add_user_credentials::Migration),
             Box::new(create_reactions_table::Migration),
+            Box::new(add_refresh_token_to_users::Migration),
         ]
     }
 }

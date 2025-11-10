@@ -68,6 +68,7 @@ async fn graphql_handler(
 
     // Extract refresh token from response headers before converting
     let refresh_token_header = response.http_headers.get("X-Refresh-Token").cloned();
+    let clear_refresh_token = response.http_headers.get("X-Clear-Refresh-Token").cloned();
 
     // Convert to HTTP response
     let mut http_response: Response = GraphQLResponse::from(response).into_response();
@@ -84,6 +85,14 @@ async fn graphql_handler(
                 .headers_mut()
                 .insert(header::SET_COOKIE, cookie.parse().unwrap());
         }
+    }
+
+    // If logout requested, clear the refresh token cookie
+    if clear_refresh_token.is_some() {
+        let clear_cookie = "refresh_token=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/";
+        http_response
+            .headers_mut()
+            .insert(header::SET_COOKIE, clear_cookie.parse().unwrap());
     }
 
     http_response
