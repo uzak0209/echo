@@ -17,21 +17,14 @@ pub trait ReactionRepository: Send + Sync {
         &self,
         post_id: Uuid,
         user_id: Uuid,
-        reaction_type: ReactionType,
     ) -> Result<(), DomainError>;
 
     /// Get all reactions for a specific post
     async fn find_by_post_id(&self, post_id: Uuid) -> Result<Vec<Reaction>, DomainError>;
 
-    /// Get reaction counts by type for a post
-    async fn get_reaction_counts(&self, post_id: Uuid) -> Result<Vec<(ReactionType, i64)>, DomainError>;
-
-    /// Get the latest reaction for each post by the author (for displaying on author's avatar)
+    /// Get the latest reaction for a specific post (for displaying on post author's avatar)
     async fn get_latest_reaction_for_post(&self, post_id: Uuid) -> Result<Option<Reaction>, DomainError>;
 
     /// Get the latest reaction across all posts by a specific user (for displaying on user's avatar)
     async fn get_latest_reaction_for_user(&self, user_id: Uuid) -> Result<Option<Reaction>, DomainError>;
-
-    /// Get cumulative reaction counts that a user has received on all their posts (for 3D model expression)
-    async fn get_user_received_reaction_counts(&self, user_id: Uuid) -> Result<Vec<(ReactionType, i64)>, DomainError>;
 }

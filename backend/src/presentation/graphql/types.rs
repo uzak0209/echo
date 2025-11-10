@@ -1,5 +1,5 @@
 use crate::application::dto::PostDto;
-use crate::application::usecases::{AuthTokens, ExpressionState, LoginTokens, RefreshedTokens, SignupTokens};
+use crate::application::usecases::{AuthTokens, LoginTokens, RefreshedTokens, SignupTokens};
 use crate::domain::entities::ReactionType;
 use async_graphql::{Enum, InputObject, SimpleObject};
 
@@ -108,44 +108,6 @@ impl From<ReactionType> for ReactionTypeGql {
             ReactionType::Laugh => ReactionTypeGql::Laugh,
             ReactionType::Sad => ReactionTypeGql::Sad,
             ReactionType::Confused => ReactionTypeGql::Confused,
-        }
-    }
-}
-
-/// Reaction count by type for expression state
-#[derive(SimpleObject)]
-pub struct ReactionCount {
-    pub reaction_type: ReactionTypeGql,
-    pub count: i64,
-}
-
-/// User's 3D model expression state based on reactions received
-#[derive(SimpleObject)]
-pub struct UserExpressionState {
-    /// Dominant expression type based on most received reactions
-    pub dominant_expression: Option<ReactionTypeGql>,
-    /// Intensity level (0.0 to 1.0) based on total reaction count
-    pub intensity: f32,
-    /// Breakdown of reaction counts by type
-    pub reaction_counts: Vec<ReactionCount>,
-    /// Total number of reactions received
-    pub total_reactions: i64,
-}
-
-impl From<ExpressionState> for UserExpressionState {
-    fn from(state: ExpressionState) -> Self {
-        Self {
-            dominant_expression: state.dominant_expression.map(|r| r.into()),
-            intensity: state.intensity,
-            reaction_counts: state
-                .reaction_counts
-                .into_iter()
-                .map(|(reaction_type, count)| ReactionCount {
-                    reaction_type: reaction_type.into(),
-                    count,
-                })
-                .collect(),
-            total_reactions: state.total_reactions,
         }
     }
 }

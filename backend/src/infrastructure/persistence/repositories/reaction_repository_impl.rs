@@ -45,17 +45,12 @@ impl ReactionRepository for ReactionRepositoryImpl {
         user_id: Uuid,
         reaction_type: ReactionType,
     ) -> Result<Reaction, DomainError> {
-        // First, check if this exact reaction already exists
-        let existing = reaction::Entity::find()
+        // Delete any existing reaction from this user on this post (last reaction wins)
+        reaction::Entity::delete_many()
             .filter(reaction::Column::PostId.eq(post_id))
             .filter(reaction::Column::UserId.eq(user_id))
-            .filter(reaction::Column::ReactionType.eq(reaction_type.as_str()))
-            .one(&self.db)
+            .exec(&self.db)
             .await?;
-
-        if let Some(existing_model) = existing {
-            return Self::model_to_entity(existing_model);
-        }
 
         // Create new reaction
         let new_reaction = Reaction::new(post_id, user_id, reaction_type);
@@ -76,12 +71,10 @@ impl ReactionRepository for ReactionRepositoryImpl {
         &self,
         post_id: Uuid,
         user_id: Uuid,
-        reaction_type: ReactionType,
     ) -> Result<(), DomainError> {
         reaction::Entity::delete_many()
             .filter(reaction::Column::PostId.eq(post_id))
             .filter(reaction::Column::UserId.eq(user_id))
-            .filter(reaction::Column::ReactionType.eq(reaction_type.as_str()))
             .exec(&self.db)
             .await?;
 
@@ -98,20 +91,6 @@ impl ReactionRepository for ReactionRepositoryImpl {
             .into_iter()
             .map(Self::model_to_entity)
             .collect::<Result<Vec<_>, _>>()
-    }
-
-    async fn get_reaction_counts(
-        &self,
-        post_id: Uuid,
-    ) -> Result<Vec<(ReactionType, i64)>, DomainError> {
-        let reactions = self.find_by_post_id(post_id).await?;
-
-        let mut counts = std::collections::HashMap::new();
-        for reaction in reactions {
-            *counts.entry(reaction.reaction_type).or_insert(0) += 1;
-        }
-
-        Ok(counts.into_iter().collect())
     }
 
     async fn get_latest_reaction_for_post(
@@ -148,33 +127,5 @@ impl ReactionRepository for ReactionRepositoryImpl {
             Some(m) => Ok(Some(Self::model_to_entity(m)?)),
             None => Ok(None),
         }
-    }
-
-    async fn get_user_received_reaction_counts(
-        &self,
-        user_id: Uuid,
-    ) -> Result<Vec<(ReactionType, i64)>, DomainError> {
-        use crate::infrastructure::persistence::models::post;
-        use sea_orm::JoinType;
-
-        // Get all reactions on posts created by this user
-        let reactions = reaction::Entity::find()
-            .join(JoinType::InnerJoin, reaction::Relation::Post.def())
-            .filter(post::Column::UserId.eq(user_id))
-            .all(&self.db)
-            .await?;
-
-        // Convert to entities and count by type
-        let reaction_entities: Vec<Reaction> = reactions
-            .into_iter()
-            .map(Self::model_to_entity)
-            .collect::<Result<Vec<_>, _>>()?;
-
-        let mut counts = std::collections::HashMap::new();
-        for reaction in reaction_entities {
-            *counts.entry(reaction.reaction_type).or_insert(0) += 1;
-        }
-
-        Ok(counts.into_iter().collect())
     }
 }
