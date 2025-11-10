@@ -1,5 +1,5 @@
-use super::types::{Post, ReactionTypeGql, UserExpressionState};
-use crate::application::usecases::{GetTimelineUseCase, GetUserExpressionStateUseCase, GetUserLatestReactionUseCase};
+use super::types::{Post, ReactionTypeGql};
+use crate::application::usecases::{GetTimelineUseCase, GetUserLatestReactionUseCase};
 use async_graphql::{Context, Object, Result};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -38,17 +38,5 @@ impl QueryRoot {
         let reaction_type = use_case.execute(user_uuid).await?;
 
         Ok(reaction_type.map(|r| r.into()))
-    }
-
-    async fn user_expression_state(&self, ctx: &Context<'_>) -> Result<UserExpressionState> {
-        let use_case = ctx.data::<Arc<GetUserExpressionStateUseCase>>()?;
-
-        // Get user_id from JWT context
-        let user_id = ctx.data::<Uuid>()
-            .map_err(|_| async_graphql::Error::new("Unauthorized: No valid access token"))?;
-
-        let expression_state = use_case.execute(*user_id).await?;
-
-        Ok(expression_state.into())
     }
 }

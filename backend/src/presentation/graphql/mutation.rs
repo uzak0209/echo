@@ -112,7 +112,6 @@ impl MutationRoot {
         &self,
         ctx: &Context<'_>,
         post_id: String,
-        reaction_type: ReactionTypeGql,
     ) -> Result<bool> {
         let use_case = ctx.data::<Arc<RemoveReactionUseCase>>()?;
 
@@ -124,7 +123,7 @@ impl MutationRoot {
             .map_err(|e| async_graphql::Error::new(format!("Invalid post UUID: {}", e)))?;
 
         use_case
-            .execute(post_uuid, *user_id, reaction_type.into())
+            .execute(post_uuid, *user_id)
             .await?;
 
         Ok(true)

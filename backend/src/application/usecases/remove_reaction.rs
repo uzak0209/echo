@@ -1,6 +1,6 @@
 use crate::{
     application::error::AppError,
-    domain::{entities::ReactionType, repositories::ReactionRepository},
+    domain::repositories::ReactionRepository,
 };
 use std::sync::Arc;
 use uuid::Uuid;
@@ -20,10 +20,9 @@ impl RemoveReactionUseCase {
         &self,
         post_id: Uuid,
         user_id: Uuid,
-        reaction_type: ReactionType,
     ) -> Result<bool, AppError> {
         self.reaction_repository
-            .remove_reaction(post_id, user_id, reaction_type)
+            .remove_reaction(post_id, user_id)
             .await?;
 
         Ok(true)
