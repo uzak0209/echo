@@ -246,12 +246,13 @@ export function MascotAvatar({ userId, expression }: MascotAvatarProps) {
     };
   }, [userId]);
 
-  // Update expression when it changes
+  // Update expression when it changes or after loading completes
   useEffect(() => {
     const updateExpression = async () => {
       const THREE = await import('three');
 
-      if (!mascotRef.current.mouth || !sceneRef.current) return;
+      // Wait for scene to be ready
+      if (!mascotRef.current.mouth || !sceneRef.current || isLoading) return;
 
       // Remove old mouth and effects
       const group = mascotRef.current.group;
@@ -486,10 +487,10 @@ export function MascotAvatar({ userId, expression }: MascotAvatarProps) {
       }
     };
 
-    if (expression && mascotRef.current.group) {
+    if (mascotRef.current.group && !isLoading) {
       updateExpression();
     }
-  }, [expression]);
+  }, [expression, isLoading]);
 
   return (
     <div className="w-full h-full relative">
