@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use std::str::FromStr;
 use uuid::Uuid;
 
 /// Reaction types for posts
@@ -22,17 +23,6 @@ impl ReactionType {
         }
     }
 
-    pub fn from_str(s: &str) -> Option<Self> {
-        match s {
-            "surprise" => Some(ReactionType::Surprise),
-            "empathy" => Some(ReactionType::Empathy),
-            "laugh" => Some(ReactionType::Laugh),
-            "sad" => Some(ReactionType::Sad),
-            "confused" => Some(ReactionType::Confused),
-            _ => None,
-        }
-    }
-
     /// Get all reaction types
     pub fn all() -> Vec<ReactionType> {
         vec![
@@ -42,6 +32,21 @@ impl ReactionType {
             ReactionType::Sad,
             ReactionType::Confused,
         ]
+    }
+}
+
+impl FromStr for ReactionType {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "surprise" => Ok(ReactionType::Surprise),
+            "empathy" => Ok(ReactionType::Empathy),
+            "laugh" => Ok(ReactionType::Laugh),
+            "sad" => Ok(ReactionType::Sad),
+            "confused" => Ok(ReactionType::Confused),
+            _ => Err(format!("Invalid reaction type: {}", s)),
+        }
     }
 }
 
@@ -83,20 +88,20 @@ mod tests {
     #[test]
     fn test_reaction_type_from_str() {
         assert_eq!(
-            ReactionType::from_str("surprise"),
-            Some(ReactionType::Surprise)
+            "surprise".parse::<ReactionType>().unwrap(),
+            ReactionType::Surprise
         );
         assert_eq!(
-            ReactionType::from_str("empathy"),
-            Some(ReactionType::Empathy)
+            "empathy".parse::<ReactionType>().unwrap(),
+            ReactionType::Empathy
         );
-        assert_eq!(ReactionType::from_str("laugh"), Some(ReactionType::Laugh));
-        assert_eq!(ReactionType::from_str("sad"), Some(ReactionType::Sad));
+        assert_eq!("laugh".parse::<ReactionType>().unwrap(), ReactionType::Laugh);
+        assert_eq!("sad".parse::<ReactionType>().unwrap(), ReactionType::Sad);
         assert_eq!(
-            ReactionType::from_str("confused"),
-            Some(ReactionType::Confused)
+            "confused".parse::<ReactionType>().unwrap(),
+            ReactionType::Confused
         );
-        assert_eq!(ReactionType::from_str("invalid"), None);
+        assert!("invalid".parse::<ReactionType>().is_err());
     }
 
     #[test]

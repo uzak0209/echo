@@ -19,12 +19,6 @@ pub trait ReactionRepository: Send + Sync {
         user_id: Uuid,
     ) -> Result<(), DomainError>;
 
-    /// Get all reactions for a specific post
-    async fn find_by_post_id(&self, post_id: Uuid) -> Result<Vec<Reaction>, DomainError>;
-
-    /// Get the latest reaction for a specific post (for displaying on post author's avatar)
-    async fn get_latest_reaction_for_post(&self, post_id: Uuid) -> Result<Option<Reaction>, DomainError>;
-
     /// Get the latest reaction across all posts by a specific user (for displaying on user's avatar)
     async fn get_latest_reaction_for_user(&self, user_id: Uuid) -> Result<Option<Reaction>, DomainError>;
 }
