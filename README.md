@@ -23,7 +23,7 @@
 
 - ✅ 投稿者は自分の投稿を確認できない
 - ✅ 「いいね」やフォローなどの承認機能は一切なし
-- ✅ プロフィール画像はランダム
+- ✅ 名前・プロフィール画像はランダム
 - ✅ 投稿は100回表示されたら自動削除
 - ✅ 他人の投稿はランダムに閲覧可能
 
@@ -265,7 +265,7 @@ mutation {
 }
 ```
 
-- 10回表示されると自動削除
+- 100回表示されると自動削除
 
 #### リアクション追加
 
@@ -324,7 +324,7 @@ mutation {
 | user_id | UUID | 投稿者ID（外部キー） |
 | content | Text | 投稿内容 |
 | image_url | String (nullable) | 画像URL |
-| display_count | Integer | 表示回数（10回で削除） |
+| display_count | Integer | 表示回数（100回で削除） |
 | valid | Boolean | 論理削除フラグ |
 | created_at | Timestamp | 作成日時 |
 

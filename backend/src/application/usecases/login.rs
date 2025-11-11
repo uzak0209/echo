@@ -57,6 +57,11 @@ impl LoginUseCase {
             .generate_refresh_token(user.id)
             .map_err(|e| AppError::internal(format!("Failed to generate refresh token: {}", e)))?;
 
+        // Save refresh token to database
+        self.user_repository
+            .update_refresh_token(user.id, Some(refresh_token.clone()))
+            .await?;
+
         Ok(LoginTokens {
             access_token,
             refresh_token,

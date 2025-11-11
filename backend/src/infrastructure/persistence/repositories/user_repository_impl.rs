@@ -24,6 +24,7 @@ impl UserRepositoryImpl {
             display_name: DisplayName::new(model.display_name),
             avatar_url: model.avatar_url,
             password_hash: model.password_hash,
+            refresh_token: model.refresh_token,
             created_at: model.created_at.into(),
         }
     }
@@ -34,6 +35,7 @@ impl UserRepositoryImpl {
             display_name: Set(user.display_name.value().to_string()),
             avatar_url: Set(user.avatar_url.clone()),
             password_hash: Set(user.password_hash.clone()),
+            refresh_token: Set(None),
             valid: Set(true),
             created_at: Set(user.created_at.into()),
         }
@@ -82,6 +84,23 @@ impl UserRepository for UserRepositoryImpl {
         let active_model = Self::entity_to_active_model(&user);
         let result = active_model.insert(&self.db).await?;
         Ok(Self::model_to_entity(result))
+    }
+
+    async fn update_refresh_token(
+        &self,
+        user_id: Uuid,
+        refresh_token: Option<String>,
+    ) -> Result<(), DomainError> {
+        let user_model = user::Entity::find_by_id(user_id)
+            .one(&self.db)
+            .await?
+            .ok_or_else(|| DomainError::NotFound("User not found".to_string()))?;
+
+        let mut active_model: user::ActiveModel = user_model.into();
+        active_model.refresh_token = Set(refresh_token);
+        active_model.update(&self.db).await?;
+
+        Ok(())
     }
 
     async fn delete(&self, id: Uuid) -> Result<(), DomainError> {

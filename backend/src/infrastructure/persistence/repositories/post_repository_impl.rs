@@ -37,6 +37,7 @@ impl PostRepositoryImpl {
             display_name: DisplayName::new(model.display_name),
             avatar_url: model.avatar_url,
             password_hash: model.password_hash,
+            refresh_token: model.refresh_token,
             created_at: model.created_at.into(),
         }
     }

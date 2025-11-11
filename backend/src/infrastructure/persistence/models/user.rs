@@ -9,6 +9,7 @@ pub struct Model {
     pub display_name: String,
     pub avatar_url: String,
     pub password_hash: Option<String>,
+    pub refresh_token: Option<String>,
     pub valid: bool,
     pub created_at: DateTimeUtc,
 }

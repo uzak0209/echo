@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
-import { SIGNUP, LOGIN, CREATE_USER, REFRESH_TOKEN } from './graphql/mutations';
+import { SIGNUP, LOGIN, CREATE_USER, REFRESH_TOKEN, LOGOUT } from './graphql/mutations';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -29,6 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loginMutation] = useMutation(LOGIN);
   const [createUser] = useMutation(CREATE_USER);
   const [refreshToken] = useMutation(REFRESH_TOKEN);
+  const [logoutMutation] = useMutation(LOGOUT);
 
   const signup = useCallback(
     async (username: string, password: string) => {
@@ -139,7 +140,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [refreshToken]);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      // Call backend logout mutation to clear refresh token
+      await logoutMutation();
+    } catch (error) {
+      console.error('Logout mutation failed:', error);
+      // Continue with local logout even if backend fails
+    }
+
+    // Clear local state
     setAccessToken(null);
     setUserId(null);
     setDisplayName(null);
@@ -152,7 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('displayName');
       localStorage.removeItem('avatarUrl');
     }
-  }, []);
+  }, [logoutMutation]);
 
   // Try to restore auth data from localStorage on mount
   useEffect(() => {

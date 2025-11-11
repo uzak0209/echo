@@ -18,6 +18,11 @@ export default function TimelinePage() {
 		}
 	}, [isAuthenticated, router]);
 
+	const handleLogout = async () => {
+		await logout();
+		router.push('/login');
+	};
+
 	if (!isAuthenticated) {
 		return null;
 	}
@@ -37,7 +42,7 @@ export default function TimelinePage() {
 						<Button variant="outline" onClick={() => router.push('/avatar')}>
 							Mascot
 						</Button>
-						<Button variant="outline" onClick={logout}>
+						<Button variant="outline" onClick={handleLogout}>
 							Logout
 						</Button>
 					</div>
