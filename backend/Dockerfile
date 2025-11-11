@@ -27,6 +27,9 @@ COPY . .
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Ensure Windows CRLFs are removed so the script is executable inside Linux containers
+RUN sed -i 's/\r$//' /entrypoint.sh || true
+
 # Expose port
 EXPOSE 8000
 
