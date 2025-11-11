@@ -74,76 +74,69 @@ echo/
 
 ## セットアップ
 
-### 1. データベースのセットアップ
+### 前提条件
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) がインストールされていること
+
+### 起動手順
 
 ```bash
-# PostgreSQLをインストール（macOSの場合）
-brew install postgresql@14
+# 1. リポジトリをクローン
+git clone <repository-url>
+cd echo
 
-# データベースを作成
-createdb echo
+# 2. すべてのサービスを起動（初回はビルドに数分かかります）
+make up
 
-# 環境変数を設定
-cd backend
-cp .env.example .env
-# .env ファイルを編集してDATABASE_URLを設定
+# 3. シードデータを挿入
+make seed
 ```
 
-### 2. バックエンドのセットアップ
+**完了！** 以下にアクセスできます：
+
+- **フロントエンド**: http://localhost:3000
+- **GraphQL Playground**: http://localhost:8000
+- **GraphQL API**: http://localhost:8000/graphql
+
+### テストユーザー
+
+以下のユーザーでログインできます（パスワードはすべて `password123`）：
+
+- alice
+- bob
+- charlie
+- diana
+- eve
+
+### よく使うコマンド
 
 ```bash
-cd backend
+# サービス起動・停止
+make up           # すべてのサービスを起動
+make down         # すべてのサービスを停止
+make restart      # すべてのサービスを再起動
 
-# 依存関係のインストール（Rustが必要）
-# Rustがない場合: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# ログ確認
+make logs         # すべてのログを表示
+make logs SERVICE=backend    # バックエンドのログのみ表示
+make logs SERVICE=frontend   # フロントエンドのログのみ表示
 
-# 環境変数の設定
-cp .env.example .env
-# .env ファイルを編集:
-# DATABASE_URL=postgres://localhost/echo
-# JWT_SECRET=your-secret-key-here
-# PORT=8000
+# データベース
+make seed         # テストデータを挿入
+make seed-reset   # DBをリセットしてテストデータを再挿入
+make db           # PostgreSQLに接続
 
-# マイグレーションの実行
-cargo install sea-orm-cli
-sea-orm-cli migrate up -d migration
-
-# サーバーの起動
-cargo run
+# その他
+make test         # テストを実行
+make rebuild      # クリーンビルドして再起動
+make help         # すべてのコマンドを表示
 ```
 
-バックエンドは http://localhost:8000 で起動します。
+### 開発時のポイント
 
-利用可能なエンドポイント:
-- GraphQL Playground: http://localhost:8000
-- GraphQL API: http://localhost:8000/graphql
-- SSE: http://localhost:8000/api/reactions/events?token=<sse_token>
-
-### 3. Webフロントエンドのセットアップ
-
-```bash
-cd frontend
-
-# 依存関係のインストール
-npm install
-
-# 環境変数の設定
-cp .env.local.example .env.local
-# .env.local ファイルを編集:
-# NEXT_PUBLIC_GRAPHQL_URL=http://localhost:8000/graphql
-# NEXT_PUBLIC_SSE_URL=http://localhost:8000/api/reactions/events
-
-# 開発サーバーの起動
-npm run dev
-```
-
-Webアプリは http://localhost:3000 で確認できます。
-
-### 4. Androidアプリのセットアップ
-
-1. Android Studioでandroidディレクトリを開く
-2. Gradle同期を実行
-3. エミュレータまたは実機でアプリを実行
+- **コードの自動反映**: バックエンド・フロントエンドのコードを変更すると自動的に再起動・反映されます
+- **データベースリセット**: `make seed-reset` でデータベースをクリーンな状態に戻せます
+- **ログ監視**: `make logs` でリアルタイムにログを確認できます（Ctrl+Cで終了）
 
 ## GraphQL API
 
@@ -380,47 +373,6 @@ Infrastructure Layer (Repository Implementation, JWT, SSE)
 **プレゼンテーション層**: API
 - GraphQL: Query, Mutation定義
 - SSE: リアクションイベント配信
-
-## 開発
-
-### バックエンド
-
-```bash
-# 開発モード（自動リロード）
-cargo install cargo-watch
-cargo watch -x run
-
-# テスト
-cargo test
-
-# ビルド
-cargo build --release
-
-# マイグレーション追加
-sea-orm-cli migrate generate <migration_name> -d migration
-
-# マイグレーション実行
-sea-orm-cli migrate up -d migration
-
-# マイグレーションロールバック
-sea-orm-cli migrate down -d migration
-```
-
-### フロントエンド
-
-```bash
-# 開発
-npm run dev
-
-# ビルド
-npm run build
-
-# 本番起動
-npm run start
-
-# GraphQL コード生成（スキーマ変更時）
-npm run codegen
-```
 
 ## SSE（Server-Sent Events）でリアルタイムリアクション通知
 
