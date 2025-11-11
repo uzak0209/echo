@@ -20,7 +20,7 @@ impl DisplayCount {
     }
 
     pub fn is_expired(&self) -> bool {
-        self.0 >= 10
+        self.0 >= 100
     }
 }
 
@@ -70,9 +70,11 @@ mod tests {
     #[case(0, false)]
     #[case(5, false)]
     #[case(9, false)]
-    #[case(10, true)]
-    #[case(11, true)]
+    #[case(10, false)]
+    #[case(50, false)]
+    #[case(99, false)]
     #[case(100, true)]
+    #[case(101, true)]
     fn test_is_expired(#[case] count_value: i32, #[case] expected: bool) {
         let count = DisplayCount::from_value(count_value);
         assert_eq!(count.is_expired(), expected);
@@ -83,7 +85,7 @@ mod tests {
         let mut count = DisplayCount::new();
         assert!(!count.is_expired());
 
-        for _ in 0..10 {
+        for _ in 0..100 {
             count.increment();
         }
         assert!(count.is_expired());
