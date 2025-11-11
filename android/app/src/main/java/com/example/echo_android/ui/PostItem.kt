@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -25,9 +26,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+
+enum class ReactionType(val emoji: String) {
+    SURPRISE("😮"),
+    EMPATHY("❤️"),
+    LAUGH("😂"),
+    SAD("😢"),
+    CONFUSED("😕")
+}
 
 data class  Post(
     val id: Int,
@@ -39,6 +45,7 @@ data class  Post(
 data class Reaction(
     var count: Int,
     var active: Boolean,
+    val type: ReactionType,
 )
 
 @Composable
@@ -46,8 +53,10 @@ fun PostItem(post: Post) {
     var reactions by remember { mutableStateOf(post.reactions) }
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        horizontalArrangement = Arrangement.Start)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.Center)
     {
         // icon
         Box(
@@ -69,26 +78,44 @@ fun PostItem(post: Post) {
                 Text(text = "@" + post.id.toString())
             }
 
-            Text(text = post.text)
+            Spacer(modifier = Modifier.size(4.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(text = post.text)
+                }
+            }
 
             Spacer(modifier = Modifier.size(4.dp))
 
+            // リアクションボタン
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Button(onClick = { /* TODO: リアクション */}) {
-                    Text(text = "Like")
+                ReactionType.entries.forEach { reactionType ->
+                    ReactionButton(
+                        reaction = reactionType,
+                        onClick = { /* TODO: リアクション*/}
+                    )
                 }
-                Button(onClick = { /* TODO: リアクション */}) {
-                    Text(text = "sad")
-                }
-                Button(onClick = { /* TODO: リアクション */}) {
-                    Text(text = "happy")
-                }
+
             }
         }
     }
 
+}
+
+@Composable
+fun ReactionButton(reaction: ReactionType, onClick: () -> Unit = {}) {
+    Button(
+        onClick = onClick
+    ) {
+        Text(
+            text = reaction.emoji
+        )
+    }
 }
 
 @Preview(showBackground = true)
