@@ -1,0 +1,9 @@
+query GetTimeline{
+    timeline(limit: 10) {
+        id
+        content
+        imageUrl
+        authorName
+        authorAvatar
+    }
+}

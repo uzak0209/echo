@@ -64,8 +64,12 @@ dependencies {
     implementation(libs.apollo.runtime)
 }
 
-//apollo {
-//    service("service") {
-//        packageName.set("com.example.rocketreserver")
-//    }
-//}
+apollo {
+    service("service") {
+        packageName.set("com.example.rocketreserver")
+        introspection {
+            endpointUrl.set("http://localhost:8000/graphql")
+            schemaFile.set(file("src/main/graphql/schema.graphqls"))
+        }
+    }
+}
