@@ -79,8 +79,7 @@ impl PostRepository for PostRepositoryImpl {
     ) -> Result<Vec<(Post, User)>, DomainError> {
         let mut query = post::Entity::find()
             .find_also_related(user::Entity)
-            .filter(post::Column::Valid.eq(true))
-            .filter(post::Column::DisplayCount.lt(10));
+            .filter(post::Column::Valid.eq(true));
 
         // Exclude posts from specific user (don't show own posts)
         if let Some(user_id) = exclude_user_id {
