@@ -192,6 +192,18 @@ impl UserRepository for MockUserRepository {
         Ok(user)
     }
 
+    async fn update_refresh_token(
+        &self,
+        user_id: Uuid,
+        refresh_token: Option<String>,
+    ) -> Result<(), DomainError> {
+        let mut users = self.users.lock().unwrap();
+        if let Some(user) = users.iter_mut().find(|u| u.id == user_id) {
+            user.refresh_token = refresh_token;
+        }
+        Ok(())
+    }
+
     async fn delete(&self, id: Uuid) -> Result<(), DomainError> {
         let mut users = self.users.lock().unwrap();
         users.retain(|u| u.id != id);
@@ -433,7 +445,7 @@ async fn test_increment_display_count_success() {
 }
 
 #[tokio::test]
-async fn test_increment_display_count_deletes_after_10() {
+async fn test_increment_display_count_deletes_after_100() {
     let mock_post_repo = Arc::new(MockPostRepository::new());
     let mock_user_repo = Arc::new(MockUserRepository::new());
 
@@ -457,8 +469,8 @@ async fn test_increment_display_count_deletes_after_10() {
     let increment_use_case =
         IncrementDisplayCountUseCase::new(mock_post_repo.clone() as Arc<dyn PostRepository>);
 
-    // Increment 10 times
-    for _ in 0..10 {
+    // Increment 100 times
+    for _ in 0..100 {
         increment_use_case.execute(post_id).await.unwrap();
     }
 

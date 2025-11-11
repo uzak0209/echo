@@ -4,9 +4,9 @@ use std::sync::Arc;
 
 use crate::{
     application::usecases::{
-        AddReactionUseCase, CreatePostUseCase, CreateUserUseCase, GenerateSseTokenUseCase,
+        AddReactionUseCase, CreatePostUseCase, GenerateSseTokenUseCase,
         GetTimelineUseCase, GetUserLatestReactionUseCase,
-        IncrementDisplayCountUseCase, LoginUseCase, RefreshTokenUseCase, RemoveReactionUseCase,
+        IncrementDisplayCountUseCase, LoginUseCase, LogoutUseCase, RefreshTokenUseCase, RemoveReactionUseCase,
         SignupUseCase,
     },
     infrastructure::{
@@ -41,13 +41,10 @@ pub fn build_schema(
         Arc::new(CreatePostUseCase::new(post_repo.clone(), user_repo.clone()));
     let increment_display_count_use_case =
         Arc::new(IncrementDisplayCountUseCase::new(post_repo.clone()));
-    let create_user_use_case = Arc::new(CreateUserUseCase::new(
-        user_repo.clone(),
-        jwt_service.clone(),
-    ));
-    let refresh_token_use_case = Arc::new(RefreshTokenUseCase::new(jwt_service.clone()));
+    let refresh_token_use_case = Arc::new(RefreshTokenUseCase::new(user_repo.clone(), jwt_service.clone()));
     let login_use_case = Arc::new(LoginUseCase::new(user_repo.clone(), jwt_service.clone()));
     let signup_use_case = Arc::new(SignupUseCase::new(user_repo.clone(), jwt_service.clone()));
+    let logout_use_case = Arc::new(LogoutUseCase::new(user_repo.clone()));
     let add_reaction_use_case = Arc::new(AddReactionUseCase::new(
         reaction_repo.clone(),
         post_repo.clone(),
@@ -62,10 +59,10 @@ pub fn build_schema(
         .data(get_timeline_use_case)
         .data(create_post_use_case)
         .data(increment_display_count_use_case)
-        .data(create_user_use_case)
         .data(refresh_token_use_case)
         .data(login_use_case)
         .data(signup_use_case)
+        .data(logout_use_case)
         .data(add_reaction_use_case)
         .data(remove_reaction_use_case)
         .data(get_user_latest_reaction_use_case)

@@ -27,7 +27,7 @@ impl PostRepositoryImpl {
             content: PostContent::new(model.content)?,
             image_url: model.image_url,
             display_count: model.display_count.into(),
-            created_at: model.created_at.into(),
+            created_at: model.created_at,
         })
     }
 
@@ -37,7 +37,8 @@ impl PostRepositoryImpl {
             display_name: DisplayName::new(model.display_name),
             avatar_url: model.avatar_url,
             password_hash: model.password_hash,
-            created_at: model.created_at.into(),
+            refresh_token: model.refresh_token,
+            created_at: model.created_at,
         }
     }
 
@@ -49,7 +50,7 @@ impl PostRepositoryImpl {
             image_url: Set(post.image_url.clone()),
             valid: Set(true),
             display_count: Set(post.display_count.value()),
-            created_at: Set(post.created_at.into()),
+            created_at: Set(post.created_at),
         }
     }
 }
@@ -71,31 +72,14 @@ impl PostRepository for PostRepositoryImpl {
         }
     }
 
-    async fn find_available(&self, limit: usize, exclude_user_id: Option<Uuid>) -> Result<Vec<Post>, DomainError> {
-        let mut query = post::Entity::find()
-            .filter(post::Column::Valid.eq(true))
-            .filter(post::Column::DisplayCount.lt(10));
-
-        // Exclude posts from specific user (don't show own posts)
-        if let Some(user_id) = exclude_user_id {
-            query = query.filter(post::Column::UserId.ne(user_id));
-        }
-
-        let models = query.all(&self.db).await?;
-
-        let posts: Vec<Post> = models
-            .into_iter()
-            .map(Self::model_to_entity)
-            .collect::<Result<Vec<_>, _>>()?;
-
-        Ok(posts.into_iter().take(limit).collect())
-    }
-
-    async fn find_available_with_users(&self, limit: usize, exclude_user_id: Option<Uuid>) -> Result<Vec<(Post, User)>, DomainError> {
+    async fn find_available_with_users(
+        &self,
+        limit: usize,
+        exclude_user_id: Option<Uuid>,
+    ) -> Result<Vec<(Post, User)>, DomainError> {
         let mut query = post::Entity::find()
             .find_also_related(user::Entity)
-            .filter(post::Column::Valid.eq(true))
-            .filter(post::Column::DisplayCount.lt(10));
+            .filter(post::Column::Valid.eq(true));
 
         // Exclude posts from specific user (don't show own posts)
         if let Some(user_id) = exclude_user_id {
@@ -135,7 +119,7 @@ impl PostRepository for PostRepositoryImpl {
         active_model.display_count = Set(new_count);
 
         // If display count reaches 10, mark as invalid (expired)
-        if new_count >= 10 {
+        if new_count >= 100 {
             active_model.valid = Set(false);
         }
 

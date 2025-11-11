@@ -24,7 +24,7 @@ fn extract_user_id(
     _headers: &HeaderMap,
     query_params: &SseQueryParams,
     jwt_service: &JwtService,
-) -> Result<Uuid, Response> {
+) -> Result<Uuid, Box<Response>> {
     // SSE接続にはクエリパラメータで短命トークン（60秒）を必須とする
     // EventSource APIはカスタムヘッダーを送信できないため、クエリパラメータのみ対応
     if let Some(token) = &query_params.token {
@@ -32,19 +32,19 @@ fn extract_user_id(
         match jwt_service.verify_sse_token(token) {
             Ok(claims) => {
                 return Uuid::parse_str(&claims.sub)
-                    .map_err(|_| (StatusCode::UNAUTHORIZED, "Invalid user ID in SSE token").into_response())
+                    .map_err(|_| Box::new((StatusCode::UNAUTHORIZED, "Invalid user ID in SSE token").into_response()))
             }
             Err(_) => {
-                return Err((StatusCode::UNAUTHORIZED, "Invalid or expired SSE token").into_response())
+                return Err(Box::new((StatusCode::UNAUTHORIZED, "Invalid or expired SSE token").into_response()))
             }
         }
     }
 
-    Err((
+    Err(Box::new((
         StatusCode::UNAUTHORIZED,
         "Missing SSE token. Use generateSseToken mutation to get a token, then connect with ?token=<sse_token>",
     )
-        .into_response())
+        .into_response()))
 }
 
 /// SSEハンドラー (短命トークン認証)
@@ -62,7 +62,7 @@ pub async fn reaction_events_handler(
     // Extract and verify user_id from query params or headers
     let user_id = match extract_user_id(&headers, &query_params, &jwt_service) {
         Ok(id) => id,
-        Err(response) => return response,
+        Err(response) => return *response,
     };
 
     // Subscribe to reaction stream

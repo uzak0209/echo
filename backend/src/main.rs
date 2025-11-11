@@ -18,7 +18,6 @@ use tower_http::cors::CorsLayer;
 #[derive(Clone)]
 struct AppState {
     schema: presentation::graphql::schema::AppSchema,
-    stream_manager: Arc<infrastructure::sse::ReactionStreamManager>,
     jwt_service: Arc<infrastructure::auth::JwtService>,
 }
 
@@ -68,6 +67,7 @@ async fn graphql_handler(
 
     // Extract refresh token from response headers before converting
     let refresh_token_header = response.http_headers.get("X-Refresh-Token").cloned();
+    let clear_refresh_token = response.http_headers.get("X-Clear-Refresh-Token").cloned();
 
     // Convert to HTTP response
     let mut http_response: Response = GraphQLResponse::from(response).into_response();
@@ -84,6 +84,14 @@ async fn graphql_handler(
                 .headers_mut()
                 .insert(header::SET_COOKIE, cookie.parse().unwrap());
         }
+    }
+
+    // If logout requested, clear the refresh token cookie
+    if clear_refresh_token.is_some() {
+        let clear_cookie = "refresh_token=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/";
+        http_response
+            .headers_mut()
+            .insert(header::SET_COOKIE, clear_cookie.parse().unwrap());
     }
 
     http_response
@@ -117,7 +125,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let state = AppState {
         schema,
-        stream_manager: stream_manager.clone(),
         jwt_service: jwt_service.clone(),
     };
 

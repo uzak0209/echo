@@ -30,12 +30,6 @@ pub enum DomainError {
 
     #[error("Entity not found: {0}")]
     NotFound(String),
-
-    #[error("Business rule violation: {0}")]
-    BusinessRuleViolation(String),
-
-    #[error("Unknown domain error: {0}")]
-    Unknown(String),
 }
 
 impl DomainError {

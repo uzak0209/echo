@@ -76,18 +76,6 @@ impl ReactionStreamManager {
 
         Ok(())
     }
-
-    /// クリーンアップ: 購読者がいないチャンネルを削除
-    pub async fn cleanup(&self) {
-        let mut streams = self.streams.write().await;
-        streams.retain(|_, sender| sender.receiver_count() > 0);
-    }
-
-    /// アクティブなストリーム数を取得
-    pub async fn active_streams(&self) -> usize {
-        let streams = self.streams.read().await;
-        streams.len()
-    }
 }
 
 impl Default for ReactionStreamManager {
