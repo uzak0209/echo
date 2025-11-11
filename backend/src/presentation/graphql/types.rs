@@ -1,5 +1,5 @@
 use crate::application::dto::PostDto;
-use crate::application::usecases::{AuthTokens, LoginTokens, RefreshedTokens, SignupTokens};
+use crate::application::usecases::{LoginTokens, RefreshedTokens, SignupTokens};
 use crate::domain::entities::ReactionType;
 use async_graphql::{Enum, InputObject, SimpleObject};
 
@@ -37,15 +37,6 @@ pub struct CreatePostInput {
 pub struct AuthResponse {
     pub access_token: String,
     pub user_id: String,
-}
-
-impl From<AuthTokens> for AuthResponse {
-    fn from(tokens: AuthTokens) -> Self {
-        Self {
-            access_token: tokens.access_token,
-            user_id: tokens.user_id,
-        }
-    }
 }
 
 impl From<LoginTokens> for AuthResponse {

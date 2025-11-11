@@ -24,14 +24,6 @@ impl Post {
             created_at: Utc::now(),
         }
     }
-
-    pub fn increment_display(&mut self) {
-        self.display_count.increment();
-    }
-
-    pub fn is_expired(&self) -> bool {
-        self.display_count.is_expired()
-    }
 }
 
 #[cfg(test)]
@@ -51,7 +43,6 @@ mod tests {
         assert_eq!(post.content.value(), "Test post content");
         assert_eq!(post.image_url, None);
         assert_eq!(post.display_count.value(), 0);
-        assert!(!post.is_expired());
     }
 
     #[rstest]
@@ -66,33 +57,5 @@ mod tests {
             post.image_url,
             Some("https://example.com/image.jpg".to_string())
         );
-    }
-
-    #[rstest]
-    fn test_increment_display(sample_post_content: PostContent) {
-        let mut post = Post::new(Uuid::new_v4(), sample_post_content, None);
-
-        assert_eq!(post.display_count.value(), 0);
-
-        post.increment_display();
-        assert_eq!(post.display_count.value(), 1);
-
-        post.increment_display();
-        assert_eq!(post.display_count.value(), 2);
-    }
-
-    #[rstest]
-    fn test_is_expired_after_10_displays(sample_post_content: PostContent) {
-        let mut post = Post::new(Uuid::new_v4(), sample_post_content, None);
-
-        assert!(!post.is_expired());
-
-        for _ in 0..9 {
-            post.increment_display();
-        }
-        assert!(!post.is_expired());
-
-        post.increment_display();
-        assert!(post.is_expired());
     }
 }

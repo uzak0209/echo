@@ -25,7 +25,7 @@ impl UserRepositoryImpl {
             avatar_url: model.avatar_url,
             password_hash: model.password_hash,
             refresh_token: model.refresh_token,
-            created_at: model.created_at.into(),
+            created_at: model.created_at,
         }
     }
 
@@ -37,7 +37,7 @@ impl UserRepositoryImpl {
             password_hash: Set(user.password_hash.clone()),
             refresh_token: Set(None),
             valid: Set(true),
-            created_at: Set(user.created_at.into()),
+            created_at: Set(user.created_at),
         }
     }
 }
@@ -57,19 +57,6 @@ impl UserRepository for UserRepositoryImpl {
             .await?;
 
         Ok(model.map(Self::model_to_entity))
-    }
-
-    async fn create_user(
-        &self,
-        display_name: String,
-        avatar_url: Option<String>,
-    ) -> Result<User, DomainError> {
-        let display_name = DisplayName::new(display_name);
-        let avatar_url = avatar_url.unwrap_or_else(|| "https://example.com/default-avatar.jpg".to_string());
-        let user = User::new(display_name, avatar_url);
-        let active_model = Self::entity_to_active_model(&user);
-        let result = active_model.insert(&self.db).await?;
-        Ok(Self::model_to_entity(result))
     }
 
     async fn create_user_with_credentials(
@@ -100,11 +87,6 @@ impl UserRepository for UserRepositoryImpl {
         active_model.refresh_token = Set(refresh_token);
         active_model.update(&self.db).await?;
 
-        Ok(())
-    }
-
-    async fn delete(&self, id: Uuid) -> Result<(), DomainError> {
-        user::Entity::delete_by_id(id).exec(&self.db).await?;
         Ok(())
     }
 }

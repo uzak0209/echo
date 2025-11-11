@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use crate::{
     application::usecases::{
-        AddReactionUseCase, CreatePostUseCase, CreateUserUseCase, GenerateSseTokenUseCase,
+        AddReactionUseCase, CreatePostUseCase, GenerateSseTokenUseCase,
         GetTimelineUseCase, GetUserLatestReactionUseCase,
         IncrementDisplayCountUseCase, LoginUseCase, LogoutUseCase, RefreshTokenUseCase, RemoveReactionUseCase,
         SignupUseCase,
@@ -41,10 +41,6 @@ pub fn build_schema(
         Arc::new(CreatePostUseCase::new(post_repo.clone(), user_repo.clone()));
     let increment_display_count_use_case =
         Arc::new(IncrementDisplayCountUseCase::new(post_repo.clone()));
-    let create_user_use_case = Arc::new(CreateUserUseCase::new(
-        user_repo.clone(),
-        jwt_service.clone(),
-    ));
     let refresh_token_use_case = Arc::new(RefreshTokenUseCase::new(user_repo.clone(), jwt_service.clone()));
     let login_use_case = Arc::new(LoginUseCase::new(user_repo.clone(), jwt_service.clone()));
     let signup_use_case = Arc::new(SignupUseCase::new(user_repo.clone(), jwt_service.clone()));
@@ -63,7 +59,6 @@ pub fn build_schema(
         .data(get_timeline_use_case)
         .data(create_post_use_case)
         .data(increment_display_count_use_case)
-        .data(create_user_use_case)
         .data(refresh_token_use_case)
         .data(login_use_case)
         .data(signup_use_case)

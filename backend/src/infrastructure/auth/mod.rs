@@ -1,3 +1,3 @@
 mod jwt;
 
-pub use jwt::{Claims, JwtService, TokenType};
+pub use jwt::JwtService;

@@ -33,7 +33,7 @@ impl SignupUseCase {
         avatar_url: Option<String>,
     ) -> Result<SignupTokens, AppError> {
         // Check if user already exists
-        if let Some(_) = self.user_repository.find_by_username(&username).await? {
+        if (self.user_repository.find_by_username(&username).await?).is_some() {
             return Err(AppError::validation("Username already registered"));
         }
 
@@ -42,7 +42,7 @@ impl SignupUseCase {
             .map_err(|e| AppError::internal(format!("Failed to hash password: {}", e)))?;
 
         // Generate random avatar if not provided
-        let final_avatar_url = avatar_url.unwrap_or_else(|| PersonaGenerator::generate_avatar());
+        let final_avatar_url = avatar_url.unwrap_or_else(PersonaGenerator::generate_avatar);
 
         // Create user
         let user = self

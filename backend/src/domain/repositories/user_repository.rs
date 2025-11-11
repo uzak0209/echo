@@ -6,11 +6,6 @@ use uuid::Uuid;
 pub trait UserRepository: Send + Sync {
     async fn find_by_id(&self, id: Uuid) -> Result<Option<User>, DomainError>;
     async fn find_by_username(&self, username: &str) -> Result<Option<User>, DomainError>;
-    async fn create_user(
-        &self,
-        display_name: String,
-        avatar_url: Option<String>,
-    ) -> Result<User, DomainError>;
     async fn create_user_with_credentials(
         &self,
         display_name: String,
@@ -22,5 +17,4 @@ pub trait UserRepository: Send + Sync {
         user_id: Uuid,
         refresh_token: Option<String>,
     ) -> Result<(), DomainError>;
-    async fn delete(&self, id: Uuid) -> Result<(), DomainError>;
 }

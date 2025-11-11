@@ -18,7 +18,6 @@ use tower_http::cors::CorsLayer;
 #[derive(Clone)]
 struct AppState {
     schema: presentation::graphql::schema::AppSchema,
-    stream_manager: Arc<infrastructure::sse::ReactionStreamManager>,
     jwt_service: Arc<infrastructure::auth::JwtService>,
 }
 
@@ -126,7 +125,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let state = AppState {
         schema,
-        stream_manager: stream_manager.clone(),
         jwt_service: jwt_service.clone(),
     };
 

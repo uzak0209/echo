@@ -1,6 +1,5 @@
 pub mod add_reaction;
 pub mod create_post;
-pub mod create_user;
 pub mod generate_sse_token;
 pub mod get_timeline;
 pub mod get_user_latest_reaction;
@@ -13,7 +12,6 @@ pub mod signup;
 
 pub use add_reaction::AddReactionUseCase;
 pub use create_post::CreatePostUseCase;
-pub use create_user::{AuthTokens, CreateUserUseCase};
 pub use generate_sse_token::GenerateSseTokenUseCase;
 pub use get_timeline::GetTimelineUseCase;
 pub use get_user_latest_reaction::GetUserLatestReactionUseCase;

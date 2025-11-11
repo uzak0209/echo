@@ -5,11 +5,6 @@ use uuid::Uuid;
 #[async_trait]
 pub trait PostRepository: Send + Sync {
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Post>, DomainError>;
-    async fn find_available(
-        &self,
-        limit: usize,
-        exclude_user_id: Option<Uuid>,
-    ) -> Result<Vec<Post>, DomainError>;
     async fn find_available_with_users(
         &self,
         limit: usize,
