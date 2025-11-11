@@ -72,7 +72,11 @@ impl PostRepository for PostRepositoryImpl {
         }
     }
 
-    async fn find_available_with_users(&self, limit: usize, exclude_user_id: Option<Uuid>) -> Result<Vec<(Post, User)>, DomainError> {
+    async fn find_available_with_users(
+        &self,
+        limit: usize,
+        exclude_user_id: Option<Uuid>,
+    ) -> Result<Vec<(Post, User)>, DomainError> {
         let mut query = post::Entity::find()
             .find_also_related(user::Entity)
             .filter(post::Column::Valid.eq(true))
@@ -116,7 +120,7 @@ impl PostRepository for PostRepositoryImpl {
         active_model.display_count = Set(new_count);
 
         // If display count reaches 10, mark as invalid (expired)
-        if new_count >= 10 {
+        if new_count >= 100 {
             active_model.valid = Set(false);
         }
 
