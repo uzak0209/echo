@@ -28,12 +28,12 @@ export default function LoginPage() {
     setError(null);
 
     if (!username.trim()) {
-      setError('Username is required');
+      setError('ユーザー名を入力してください');
       return;
     }
 
     if (!password.trim()) {
-      setError('Password is required');
+      setError('パスワードを入力してください');
       return;
     }
 
@@ -48,7 +48,7 @@ export default function LoginPage() {
         router.push('/avatar');
       }
     } catch (err) {
-      setError(isLogin ? 'Failed to login. Please try again.' : 'Failed to create account. Please try again.');
+      setError(isLogin ? 'ログインに失敗しました。もう一度お試しください。' : 'アカウント作成に失敗しました。もう一度お試しください。');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -59,19 +59,19 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Welcome to Echo</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">Echo へようこそ</CardTitle>
           <CardDescription className="text-center">
-            {isLogin ? 'Login to your account' : 'Create a new account'}
+            {isLogin ? 'アカウントにログイン' : '新規アカウント作成'}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">ユーザー名</Label>
               <Input
                 id="username"
                 type="text"
-                placeholder="Your username"
+                placeholder="ユーザー名を入力"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={isLoading}
@@ -80,11 +80,11 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">パスワード</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Your password"
+                placeholder="パスワードを入力"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
@@ -94,7 +94,7 @@ export default function LoginPage() {
             </div>
             {error && <p className="text-sm text-red-500">{error}</p>}
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (isLogin ? 'Logging in...' : 'Creating account...') : (isLogin ? 'Login' : 'Sign Up')}
+              {isLoading ? (isLogin ? 'ログイン中...' : 'アカウント作成中...') : (isLogin ? 'ログイン' : '新規登録')}
             </Button>
             <div className="text-center">
               <button
@@ -106,11 +106,11 @@ export default function LoginPage() {
                 className="text-sm text-purple-600 hover:underline"
                 disabled={isLoading}
               >
-                {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Login'}
+                {isLogin ? 'アカウントをお持ちでない方はこちら' : 'すでにアカウントをお持ちの方はこちら'}
               </button>
             </div>
             <p className="text-xs text-center text-gray-500 mt-4">
-              Your posts will be anonymous and disappear after being viewed 10 times
+              投稿は匿名で、100回表示されると自動的に消えます
             </p>
           </form>
         </CardContent>

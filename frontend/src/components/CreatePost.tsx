@@ -58,14 +58,14 @@ export function CreatePost() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
-          <DialogTitle>Create a Post</DialogTitle>
+          <DialogTitle>投稿を作成</DialogTitle>
           <DialogDescription>
-            Share your thoughts. Your post will disappear after 10 views.
+            あなたの思いを共有しましょう。投稿は100回表示されると消えます。
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 pt-4">
           <Textarea
-            placeholder="What's on your mind?"
+            placeholder="いま何してる？"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             maxLength={1000}
@@ -73,14 +73,14 @@ export function CreatePost() {
           />
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">
-              {content.length}/1000 characters
+              {content.length}/1000 文字
             </p>
             <Button onClick={handleSubmit} disabled={loading || !content.trim()}>
-              {loading ? 'Posting...' : 'Post'}
+              {loading ? '投稿中...' : '投稿'}
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Note: You won't be able to see your own post. It will be shown to others randomly.
+            注意: 自分の投稿は確認できません。他のユーザーにランダムで表示されます。
           </p>
         </div>
       </DialogContent>
