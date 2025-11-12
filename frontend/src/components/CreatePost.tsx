@@ -49,9 +49,11 @@ export function CreatePost() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="gap-2">
-          <Plus className="h-5 w-5" />
-          Post
+        <Button
+          size="lg"
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-green-500 hover:bg-green-600 shadow-lg z-50 p-0"
+        >
+          <Plus className="h-6 w-6" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[525px]">

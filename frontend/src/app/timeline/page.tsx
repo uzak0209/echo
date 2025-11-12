@@ -32,13 +32,15 @@ export default function TimelinePage() {
 			{/* Real-time reaction notifications via SSE */}
 			<ReactionNotification />
 
+			{/* Floating action button for creating posts */}
+			<CreatePost />
+
 			<div className="container mx-auto px-4 py-8 max-w-2xl">
 				<header className="mb-8 flex justify-between items-center">
 					<div>
 						<h1 className="text-4xl font-bold mb-2">Echo</h1>
 					</div>
 					<div className="flex gap-2">
-						<CreatePost />
 						<Button variant="outline" onClick={() => router.push('/avatar')}>
 							Mascot
 						</Button>
