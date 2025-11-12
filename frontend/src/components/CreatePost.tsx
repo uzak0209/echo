@@ -51,37 +51,47 @@ export function CreatePost() {
       <DialogTrigger asChild>
         <Button
           size="lg"
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-green-500 hover:bg-green-600 shadow-lg z-50 p-0"
+          className="fixed bottom-8 right-8 h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 shadow-lg hover:shadow-xl z-50 p-0 transition-all duration-300 border-2 border-white/20"
         >
-          <Plus className="h-6 w-6" />
+          <Plus className="h-8 w-8 text-white" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[600px] bg-card border border-border">
         <DialogHeader>
-          <DialogTitle>投稿を作成</DialogTitle>
-          <DialogDescription>
-            あなたの思いを共有しましょう。投稿は100回表示されると消えます。
-          </DialogDescription>
+          <DialogTitle className="text-xl font-semibold">
+            投稿を作成
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 pt-4">
-          <Textarea
-            placeholder="いま何してる？"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            maxLength={1000}
-            className="min-h-[150px]"
-          />
+          <div className="relative">
+            <Textarea
+              placeholder="いま何してる？"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              maxLength={1000}
+              className="min-h-[180px] resize-none text-base"
+            />
+          </div>
+
           <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              {content.length}/1000 文字
-            </p>
-            <Button onClick={handleSubmit} disabled={loading || !content.trim()}>
-              {loading ? '投稿中...' : '投稿'}
+            <span className="text-sm text-muted-foreground">
+              {content.length}/1000
+            </span>
+            <Button
+              onClick={handleSubmit}
+              disabled={loading || !content.trim()}
+              className="bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 transition-all duration-300"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  投稿中...
+                </span>
+              ) : (
+                '投稿'
+              )}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">
-            注意: 自分の投稿は確認できません。他のユーザーにランダムで表示されます。
-          </p>
         </div>
       </DialogContent>
     </Dialog>

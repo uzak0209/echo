@@ -56,65 +56,95 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Echo へようこそ</CardTitle>
-          <CardDescription className="text-center">
-            {isLogin ? 'アカウントにログイン' : '新規アカウント作成'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">ユーザー名</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="ユーザー名を入力"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={isLoading}
-                className="w-full"
-                maxLength={50}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">パスワード</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="パスワードを入力"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-                className="w-full"
-                minLength={6}
-              />
-            </div>
-            {error && <p className="text-sm text-red-500">{error}</p>}
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (isLogin ? 'ログイン中...' : 'アカウント作成中...') : (isLogin ? 'ログイン' : '新規登録')}
-            </Button>
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setError(null);
-                }}
-                className="text-sm text-purple-600 hover:underline"
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
+      {/* Subtle background */}
+      <div className="fixed inset-0 opacity-5 pointer-events-none">
+        <div className="absolute top-10 left-10 w-96 h-96 bg-blue-400 rounded-full blur-[150px]" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-400 rounded-full blur-[150px]" />
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Logo and title */}
+        <div className="text-center mb-8">
+          <h1 className="text-5xl font-bold gradient-text">
+            Echo
+          </h1>
+        </div>
+
+        <Card className="w-full bg-card border border-border">
+          <CardHeader className="space-y-2 pb-6">
+            <CardTitle className="text-2xl font-semibold text-center">
+              {isLogin ? 'ログイン' : '新規登録'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="username">ユーザー名</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="ユーザー名を入力"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={isLoading}
+                  maxLength={50}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">パスワード</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="パスワードを入力"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                  minLength={6}
+                />
+              </div>
+
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                  <p className="text-sm text-red-400 flex items-center gap-2">
+                    <span>⚠️</span>
+                    {error}
+                  </p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 transition-all duration-300 text-base h-11"
                 disabled={isLoading}
               >
-                {isLogin ? 'アカウントをお持ちでない方はこちら' : 'すでにアカウントをお持ちの方はこちら'}
-              </button>
-            </div>
-            <p className="text-xs text-center text-gray-500 mt-4">
-              投稿は匿名で、100回表示されると自動的に消えます
-            </p>
-          </form>
-        </CardContent>
-      </Card>
+                {isLoading ? (
+                  <span className="flex items-center gap-2 justify-center">
+                    <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    {isLogin ? 'ログイン中...' : '作成中...'}
+                  </span>
+                ) : (
+                  isLogin ? 'ログイン' : '新規登録'
+                )}
+              </Button>
+
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setError(null);
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
+                  disabled={isLoading}
+                >
+                  {isLogin ? 'アカウントをお持ちでない方' : 'すでにアカウントをお持ちの方'}
+                </button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
