@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import com.example.rocketreserver.GetTimelineQuery
 
 enum class ReactionType(val emoji: String) {
     SURPRISE("😮"),
@@ -35,13 +36,6 @@ enum class ReactionType(val emoji: String) {
     CONFUSED("😕")
 }
 
-data class  Post(
-    val id: Int,
-    val username: String,
-    val text: String,
-    val reactions: Map<String, Reaction>,
-)
-
 data class Reaction(
     var count: Int,
     var active: Boolean,
@@ -49,9 +43,7 @@ data class Reaction(
 )
 
 @Composable
-fun PostItem(post: Post) {
-    var reactions by remember { mutableStateOf(post.reactions) }
-
+fun PostItem(post: GetTimelineQuery.Timeline) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -73,9 +65,8 @@ fun PostItem(post: Post) {
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = post.username)
+                Text(text = post.authorName)
                 Spacer(modifier = Modifier.size(4.dp))
-                Text(text = "@" + post.id.toString())
             }
 
             Spacer(modifier = Modifier.size(4.dp))
@@ -84,7 +75,7 @@ fun PostItem(post: Post) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(8.dp)) {
-                    Text(text = post.text)
+                    Text(text = post.content)
                 }
             }
 
@@ -118,15 +109,15 @@ fun ReactionButton(reaction: ReactionType, onClick: () -> Unit = {}) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PostItemPreview() {
-    PostItem(
-        post = Post(
-            id = 1,
-            username = "kun",
-            text = "aaaaaa",
-            reactions = emptyMap()
-        )
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PostItemPreview() {
+//    PostItem(
+//        post = Post(
+//            id = 1,
+//            username = "kun",
+//            text = "aaaaaa",
+//            reactions = emptyMap()
+//        )
+//    )
+//}

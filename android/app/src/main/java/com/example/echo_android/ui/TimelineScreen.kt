@@ -28,16 +28,7 @@ import com.example.rocketreserver.GetTimelineQuery
 @Composable
 fun TimelineScreen() {
     // sample data
-    val posts = remember {
-        (0..20).map { i ->
-            Post(
-                id = i,
-                username = "user$i",
-                text = "Hello, World!",
-                reactions = emptyMap()
-            )
-        }.toMutableStateList()
-    }
+    var posts by remember { mutableStateOf(emptyList<GetTimelineQuery.Timeline>()) }
 
     LaunchedEffect(Unit) {
         Log.d("TimelineScreen", "Starting query...")
@@ -48,6 +39,8 @@ fun TimelineScreen() {
         Log.d("TimelineScreen", "Errors: ${response.errors}")
         Log.d("TimelineScreen", "Data: ${response.data}")
         Log.d("TimelineScreen", "Exception: ${response.exception}")
+
+        posts = response.data?.timeline?.filterNotNull() ?: emptyList()
     }
 
     LazyColumn(
