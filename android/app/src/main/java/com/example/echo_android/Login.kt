@@ -2,8 +2,12 @@ package com.example.echo_android
 
 import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -13,43 +17,26 @@ import com.example.rocketreserver.LoginMutation
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.echo_android.ui.AuthScreen
+import com.example.rocketreserver.SignupMutation
 
 @Composable
-fun Login(navigateBack: () -> Unit
+fun Login(
+    navigateBack: () -> Unit
 ) {
-    /*
-    login画面UI
-     */
-    // todo: home画面に戻るのでいいのかな？
-    val scope = rememberCoroutineScope()
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-    Column {
-        TextField(
-            value = username,
-            onValueChange = {username = it},
-            label = {Text("username")}
-        )
-        TextField(
-            value = password,
-            onValueChange = {password = it},
-            label = {Text("password")}
-        )
-        Button(
-            onClick = {
-                scope.launch {
-                    val success = login(username, password)
-                    if (success) {
-                        Log.w("com.example.echo_android.Login", "Login successful")
-                        navigateBack()
-                    }
-                }
-            },
-        ) {
-            Text(text = "login")
-        }
-    }
+    AuthScreen(
+        title = "Login",
+        buttonText = "ログイン",
+        onAuthClick = { username, password ->
+            val success = login(username, password)
+            if (success) navigateBack()
+            success
+        },
+        onSecondaryClick = { /* todo: アカウント作成画面へ */},
+        secondaryText = "アカウント作成"
+    )
 }
 
 private suspend fun login(username: String, password: String): Boolean {
