@@ -42,7 +42,7 @@ private fun MainNavHost() {
     val navController = rememberNavController()
     NavHost(navController, startDestination = NavigationDestinations.LOGIN) {
         composable(route = NavigationDestinations.LOGIN) {
-            Login(
+            Signup(
                 navigateBack = {
                     navController.navigate(NavigationDestinations.HOME)
                 },
