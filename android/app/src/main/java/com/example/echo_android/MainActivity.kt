@@ -6,20 +6,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.echo_android.ui.LoginScreen
 import com.example.echo_android.ui.MainScreen
-import com.example.echo_android.ui.TimelineScreen
 import com.example.echo_android.ui.theme.EchoandroidTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,7 +41,7 @@ private fun MainNavHost() {
     val navController = rememberNavController()
     NavHost(navController, startDestination = NavigationDestinations.LOGIN) {
         composable(route = NavigationDestinations.LOGIN) {
-            Login(
+            LoginScreen(
                 navigateBack = {
                     navController.navigate(NavigationDestinations.HOME)
                 },

@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,25 +23,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.echo_android.TimelineViewModel
 import com.example.echo_android.apolloClient
 import com.example.rocketreserver.GetTimelineQuery
 
 @Composable
-fun TimelineScreen() {
-    // sample data
-    var posts by remember { mutableStateOf(emptyList<GetTimelineQuery.Timeline>()) }
+fun TimelineScreen(viewModel: TimelineViewModel = hiltViewModel()) {
+    val posts by viewModel.viewState.collectAsState()
 
     LaunchedEffect(Unit) {
-        Log.d("TimelineScreen", "Starting query...")
-
-        val response = apolloClient.query(GetTimelineQuery()).execute()
-        Log.d("TimelineScreen", "Response received")
-        Log.d("TimelineScreen", "Has errors: ${response.hasErrors()}")
-        Log.d("TimelineScreen", "Errors: ${response.errors}")
-        Log.d("TimelineScreen", "Data: ${response.data}")
-        Log.d("TimelineScreen", "Exception: ${response.exception}")
-
-        posts = response.data?.timeline?.filterNotNull() ?: emptyList()
+        viewModel.getTimeline()
     }
 
     LazyColumn(
