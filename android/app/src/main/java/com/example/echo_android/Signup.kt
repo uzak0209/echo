@@ -40,7 +40,6 @@ private suspend fun signup(username: String, password: String): Boolean {
         else -> {
             val token = response.data!!.signup.accessToken
             Log.w("com.example.echo_android.Signup", "Setting token: $token")
-            // todo: tokenを保存
             TokenRepository.setToken(token)
             val saved = TokenRepository.getToken()
             Log.d("Signup", "Token saved verification: ${if (saved != null) "OK" else "FAILED"}")
