@@ -28,6 +28,7 @@ fun AuthScreen(
     onSecondaryClick: () -> Unit,
     secondaryText: String
     ) {
+    // todo: usernameとpasswordが空白の場合などエラーを受け取ったらエラーメッセージを表示する
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
