@@ -21,7 +21,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.echo_android.ui.MainScreen
 import com.example.echo_android.ui.TimelineScreen
 import com.example.echo_android.ui.theme.EchoandroidTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +44,7 @@ private fun MainNavHost() {
     val navController = rememberNavController()
     NavHost(navController, startDestination = NavigationDestinations.LOGIN) {
         composable(route = NavigationDestinations.LOGIN) {
-            Signup(
+            Login(
                 navigateBack = {
                     navController.navigate(NavigationDestinations.HOME)
                 },
