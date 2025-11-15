@@ -1,4 +1,4 @@
-package com.example.echo_android.ui
+package com.example.echo_android.ui.feature
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +17,8 @@ import com.example.echo_android.ui.theme.AvatarScreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.echo_android.ui.feature.post.CreatePostDialog
+import com.example.echo_android.ui.feature.timeline.TimelineScreen
 
 @Composable
 fun MainScreen() {
@@ -59,7 +61,7 @@ fun MainScreen() {
 
         if (showDialog) {
             CreatePostDialog(
-                onDismiss = { showDialog = false}
+                onDismiss = { showDialog = false }
             )
         }
     }
