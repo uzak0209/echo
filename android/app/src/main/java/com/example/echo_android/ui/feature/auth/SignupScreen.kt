@@ -1,21 +1,32 @@
-package com.example.echo_android
+package com.example.echo_android.ui.feature.auth
 
 import android.util.Log
 import androidx.compose.runtime.Composable
-import com.example.echo_android.ui.AuthScreen
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.echo_android.repository.TokenRepository
+import com.example.echo_android.network.apolloClient
 import com.example.rocketreserver.SignupMutation
 
 @Composable
-fun Signup(
-    navigateBack: () -> Unit
+fun SignupScreen(
+    navigateBack: () -> Unit,
+    viewModel: SignupViewModel = hiltViewModel()
 ) {
+    val success by viewModel.state.collectAsState()
+
+    LaunchedEffect(success) {
+        if (success) navigateBack()
+    }
+
     AuthScreen(
         title = "Signup",
         buttonText = "登録",
         onAuthClick = { username, password ->
-            val success = signup(username, password)
-            if (success) navigateBack()
-            success
+            viewModel.signup(username, password)
+            true
         },
         onSecondaryClick = { /* todo: ログイン画面へ戻る */ },
         secondaryText = "ログインはこちら"
@@ -28,7 +39,7 @@ private suspend fun signup(username: String, password: String): Boolean {
     val response = apolloClient.mutation(SignupMutation(username = username, password = password)).execute()
     return when {
         response.exception != null -> {
-            Log.w("com.example.echo_android.Signup", "Failed to com.example.echo_android.signup", response.exception)
+            Log.w("com.example.echo_android.Signup", "Failed to com.example.echo_android.ui.feature.auth.signup", response.exception)
             false
         }
 
