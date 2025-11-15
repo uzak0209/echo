@@ -1,11 +1,11 @@
-package com.example.echo_android.ui
+package com.example.echo_android.ui.feature.auth
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.echo_android.LoginViewModel
+import com.example.echo_android.ui.feature.auth.LoginViewModel
 
 @Composable
 fun LoginScreen(
@@ -25,7 +25,7 @@ fun LoginScreen(
             viewModel.login(username, password)
             true
         },
-        onSecondaryClick = { /* todo: アカウント作成画面へ */},
+        onSecondaryClick = { /* todo: アカウント作成画面へ */ },
         secondaryText = "アカウント作成"
     )
 }

@@ -1,7 +1,9 @@
-package com.example.echo_android
+package com.example.echo_android.ui.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.echo_android.network.ApolloWrapper
+import com.example.echo_android.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

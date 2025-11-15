@@ -15,8 +15,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.echo_android.ui.LoginScreen
-import com.example.echo_android.ui.MainScreen
+import com.example.echo_android.network.ApolloClientFactory
+import com.example.echo_android.ui.feature.MainScreen
+import com.example.echo_android.ui.feature.auth.SignupScreen
+import com.example.echo_android.ui.navigation.NavigationDestinations
 import com.example.echo_android.ui.theme.EchoandroidTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,7 +43,7 @@ private fun MainNavHost() {
     val navController = rememberNavController()
     NavHost(navController, startDestination = NavigationDestinations.LOGIN) {
         composable(route = NavigationDestinations.LOGIN) {
-            LoginScreen(
+            SignupScreen(
                 navigateBack = {
                     navController.navigate(NavigationDestinations.HOME)
                 },

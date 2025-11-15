@@ -1,6 +1,5 @@
-package com.example.echo_android.ui
+package com.example.echo_android.ui.feature.auth
 
-import android.icu.text.CaseMap
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size

@@ -1,4 +1,4 @@
-package com.example.echo_android
+package com.example.echo_android.ui.navigation
 
 object NavigationDestinations {
     const val HOME = "home"

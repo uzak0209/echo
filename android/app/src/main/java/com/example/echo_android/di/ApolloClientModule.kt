@@ -1,11 +1,11 @@
-package com.example.echo_android
+package com.example.echo_android.di
 
-import android.content.Context
 import com.apollographql.apollo.ApolloClient
+import com.example.echo_android.network.ApolloWrapper
+import com.example.echo_android.network.apolloClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 

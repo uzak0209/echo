@@ -1,8 +1,9 @@
-package com.example.echo_android
+package com.example.echo_android.ui.feature.timeline
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.echo_android.network.ApolloWrapper
 import com.example.rocketreserver.GetTimelineQuery
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
