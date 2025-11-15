@@ -13,6 +13,7 @@ import com.example.rocketreserver.SignupMutation
 @Composable
 fun SignupScreen(
     navigateBack: () -> Unit,
+    onSecondaryClick: () -> Unit,
     viewModel: SignupViewModel = hiltViewModel()
 ) {
     val success by viewModel.state.collectAsState()
@@ -28,7 +29,7 @@ fun SignupScreen(
             viewModel.signup(username, password)
             true
         },
-        onSecondaryClick = { /* todo: ログイン画面へ戻る */ },
+        onSecondaryClick = { onSecondaryClick() },
         secondaryText = "ログインはこちら"
     )
 }

@@ -10,6 +10,7 @@ import com.example.echo_android.ui.feature.auth.LoginViewModel
 @Composable
 fun LoginScreen(
     navigateBack: () -> Unit,
+    onSecondaryClick: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val success by viewModel.state.collectAsState()
@@ -25,7 +26,7 @@ fun LoginScreen(
             viewModel.login(username, password)
             true
         },
-        onSecondaryClick = { /* todo: アカウント作成画面へ */ },
+        onSecondaryClick = { onSecondaryClick()},
         secondaryText = "アカウント作成"
     )
 }

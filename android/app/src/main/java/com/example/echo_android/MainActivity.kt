@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.echo_android.network.ApolloClientFactory
 import com.example.echo_android.ui.feature.MainScreen
+import com.example.echo_android.ui.feature.auth.LoginScreen
 import com.example.echo_android.ui.feature.auth.SignupScreen
 import com.example.echo_android.ui.navigation.NavigationDestinations
 import com.example.echo_android.ui.theme.EchoandroidTheme
@@ -43,10 +44,24 @@ private fun MainNavHost() {
     val navController = rememberNavController()
     NavHost(navController, startDestination = NavigationDestinations.LOGIN) {
         composable(route = NavigationDestinations.LOGIN) {
+            LoginScreen(
+                navigateBack = {
+                    navController.navigate(NavigationDestinations.HOME)
+                },
+                onSecondaryClick = {
+                    navController.navigate(NavigationDestinations.SIGNUP)
+                }
+            )
+        }
+
+        composable(route = NavigationDestinations.SIGNUP) {
             SignupScreen(
                 navigateBack = {
                     navController.navigate(NavigationDestinations.HOME)
                 },
+                onSecondaryClick = {
+                    navController.navigate(NavigationDestinations.LOGIN)
+                }
             )
         }
 
