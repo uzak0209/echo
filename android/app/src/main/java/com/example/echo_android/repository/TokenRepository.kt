@@ -1,4 +1,4 @@
-package com.example.echo_android
+package com.example.echo_android.repository
 
 import android.content.Context
 import android.content.SharedPreferences

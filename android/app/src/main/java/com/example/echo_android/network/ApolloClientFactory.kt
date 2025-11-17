@@ -1,4 +1,4 @@
-package com.example.echo_android
+package com.example.echo_android.network
 
 import android.content.Context
 import android.util.Log
@@ -7,6 +7,7 @@ import com.apollographql.apollo.api.http.HttpRequest
 import com.apollographql.apollo.api.http.HttpResponse
 import com.apollographql.apollo.network.http.HttpInterceptor
 import com.apollographql.apollo.network.http.HttpInterceptorChain
+import com.example.echo_android.repository.TokenRepository
 
 lateinit var apolloClient: ApolloClient
     private set
