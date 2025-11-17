@@ -24,7 +24,7 @@ fun LoginScreen(
         buttonText = "ログイン",
         onAuthClick = { username, password ->
             viewModel.login(username, password)
-            true
+            success
         },
         onSecondaryClick = { onSecondaryClick()},
         secondaryText = "アカウント作成"

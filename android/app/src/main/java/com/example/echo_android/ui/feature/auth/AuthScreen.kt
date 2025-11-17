@@ -61,6 +61,8 @@ fun AuthScreen(
                     loading = false
                     if (success) {
                         Log.d("AuthScreen", "$title successful")
+                    } else {
+                        Log.d("AuthScreen", "$title failed")
                     }
                 }
             },

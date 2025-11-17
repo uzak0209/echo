@@ -1,5 +1,6 @@
 package com.example.echo_android.ui.feature.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.echo_android.network.ApolloWrapper
@@ -22,8 +23,10 @@ class LoginViewModel @Inject constructor(
             val token = apollo.login(username, password)
             if (token != null) {
                 TokenRepository.setToken(token)
+                Log.d("LoginViewModel", "Success to login")
                 _state.value = true
             } else {
+                Log.d("LoginViewModel", "Failed to login")
                 _state.value = false
             }
         }

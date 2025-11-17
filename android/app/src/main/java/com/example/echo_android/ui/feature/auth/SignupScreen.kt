@@ -27,7 +27,7 @@ fun SignupScreen(
         buttonText = "登録",
         onAuthClick = { username, password ->
             viewModel.signup(username, password)
-            true
+            success
         },
         onSecondaryClick = { onSecondaryClick() },
         secondaryText = "ログインはこちら"
