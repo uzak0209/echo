@@ -1,0 +1,6 @@
+mutation addReaction($postId: String!, $reactionType: ReactionTypeGql!) {
+    addReaction(
+        postId: $postId,
+        reactionType: $reactionType
+    )
+}

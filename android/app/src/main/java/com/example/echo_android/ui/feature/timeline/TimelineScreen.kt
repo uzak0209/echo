@@ -11,21 +11,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlin.text.get
 
 @Composable
 fun TimelineScreen(viewModel: TimelineViewModel = hiltViewModel()) {
-    val posts by viewModel.viewState.collectAsState()
+    val viewState by viewModel.viewState.collectAsState()
+    val posts = viewState.content?.timeline
 
     LaunchedEffect(Unit) {
-        viewModel.getTimeline()
+        viewModel.fetchTimeline()
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(posts) { post ->
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(posts ?: emptyList()) { post ->
             PostItem(
-                post = post
+                post = post,
+                userReaction = viewState.userReactions[post.id],
+                onReactionClick = { postId, reactionType, isActive ->
+                    viewModel.toggleReaction(postId, reactionType, isActive)
+                }
             )
         }
     }
