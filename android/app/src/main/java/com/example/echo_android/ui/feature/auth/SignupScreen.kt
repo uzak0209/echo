@@ -33,29 +33,3 @@ fun SignupScreen(
         secondaryText = "ログインはこちら"
     )
 }
-
-private suspend fun signup(username: String, password: String): Boolean {
-    Log.d("Signup", "Starting signup for user: $username")
-
-    val response = apolloClient.mutation(SignupMutation(username = username, password = password)).execute()
-    return when {
-        response.exception != null -> {
-            Log.w("com.example.echo_android.Signup", "Failed to com.example.echo_android.ui.feature.auth.signup", response.exception)
-            false
-        }
-
-        response.hasErrors() -> {
-            Log.w("com.example.echo_android.Signup", "Failed to com.example.echo_android.sign: ${response.errors?.get(0)?.message}")
-            false
-        }
-
-        else -> {
-            val token = response.data!!.signup.accessToken
-            Log.w("com.example.echo_android.Signup", "Setting token: $token")
-            TokenRepository.setToken(token)
-            val saved = TokenRepository.getToken()
-            Log.d("Signup", "Token saved verification: ${if (saved != null) "OK" else "FAILED"}")
-            true
-        }
-    }
-}
