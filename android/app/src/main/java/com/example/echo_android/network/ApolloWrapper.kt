@@ -8,6 +8,7 @@ import android.util.Log
 import com.apollographql.apollo.api.Optional
 import com.example.rocketreserver.AddReactionMutation
 import com.example.rocketreserver.CreatePostMutation
+import com.example.rocketreserver.RefreshTokenMutation
 import com.example.rocketreserver.RemoveReactionMutation
 import com.example.rocketreserver.type.ReactionTypeGql
 import kotlinx.coroutines.flow.Flow
@@ -68,6 +69,19 @@ class ApolloWrapper(
             }
         } catch (e: Exception) {
             Log.e("ApolloWrapper", "signup error", e)
+            null
+        }
+    }
+    suspend fun refreshToken(): String? {
+        return try {
+            val response = client.mutation(
+                RefreshTokenMutation()
+            ).execute()
+
+            response.data?.refreshToken?.accessToken
+
+        } catch (e: Exception) {
+            Log.e("ApolloWrapper", "refreshToken error", e)
             null
         }
     }

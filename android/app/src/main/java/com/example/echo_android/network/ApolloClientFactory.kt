@@ -8,6 +8,7 @@ import com.apollographql.apollo.api.http.HttpResponse
 import com.apollographql.apollo.network.http.HttpInterceptor
 import com.apollographql.apollo.network.http.HttpInterceptorChain
 import com.example.echo_android.repository.TokenRepository
+import com.example.rocketreserver.RefreshTokenMutation
 
 lateinit var apolloClient: ApolloClient
     private set
@@ -30,7 +31,7 @@ class AuthorizationInterceptor : HttpInterceptor {
         request: HttpRequest,
         chain: HttpInterceptorChain
     ): HttpResponse {
-        val token = TokenRepository.getToken()
+        val token = TokenRepository.getAccessToken()
         Log.d("AuthInterceptor", "Token: ${if (token != null) "Present (${token.take(10)}...)" else "NULL"}")
 
         val newRequest = if (token != null) {
@@ -42,6 +43,46 @@ class AuthorizationInterceptor : HttpInterceptor {
             request
         }
 
+        val response = chain.proceed(newRequest)
+
+        if (response.statusCode == 401) {
+            Log.w("AuthInterceptor", "Token expired(401)")
+
+           val newAccessToken = refreshToken()
+            if (newAccessToken != null) {
+                TokenRepository.setToken(newAccessToken)
+                val retriedRequest = request.newBuilder()
+                    .addHeader("Authorization", "Bearer $newAccessToken")
+                    .build()
+            } else {
+                Log.e("AuthInterceptor", "Refresh token failed")
+                TokenRepository.removeToken()
+                return response
+            }
+        }
+
         return chain.proceed(newRequest)
+    }
+
+    private suspend fun refreshToken(): String? {
+        return try {
+            val response = apolloClient.mutation(RefreshTokenMutation()).execute()
+            when {
+                response.exception != null -> {
+                    Log.e("AuthInterceptor", "refreshToken failed", response.exception)
+                    null
+                }
+                response.hasErrors() -> {
+                    Log.e("AuthInterceptor", "refreshToken GraphQL error: ${response.errors?.firstOrNull()?.message}")
+                    null
+                }
+                else -> {
+                    response.data?.refreshToken?.accessToken
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AuthInterceptor", "refreshToken error", e)
+            null
+        }
     }
 }
