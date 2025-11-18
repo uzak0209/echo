@@ -8,9 +8,10 @@ import { useReaction } from '@/lib/reaction-context';
 import { GET_USER_LATEST_REACTION } from '@/lib/graphql/queries';
 import { Button } from '@/components/ui/button';
 import { REACTION_EMOJIS, ReactionType } from '@/lib/types/reaction';
+import { MascotAvatar } from '@/components/MascotAvatar';
 
 export default function AvatarPage() {
-  const { isAuthenticated, userId, displayName, avatarUrl } = useAuth();
+  const { isAuthenticated, userId, displayName } = useAuth();
   const router = useRouter();
   const [latestReaction, setLatestReaction] = useState<string | null>(null);
   const { latestReaction: sseReaction } = useReaction();
@@ -56,15 +57,13 @@ export default function AvatarPage() {
     return reactionType ? REACTION_EMOJIS[reactionType] : null;
   };
 
-  if (!isAuthenticated || !avatarUrl || !displayName) {
+  if (!isAuthenticated || !userId || !displayName) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-muted-foreground">Loading...</p>
       </div>
     );
   }
-
-  const emoji = getReactionEmoji(latestReaction);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
@@ -79,30 +78,12 @@ export default function AvatarPage() {
         {/* Avatar display */}
         <div className="flex flex-col items-center gap-8">
           <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Your Avatar
+            Your Mascot
           </h1>
 
-          {/* Large avatar with reaction animation */}
-          <div className="relative">
-            <div className="w-64 h-64 rounded-full overflow-hidden border-8 border-white shadow-2xl transition-transform duration-500 hover:scale-105">
-              <img
-                src={avatarUrl}
-                alt={displayName}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Reaction emoji overlay with animation */}
-            {emoji && (
-              <div
-                className="absolute -bottom-4 -right-4 bg-white rounded-full shadow-xl p-6 text-6xl animate-bounce"
-                style={{
-                  animation: 'bounce 1s ease-in-out 3',
-                }}
-              >
-                {emoji}
-              </div>
-            )}
+          {/* Mascot Avatar */}
+          <div className="w-96 h-96 border-8 border-white shadow-2xl rounded-lg overflow-hidden">
+            <MascotAvatar userId={userId} expression={latestReaction} />
           </div>
 
           {/* User info */}
@@ -110,7 +91,7 @@ export default function AvatarPage() {
             <h2 className="text-2xl font-semibold">{displayName}</h2>
             {latestReaction ? (
               <p className="text-muted-foreground">
-                最新のリアクション: <span className="font-semibold">{emoji}</span>
+                最新のリアクション: <span className="font-semibold">{latestReaction}</span>
               </p>
             ) : (
               <p className="text-muted-foreground">
@@ -124,22 +105,11 @@ export default function AvatarPage() {
             <h3 className="font-semibold mb-2 text-center">表情について</h3>
             <p className="text-sm text-muted-foreground text-center">
               あなたの投稿に対する最新のリアクションが表情として表示されます。
-              リアクションを受け取ると、アバターの表情が変化します！
+              リアクションを受け取ると、マスコットの表情が変化します！
             </p>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0) scale(1);
-          }
-          50% {
-            transform: translateY(-20px) scale(1.1);
-          }
-        }
-      `}</style>
     </div>
   );
 }

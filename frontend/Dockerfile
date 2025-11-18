@@ -8,7 +8,7 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install --legacy-peer-deps
 
-# Copy source code
+# Copy source code (node_modules excluded via .dockerignore)
 COPY . .
 
 # Expose port

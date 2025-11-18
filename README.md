@@ -94,6 +94,7 @@ make seed
 - **フロントエンド**: http://localhost:3000
 - **GraphQL Playground**: http://localhost:8000
 - **GraphQL API**: http://localhost:8000/graphql
+- **Adminer（DB管理）**: http://localhost:8080
 
 ### テストユーザー
 
@@ -128,6 +129,20 @@ make test         # テストを実行
 make rebuild      # クリーンビルドして再起動
 make help         # すべてのコマンドを表示
 ```
+
+### データベース管理（Adminer）
+
+Adminerを使ってブラウザからデータベースの中身を確認・編集できます。
+
+1. **Adminerにアクセス**: http://localhost:8080
+2. **ログイン情報**:
+   - システム: `PostgreSQL`
+   - サーバ: `postgres`
+   - ユーザ名: `postgres`
+   - パスワード: `password`
+   - データベース: `echo`
+
+ログイン後、`reactions`テーブルを確認してリアクションが正しく保存されているか確認できます。
 
 ### 開発時のポイント
 
