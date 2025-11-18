@@ -49,37 +49,49 @@ export function CreatePost() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="gap-2">
-          <Plus className="h-5 w-5" />
-          Post
+        <Button
+          size="lg"
+          className="fixed bottom-8 right-8 h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 shadow-lg hover:shadow-xl z-50 p-0 transition-all duration-300 border-2 border-white/20"
+        >
+          <Plus className="h-8 w-8 text-white" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[600px] bg-card border border-border">
         <DialogHeader>
-          <DialogTitle>Create a Post</DialogTitle>
-          <DialogDescription>
-            Share your thoughts. Your post will disappear after 10 views.
-          </DialogDescription>
+          <DialogTitle className="text-xl font-semibold">
+            投稿を作成
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 pt-4">
-          <Textarea
-            placeholder="What's on your mind?"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            maxLength={1000}
-            className="min-h-[150px]"
-          />
+          <div className="relative">
+            <Textarea
+              placeholder="いま何してる？"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              maxLength={1000}
+              className="min-h-[180px] resize-none text-base"
+            />
+          </div>
+
           <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              {content.length}/1000 characters
-            </p>
-            <Button onClick={handleSubmit} disabled={loading || !content.trim()}>
-              {loading ? 'Posting...' : 'Post'}
+            <span className="text-sm text-muted-foreground">
+              {content.length}/1000
+            </span>
+            <Button
+              onClick={handleSubmit}
+              disabled={loading || !content.trim()}
+              className="bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 transition-all duration-300"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  投稿中...
+                </span>
+              ) : (
+                '投稿'
+              )}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Note: You won't be able to see your own post. It will be shown to others randomly.
-          </p>
         </div>
       </DialogContent>
     </Dialog>
