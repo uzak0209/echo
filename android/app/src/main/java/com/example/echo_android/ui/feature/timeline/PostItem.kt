@@ -111,7 +111,7 @@ fun ReactionButton(
         onClick = onClick,
         modifier = Modifier
             .background(
-                // todo: あとで色
+                // TODO: Update color scheme later
                 color = if (active) {
                     MaterialTheme.colorScheme.primaryContainer // アクティブ時
                 } else {
