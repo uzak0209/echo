@@ -23,7 +23,6 @@ import javax.inject.Inject
 class TimelineViewModel @Inject constructor(
     private val apolloWrapper: ApolloWrapper
 ) : ViewModel() {
-
     private val _viewState = MutableStateFlow(ViewState.INITIAL)
     val viewState = _viewState.asStateFlow()
     fun fetchTimeline() {
@@ -37,19 +36,6 @@ class TimelineViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-
-    fun addReaction(postId: String, reaction: ReactionTypeGql) {
-        viewModelScope.launch {
-            _viewState.update { it.copy(isLoading = true, throwable = null) }
-            val success = apolloWrapper.addReaction(postId, reaction)
-            if (success) {
-                Log.d("TimelineViewModel", "addReaction success")
-            } else {
-                _viewState.update { it.copy(isLoading = false, throwable = Exception("addReaction failed")) }
-            }
-        }
-    }
-
     fun toggleReaction(postId: String, reaction: ReactionTypeGql, isActive: Boolean) {
         viewModelScope.launch {
             _viewState.update { it.copy(isLoading = true, throwable = null) }
@@ -82,8 +68,6 @@ class TimelineViewModel @Inject constructor(
             }
         }
     }
-
-
     data class ViewState(
         val isLoading: Boolean = false,
         val throwable: Throwable?,
