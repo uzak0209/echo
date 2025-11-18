@@ -21,23 +21,56 @@ class ApolloWrapper(
     }
 
     suspend fun login(username: String, password: String): String?   {
-        val response = client.mutation(LoginMutation(username = username, password = password)).execute()
+        return try {
+            val response = client.mutation(
+                LoginMutation(username = username, password = password)
+            ).execute()
 
-        if (response.exception != null) return null
-        if (response.hasErrors()) return null
-
-        return response.data?.login?.accessToken
+            when {
+                response.exception != null -> {
+                    Log.e("ApolloWrapper", "login failed", response.exception)
+                    null
+                }
+                response.hasErrors() -> {
+                    Log.e("ApolloWrapper", "login GraphQL error: ${response.errors?.firstOrNull()?.message}")
+                    null
+                }
+                else -> {
+                    Log.d("ApolloWrapper", "login success")
+                    response.data?.login?.accessToken
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("ApolloWrapper", "login error", e)
+            null
+        }
     }
 
     suspend fun signup(username: String, password: String): String? {
-        val response = client.mutation(SignupMutation(username = username, password = password)).execute()
+        return try {
+            val response = client.mutation(
+                SignupMutation(username = username, password = password)
+            ).execute()
 
-        if (response.exception != null) return null
-        if (response.hasErrors()) return null
-
-        return response.data?.signup?.accessToken
+            when {
+                response.exception != null -> {
+                    Log.e("ApolloWrapper", "signup failed", response.exception)
+                    null
+                }
+                response.hasErrors() -> {
+                    Log.e("ApolloWrapper", "signup GraphQL error: ${response.errors?.firstOrNull()?.message}")
+                    null
+                }
+                else -> {
+                    Log.d("ApolloWrapper", "signup success")
+                    response.data?.signup?.accessToken
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("ApolloWrapper", "signup error", e)
+            null
+        }
     }
-
     suspend fun createPost(content: String, imageUrl: String?): Boolean {
         val wrappedImageUrl = if (imageUrl != null) {
             Optional.present(imageUrl)
