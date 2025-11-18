@@ -1,0 +1,6 @@
+mutation createPost($content: String!, $imageUrl: String) {
+    createPost(input: {
+        content: $content,
+        imageUrl: $imageUrl
+    })
+}

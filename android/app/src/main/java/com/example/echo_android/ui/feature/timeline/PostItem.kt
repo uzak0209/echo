@@ -11,8 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,24 +24,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import com.example.echo_android.R
 import com.example.rocketreserver.GetTimelineQuery
-
-enum class ReactionType(val emoji: String) {
-    SURPRISE("😮"),
-    EMPATHY("❤️"),
-    LAUGH("😂"),
-    SAD("😢"),
-    CONFUSED("😕")
-}
-
-data class Reaction(
-    var count: Int,
-    var active: Boolean,
-    val type: ReactionType,
-)
+import com.example.rocketreserver.type.ReactionTypeGql
 
 @Composable
-fun PostItem(post: GetTimelineQuery.Timeline) {
+fun PostItem(
+    post: GetTimelineQuery.Timeline,
+    userReaction: ReactionTypeGql?,
+    onReactionClick: (postId: String, reactionType: ReactionTypeGql, isActive: Boolean) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -76,16 +74,20 @@ fun PostItem(post: GetTimelineQuery.Timeline) {
             Spacer(modifier = Modifier.size(4.dp))
 
             // リアクションボタン
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                ReactionType.entries.forEach { reactionType ->
+            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                ReactionTypeGql.entries
+                    .filter { it != ReactionTypeGql.UNKNOWN__ }
+                    .forEach { reactionType ->
+                    val isActive = userReaction == reactionType
+
                     ReactionButton(
                         reaction = reactionType,
-                        onClick = { /* TODO: リアクション*/}
+                        active = isActive,
+                        onClick = {
+                            onReactionClick(post.id, reactionType, isActive)
+                        }
                     )
                 }
-
             }
         }
     }
@@ -93,12 +95,29 @@ fun PostItem(post: GetTimelineQuery.Timeline) {
 }
 
 @Composable
-fun ReactionButton(reaction: ReactionType, onClick: () -> Unit = {}) {
-    Button(
-        onClick = onClick
+fun ReactionButton(
+    reaction: ReactionTypeGql,
+    active: Boolean = false,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier
+            .background(
+                // todo: あとで色
+        color = if (active) Color(0xFFFFE0E0) else Color.Transparent,
+        shape = CircleShape
+    )
     ) {
         Text(
-            text = reaction.emoji
+            text = when (reaction) {
+                ReactionTypeGql.SURPRISE -> "😲"
+                ReactionTypeGql.EMPATHY -> "🥺"
+                ReactionTypeGql.LAUGH -> "😂"
+                ReactionTypeGql.SAD -> "😢"
+                ReactionTypeGql.CONFUSED -> "😕"
+                else -> "???"
+            }
         )
     }
 }

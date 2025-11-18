@@ -1,10 +1,9 @@
-package com.example.echo_android.ui.feature.auth
+package com.example.echo_android.ui.feature.post
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.echo_android.network.ApolloWrapper
-import com.example.echo_android.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,22 +11,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
-    private  val apollo: ApolloWrapper
+class CreatePostViewModel @Inject constructor(
+    private val apollo: ApolloWrapper
 ): ViewModel() {
     private  val _state = MutableStateFlow(false)
     val state = _state.asStateFlow()
 
-    fun login(username: String, password: String) {
+    fun createPost(content: String, imageUrl: String?) {
         viewModelScope.launch {
-            val token = apollo.login(username, password)
-            if (token != null) {
-                TokenRepository.setToken(token)
-                Log.d("LoginViewModel", "Success to login")
+            val success = apollo.createPost(content, imageUrl)
+
+            if (success) {
+                Log.d("CreatePostViewModel", "Success to create post")
                 _state.value = true
             } else {
-                Log.d("LoginViewModel", "Failed to login")
-                _state.value = false
+                Log.d("CreatePostViewModel", "Failed to create post")
             }
         }
     }
