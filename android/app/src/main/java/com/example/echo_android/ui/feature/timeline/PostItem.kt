@@ -47,9 +47,7 @@ fun PostItem(
     {
         // icon
         AsyncImage(
-            model = post.authorAvatar.also {
-                android.util.Log.d("PostItem", "Loading image URL: $it")
-            },
+            model = post.authorAvatar,
             contentDescription = "Author icon",
             modifier = Modifier
                 .size(48.dp)
