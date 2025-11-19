@@ -54,6 +54,7 @@ class AuthorizationInterceptor : HttpInterceptor {
                 val retriedRequest = request.newBuilder()
                     .addHeader("Authorization", "Bearer $newAccessToken")
                     .build()
+                return chain.proceed(retriedRequest)
             } else {
                 Log.e("AuthInterceptor", "Refresh token failed")
                 TokenRepository.removeToken()
