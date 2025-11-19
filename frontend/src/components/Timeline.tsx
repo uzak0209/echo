@@ -5,6 +5,7 @@ import { GET_TIMELINE } from '@/lib/graphql/queries';
 import { PostCard } from './PostCard';
 import { Button } from './ui/button';
 import { usePostStream } from '@/lib/hooks/usePostStream';
+import { useAuth } from '@/lib/auth-context';
 import { useEffect, useState } from 'react';
 
 interface Post {
@@ -16,6 +17,7 @@ interface Post {
 }
 
 export function Timeline() {
+  const { userId } = useAuth();
   const { data, loading, error, refetch } = useQuery(GET_TIMELINE, {
     variables: { limit: 10 },
     fetchPolicy: 'network-only', // Always fetch from server, not cache
@@ -25,10 +27,16 @@ export function Timeline() {
   const { latestPost, isConnected } = usePostStream();
   const [realtimePosts, setRealtimePosts] = useState<Post[]>([]);
 
-  // 新規投稿が来たらリアルタイムで追加
+  // 新規投稿が来たらリアルタイムで追加（自分の投稿は除外）
   useEffect(() => {
     if (latestPost) {
       console.log('[Timeline] New post received:', latestPost);
+
+      // 自分の投稿は表示しない（コンセプト：承認欲求ゼロ）
+      if (latestPost.user_id === userId) {
+        console.log('[Timeline] Skipping own post');
+        return;
+      }
 
       // SSEイベントからPost型に変換
       const newPost: Post = {
@@ -47,7 +55,7 @@ export function Timeline() {
         return [newPost, ...prev];
       });
     }
-  }, [latestPost]);
+  }, [latestPost, userId]);
 
   if (loading) {
     return (
