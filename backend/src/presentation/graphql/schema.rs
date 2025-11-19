@@ -23,7 +23,8 @@ pub type AppSchema = Schema<QueryRoot, MutationRoot, EmptySubscription>;
 pub fn build_schema(
     db: DatabaseConnection,
     jwt_secret: String,
-    stream_manager: Arc<crate::infrastructure::sse::ReactionStreamManager>,
+    reaction_stream_manager: Arc<crate::infrastructure::sse::ReactionStreamManager>,
+    post_stream_manager: Arc<crate::infrastructure::sse::PostStreamManager>,
 ) -> AppSchema {
     // Create JWT service
     let jwt_service = Arc::new(JwtService::new(&jwt_secret));
@@ -38,7 +39,7 @@ pub fn build_schema(
         post_repo.clone(),
     ));
     let create_post_use_case =
-        Arc::new(CreatePostUseCase::new(post_repo.clone(), user_repo.clone()));
+        Arc::new(CreatePostUseCase::new(post_repo.clone(), user_repo.clone(), post_stream_manager));
     let increment_display_count_use_case =
         Arc::new(IncrementDisplayCountUseCase::new(post_repo.clone()));
     let refresh_token_use_case = Arc::new(RefreshTokenUseCase::new(user_repo.clone(), jwt_service.clone()));
@@ -48,7 +49,7 @@ pub fn build_schema(
     let add_reaction_use_case = Arc::new(AddReactionUseCase::new(
         reaction_repo.clone(),
         post_repo.clone(),
-        stream_manager,
+        reaction_stream_manager,
     ));
     let remove_reaction_use_case = Arc::new(RemoveReactionUseCase::new(reaction_repo.clone()));
     let get_user_latest_reaction_use_case =
