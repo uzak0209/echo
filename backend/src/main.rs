@@ -114,14 +114,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Connect to database
     let db: DatabaseConnection = Database::connect(&database_url).await?;
 
-    // Create SSE stream manager
-    let stream_manager = Arc::new(infrastructure::sse::ReactionStreamManager::new());
+    // Create SSE stream managers
+    let reaction_stream_manager = Arc::new(infrastructure::sse::ReactionStreamManager::new());
+    let post_stream_manager = Arc::new(infrastructure::sse::PostStreamManager::new());
 
     // Create JWT service
     let jwt_service = Arc::new(infrastructure::auth::JwtService::new(&jwt_secret));
 
     // Build GraphQL schema (DI is handled inside build_schema)
-    let schema = presentation::build_schema(db, jwt_secret, stream_manager.clone());
+    let schema = presentation::build_schema(db, jwt_secret, reaction_stream_manager.clone(), post_stream_manager.clone());
 
     let state = AppState {
         schema,
@@ -148,14 +149,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route(
             "/api/reactions/events",
             get(presentation::sse::reaction_events_handler)
-                .with_state((stream_manager.clone(), jwt_service)),
+                .with_state((reaction_stream_manager.clone(), jwt_service.clone())),
+        )
+        .route(
+            "/api/posts/events",
+            get(presentation::sse::post_events_handler)
+                .with_state((post_stream_manager.clone(), jwt_service.clone())),
         )
         .layer(cors);
 
     println!("GraphQL Playground: http://localhost:{}", port);
     println!("GraphQL Endpoint: http://localhost:{}/graphql", port);
-    println!("SSE Endpoint: http://localhost:{}/api/reactions/events", port);
-    println!("  Auth: Authorization: Bearer <token> (preferred) | ?token=<token> (Safari/EventSource fallback)");
+    println!("SSE Endpoint (Reactions): http://localhost:{}/api/reactions/events", port);
+    println!("SSE Endpoint (Posts): http://localhost:{}/api/posts/events", port);
+    println!("  Auth: ?token=<sse_token> (get token from generateSseToken mutation)");
 
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
 
