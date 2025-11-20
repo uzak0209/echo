@@ -92,7 +92,7 @@ class SSEClient(
 
     private fun scheduleReconnect() {
         reconnectJob?.cancel()
-        reconnectJob = CoroutineScope(Dispatchers.IO).launch {
+        reconnectJob = scope.launch {
             delay(55000) // 55秒後
             Log.d("SSEClient", "SSE再接続を開始...")
 
@@ -111,7 +111,7 @@ class SSEClient(
     }
 
     fun disconnect() {
-        reconnectJob?.cancel()
+        scope.cancel()
         reconnectJob = null
         backgroundEventSource?.close()
         backgroundEventSource = null
