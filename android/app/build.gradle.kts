@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.apollo)
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp") // kaptの代わり
     id("com.google.dagger.hilt.android")
 }
 
@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,8 +72,20 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+
+    // icon
+    implementation(libs.androidx.compose.material.icons.extended)
+
+    // coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
+
+    // OkHttp and Event Source
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.eventsource)
+    implementation(libs.kotlinx.serialization.json)
 }
 
 apollo {
@@ -83,8 +96,4 @@ apollo {
             schemaFile.set(file("src/main/graphql/schema.graphqls"))
         }
     }
-}
-
-kapt {
-    correctErrorTypes = true
 }

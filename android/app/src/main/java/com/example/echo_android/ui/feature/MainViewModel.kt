@@ -1,34 +1,71 @@
-package com.example.echo_android.ui.feature.timeline
+package com.example.echo_android.ui.feature
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.util.copy
 import com.example.echo_android.network.ApolloWrapper
-import com.example.echo_android.network.Lce
+import com.example.echo_android.network.SSEClient
 import com.example.echo_android.network.toLce
 import com.example.rocketreserver.GetTimelineQuery
 import com.example.rocketreserver.type.ReactionTypeGql
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TimelineViewModel @Inject constructor(
+class MainViewModel @Inject constructor(
     private val apolloWrapper: ApolloWrapper
-) : ViewModel() {
+): ViewModel() {
+    private val sseClient = SSEClient()
+    private val _avatarExpression = MutableStateFlow<String?>(null)
+    val avatarExpression: StateFlow<String?> = _avatarExpression.asStateFlow()
 
-    private val _viewState = MutableStateFlow(ViewState.INITIAL)
-    val viewState = _viewState.asStateFlow()
+    private val _timelineState = MutableStateFlow(ViewState.INITIAL)
+    val timelineState = _timelineState.asStateFlow()
+
+    // SSE接続とtimeline取得
+    init {
+        startRealtimeUpdates()
+        fetchTimeline()
+    }
+
+    private fun startRealtimeUpdates() {
+        viewModelScope.launch {
+            try {
+                val initialToken = apolloWrapper.generateSseToken()
+
+                if (initialToken != null) {
+                    sseClient.startSSE(
+                        sseToken = initialToken,
+                        onReaction = { reaction ->
+                            _avatarExpression.value = reaction.latestReactionForAuthor
+                            Log.d("HomeViewModel", "アバター表情更新: ${reaction.latestReactionForAuthor}")
+                        },
+                        tokenProvider = {
+                            // 55秒ごとに新しいトークンを提供
+                            apolloWrapper.generateSseToken()
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "SSE開始に失敗", e)
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        sseClient.disconnect()
+    }
     fun fetchTimeline() {
         apolloWrapper.fetchTimeline().toLce().onEach { lce ->
-            _viewState.update {
+            _timelineState.update {
                 it.copy(
                     isLoading = lce.isLoading,
                     throwable = lce.getThrowableIfError(),
@@ -37,22 +74,9 @@ class TimelineViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-
-    fun addReaction(postId: String, reaction: ReactionTypeGql) {
-        viewModelScope.launch {
-            _viewState.update { it.copy(isLoading = true, throwable = null) }
-            val success = apolloWrapper.addReaction(postId, reaction)
-            if (success) {
-                Log.d("TimelineViewModel", "addReaction success")
-            } else {
-                _viewState.update { it.copy(isLoading = false, throwable = Exception("addReaction failed")) }
-            }
-        }
-    }
-
     fun toggleReaction(postId: String, reaction: ReactionTypeGql, isActive: Boolean) {
         viewModelScope.launch {
-            _viewState.update { it.copy(isLoading = true, throwable = null) }
+            _timelineState.update { it.copy(isLoading = true, throwable = null) }
             val success = if (isActive) {
                 apolloWrapper.removeReaction(postId)
             } else {
@@ -60,7 +84,7 @@ class TimelineViewModel @Inject constructor(
             }
 
             if (success) {
-                _viewState.update { state ->
+                _timelineState.update { state ->
                     val updatedReactions = state.userReactions.toMutableMap()
                     if (isActive) {
                         updatedReactions.remove(postId)
@@ -73,7 +97,7 @@ class TimelineViewModel @Inject constructor(
                     )
                 }
             } else {
-                _viewState.update {
+                _timelineState.update {
                     it.copy(
                         isLoading = false,
                         throwable = Exception("toggleReaction failed")
@@ -82,8 +106,6 @@ class TimelineViewModel @Inject constructor(
             }
         }
     }
-
-
     data class ViewState(
         val isLoading: Boolean = false,
         val throwable: Throwable?,

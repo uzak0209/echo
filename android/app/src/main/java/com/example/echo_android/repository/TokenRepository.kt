@@ -27,7 +27,7 @@ object TokenRepository {
 
     }
 
-    fun getToken(): String? {
+    fun getAccessToken(): String? {
         return preferences.getString(KEY_TOKEN, null)
     }
 
