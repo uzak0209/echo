@@ -13,17 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.echo_android.ui.feature.MainViewModel
 import kotlin.text.get
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimelineScreen(viewModel: TimelineViewModel = hiltViewModel()) {
-    val viewState by viewModel.viewState.collectAsState()
+fun TimelineScreen(viewModel: MainViewModel = hiltViewModel()) {
+    val viewState by viewModel.timelineState.collectAsState()
     val posts = viewState.content?.timeline
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchTimeline()
-    }
 
     PullToRefreshBox(
         isRefreshing = viewState.isLoading,
