@@ -47,9 +47,7 @@ fun PostItem(
     {
         // icon
         AsyncImage(
-            model = post.authorAvatar.also {
-                android.util.Log.d("PostItem", "Loading image URL: $it")
-            },
+            model = post.authorAvatar,
             contentDescription = "Author icon",
             modifier = Modifier
                 .size(48.dp)
@@ -111,7 +109,7 @@ fun ReactionButton(
         onClick = onClick,
         modifier = Modifier
             .background(
-                // todo: あとで色
+                // TODO: Update color scheme later
                 color = if (active) {
                     MaterialTheme.colorScheme.primaryContainer // アクティブ時
                 } else {

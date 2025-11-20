@@ -41,7 +41,7 @@ fun <T : Operation.Data> ApolloCall<T>.toThrowableFlow() = toFlow().map { respon
 }.retryWhen { cause, attempt ->
     if (cause is NoNetworkException || attempt >= 5) return@retryWhen false
     // exponential backoff でリトライ間隔を徐々に伸ばす
-    val delayMillis = (300 * 2.0.pow(attempt.toDouble()) * Math.random()).toLong()
+    val delayMillis = (300 * 2.0.pow(attempt.toDouble()) * (0.5 + Math.random() * 0.5)).toLong()
     delay(delayMillis)
     true
 }

@@ -45,17 +45,15 @@ class AuthorizationInterceptor : HttpInterceptor {
 
         val response = chain.proceed(newRequest)
 
-        // 401ならRefresh
         if (response.statusCode == 401) {
             Log.w("AuthInterceptor", "Token expired(401)")
 
            val newAccessToken = refreshToken()
             if (newAccessToken != null) {
                 TokenRepository.setToken(newAccessToken)
-                val retried = request.newBuilder()
+                val retriedRequest = request.newBuilder()
                     .addHeader("Authorization", "Bearer $newAccessToken")
                     .build()
-                return chain.proceed(retried)
             } else {
                 Log.e("AuthInterceptor", "Refresh token failed")
                 TokenRepository.removeToken()
@@ -63,7 +61,7 @@ class AuthorizationInterceptor : HttpInterceptor {
             }
         }
 
-        return response
+        return chain.proceed(newRequest)
     }
 
     private suspend fun refreshToken(): String? {
