@@ -39,7 +39,7 @@ class MainViewModel @Inject constructor(
     private fun startRealtimeUpdates() {
         viewModelScope.launch {
             try {
-                val initialToken = fetchSseToken()
+                val initialToken = apolloWrapper.generateSseToken()
 
                 if (initialToken != null) {
                     sseClient.startSSE(
@@ -50,24 +50,13 @@ class MainViewModel @Inject constructor(
                         },
                         tokenProvider = {
                             // 55秒ごとに新しいトークンを提供
-                            fetchSseToken()
+                            apolloWrapper.generateSseToken()
                         }
                     )
                 }
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "SSE開始に失敗", e)
             }
-        }
-    }
-    private suspend fun fetchSseToken(): String? {
-        return try {
-            apolloWrapper
-                .generateSseToken()
-                .firstOrNull()
-                ?.generateSseToken
-        } catch (e: Exception) {
-            Log.e("HomeViewModel", "SSEトークン取得に失敗", e)
-            null
         }
     }
 

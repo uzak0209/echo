@@ -22,9 +22,28 @@ class ApolloWrapper(
             .toThrowableFlow()
     }
 
-    fun generateSseToken(): Flow<GenerateSseTokenMutation.Data> {
-        return client.mutation(GenerateSseTokenMutation())
-            .toThrowableFlow()
+    suspend fun generateSseToken(): String? {
+        val response = client.mutation(GenerateSseTokenMutation()).execute()
+
+        return try {
+            when {
+                response.exception != null -> {
+                    Log.e("ApolloWrapper", "generateSseToken failed", response.exception)
+                    return null
+                }
+                response.hasErrors() -> {
+                    Log.e("ApolloWrapper", "generateSseToken GraphQL error: ${response.errors?.firstOrNull()?.message}")
+                    return null
+                }
+                else -> {
+                    Log.d("ApolloWrapper", "generateSseToken success")
+                    response.data?.generateSseToken
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("ApolloWrapper", "generateSseToken error", e)
+            null
+        }
     }
 
     suspend fun login(username: String, password: String): String?   {
