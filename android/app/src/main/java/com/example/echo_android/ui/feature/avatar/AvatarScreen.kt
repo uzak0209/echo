@@ -52,7 +52,7 @@ fun AvatarDisplay(
     expression: String,
     modifier: Modifier = Modifier
 ) {
-    // todo: アニメーションに差し替える
+    // TODO: Replace with animation later
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surfaceVariant,
