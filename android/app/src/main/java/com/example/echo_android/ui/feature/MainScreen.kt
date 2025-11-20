@@ -13,7 +13,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -23,15 +22,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.echo_android.ui.feature.avatar.AvatarScreen
 import com.example.echo_android.ui.feature.post.CreatePostDialog
 import com.example.echo_android.ui.feature.timeline.TimelineScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(
-    viewModel: MainViewModel = hiltViewModel()
-) {
+fun MainScreen() {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Timeline", "Avatar")
 

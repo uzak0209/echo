@@ -9,7 +9,6 @@ import com.apollographql.apollo.api.Optional
 import com.example.rocketreserver.AddReactionMutation
 import com.example.rocketreserver.CreatePostMutation
 import com.example.rocketreserver.GenerateSseTokenMutation
-import com.example.rocketreserver.RefreshTokenMutation
 import com.example.rocketreserver.RemoveReactionMutation
 import com.example.rocketreserver.type.ReactionTypeGql
 import kotlinx.coroutines.flow.Flow
