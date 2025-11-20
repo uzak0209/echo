@@ -15,7 +15,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.echo_android.network.ApolloClientFactory
-import com.example.echo_android.repository.TokenRepository
 import com.example.echo_android.ui.feature.MainScreen
 import com.example.echo_android.ui.feature.auth.LoginScreen
 import com.example.echo_android.ui.feature.auth.SignupScreen
