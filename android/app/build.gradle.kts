@@ -76,6 +76,20 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+
+    // Material Icons Extended
+    implementation(libs.androidx.compose.material.icons.extended)
+
+    // Coil (画像読み込み)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
+
+    // Room KTX (ローカルデータベース)
+    implementation(libs.androidx.room.ktx)
+
+    // OkHttp EventSource (SSE)
+    implementation(libs.okhttp.eventsource)
+    implementation(libs.kotlinx.serialization.json)
 }
 
 apollo {

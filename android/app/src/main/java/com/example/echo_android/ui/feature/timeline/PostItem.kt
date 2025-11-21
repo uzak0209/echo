@@ -17,6 +17,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,10 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.example.echo_android.R
 import com.example.rocketreserver.GetTimelineQuery
 import com.example.rocketreserver.type.ReactionTypeGql
+import coil.compose.AsyncImage
 
 @Composable
 fun PostItem(
@@ -43,15 +46,17 @@ fun PostItem(
         horizontalArrangement = Arrangement.Center)
     {
         // icon
-        Box(
+        AsyncImage(
+            model = post.authorAvatar,
+            contentDescription = "Author icon",
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(color = Color.Gray),
-            contentAlignment = Alignment.Center
-        ) {
-
-        }
+                .background(color = MaterialTheme.colorScheme.surface),
+            placeholder = painterResource(R.drawable.ic_launcher_foreground), // ロード中の表示
+            error = painterResource(R.drawable.ic_launcher_foreground), // エラー時の表示
+            contentScale = ContentScale.Crop
+        )
 
         Spacer(modifier = Modifier.width(8.dp))
 
@@ -104,8 +109,12 @@ fun ReactionButton(
         onClick = onClick,
         modifier = Modifier
             .background(
-                // todo: あとで色
-        color = if (active) Color(0xFFFFE0E0) else Color.Transparent,
+                // TODO: Update color scheme later
+                color = if (active) {
+                    MaterialTheme.colorScheme.primaryContainer // アクティブ時
+                } else {
+                    Color.Transparent // 非アクティブ時
+                },
         shape = CircleShape
     )
     ) {
