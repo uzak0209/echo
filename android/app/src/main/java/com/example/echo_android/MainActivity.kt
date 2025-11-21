@@ -62,7 +62,7 @@ private fun MainNavHost() {
             }
         }
         is AuthViewModel.AuthState.Authenticated -> {
-            AuthenticatedNavHost()
+            AuthenticatedNavHost(onLogout = { authViewModel.logout() })
         }
         is AuthViewModel.AuthState.Unauthenticated -> {
             UnauthenticatedNavHost()
@@ -107,11 +107,11 @@ private fun UnauthenticatedNavHost() {
 }
 
 @Composable
-private fun AuthenticatedNavHost() {
+private fun AuthenticatedNavHost(onLogout: () -> Unit) {
     val navController = rememberNavController()
     NavHost(navController, startDestination = NavigationDestinations.HOME) {
         composable(route = NavigationDestinations.HOME) {
-            MainScreen()
+            MainScreen(onLogout = onLogout)
         }
 
         composable(route = NavigationDestinations.LOGIN) {

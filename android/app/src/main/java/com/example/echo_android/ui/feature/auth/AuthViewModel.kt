@@ -63,6 +63,15 @@ class AuthViewModel @Inject constructor(
         checkAuthentication()
     }
 
+    /**
+     * ログアウト処理
+     */
+    fun logout() {
+        Log.d("AuthViewModel", "Logging out...")
+        TokenRepository.removeToken()
+        _authState.value = AuthState.Unauthenticated
+    }
+
     sealed class AuthState {
         data object Checking : AuthState()
         data object Authenticated : AuthState()
