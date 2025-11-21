@@ -16,6 +16,7 @@ import com.example.rocketreserver.RemoveReactionMutation
 import com.example.rocketreserver.type.ReactionTypeGql
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.retryWhen
 
 class ApolloWrapper(
     private val client: ApolloClient
@@ -59,11 +60,40 @@ class ApolloWrapper(
                     throw response.exception!!
                 }
                 if (response.hasErrors()) {
-                    throw Exception("GraphQL error: ${response.errors?.firstOrNull()?.message}")
+                    val errorMessage = response.errors?.firstOrNull()?.message ?: "Unknown error"
+                    // Unauthorizedエラーの場合はリトライフラグを立てる
+                    if (isUnauthorizedError(errorMessage)) {
+                        throw UnauthorizedException(errorMessage)
+                    }
+                    throw Exception("GraphQL error: $errorMessage")
                 }
                 response.data ?: throw Exception("No data in response")
             }
+            .retryWhen { cause, attempt ->
+                if (cause is UnauthorizedException && attempt < 1) {
+                    Log.d("ApolloWrapper", "fetchTimeline Unauthorized, attempting token refresh")
+                    val newToken = refreshToken()
+                    if (newToken != null) {
+                        TokenRepository.setToken(newToken)
+                        Log.d("ApolloWrapper", "Token refreshed, retrying fetchTimeline")
+                        true // リトライする
+                    } else {
+                        Log.e("ApolloWrapper", "Token refresh failed")
+                        TokenRepository.removeToken()
+                        false // リトライしない
+                    }
+                } else {
+                    false // リトライしない
+                }
+            }
     }
+
+    private fun isUnauthorizedError(message: String): Boolean {
+        return message.contains("Unauthorized", ignoreCase = true) ||
+                message.contains("No valid access token", ignoreCase = true)
+    }
+
+    private class UnauthorizedException(message: String) : Exception(message)
 
     suspend fun login(username: String, password: String): String?   {
         // ログインは認証不要なのでrefreshClientを使用（インターセプターなし）
