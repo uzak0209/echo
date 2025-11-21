@@ -4,11 +4,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,25 +26,43 @@ fun CreatePostDialog(
     onDismiss: () -> Unit,
     viewModel: CreatePostViewModel = hiltViewModel()
 ) {
+    // ダイアログ表示時に状態をリセット
+    LaunchedEffect(Unit) {
+        viewModel.resetState()
+    }
+
     // TODO: imageUrlに対応
     var content by remember { mutableStateOf("") }
-    val posted by viewModel.state.collectAsState()
+    val postState by viewModel.state.collectAsState()
 
-    if (posted) {
-        onDismiss()
+    // 投稿成功時にダイアログを閉じる
+    LaunchedEffect(postState.posted) {
+        if (postState.posted) {
+            onDismiss()
+        }
     }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            Button(onClick = {
-                viewModel.createPost(content, "")
-            }) {
-                Text("投稿")
+            Button(
+                onClick = {
+                    viewModel.createPost(content, null)
+                },
+                enabled = !postState.isLoading && content.isNotBlank()
+            ) {
+                if (postState.isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    Text("投稿")
+                }
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !postState.isLoading
+            ) {
                 Text("キャンセル")
             }
         },
@@ -51,10 +72,17 @@ fun CreatePostDialog(
                 OutlinedTextField(
                     value = content,
                     onValueChange = { content = it },
-                    placeholder = { },
+                    placeholder = { Text("投稿内容を入力") },
                     modifier = Modifier.fillMaxWidth(),
-                    minLines = 3
+                    minLines = 3,
+                    enabled = !postState.isLoading
                 )
+                if (postState.error != null) {
+                    Text(
+                        text = postState.error!!,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         },
     )

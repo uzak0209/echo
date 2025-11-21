@@ -4,6 +4,7 @@ import com.apollographql.apollo.ApolloClient
 import com.example.rocketreserver.GetTimelineQuery
 import com.example.rocketreserver.LoginMutation
 import com.example.rocketreserver.SignupMutation
+import com.example.rocketreserver.RefreshTokenMutation
 import android.util.Log
 import com.apollographql.apollo.api.Optional
 import com.example.rocketreserver.AddReactionMutation
@@ -11,13 +12,23 @@ import com.example.rocketreserver.CreatePostMutation
 import com.example.rocketreserver.RemoveReactionMutation
 import com.example.rocketreserver.type.ReactionTypeGql
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class ApolloWrapper(
     private val client: ApolloClient
 ) {
     fun fetchTimeline(): Flow<GetTimelineQuery.Data> {
         return client.query(GetTimelineQuery())
-            .toThrowableFlow()
+            .toFlow()
+            .map { response ->
+                if (response.exception != null) {
+                    throw response.exception!!
+                }
+                if (response.hasErrors()) {
+                    throw Exception("GraphQL error: ${response.errors?.firstOrNull()?.message}")
+                }
+                response.data ?: throw Exception("No data in response")
+            }
     }
 
     suspend fun login(username: String, password: String): String?   {
@@ -36,6 +47,30 @@ class ApolloWrapper(
         if (response.hasErrors()) return null
 
         return response.data?.signup?.accessToken
+    }
+
+    suspend fun refreshToken(): String? {
+        return try {
+            val response = client.mutation(RefreshTokenMutation()).execute()
+
+            when {
+                response.exception != null -> {
+                    Log.e("ApolloWrapper", "refreshToken failed", response.exception)
+                    null
+                }
+                response.hasErrors() -> {
+                    Log.e("ApolloWrapper", "refreshToken GraphQL error: ${response.errors?.firstOrNull()?.message}")
+                    null
+                }
+                else -> {
+                    Log.d("ApolloWrapper", "refreshToken success")
+                    response.data?.refreshToken?.accessToken
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("ApolloWrapper", "refreshToken error", e)
+            null
+        }
     }
 
     suspend fun createPost(content: String, imageUrl: String?): Boolean {

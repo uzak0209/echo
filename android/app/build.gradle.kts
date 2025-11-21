@@ -66,6 +66,9 @@ dependencies {
     // Apollo
     implementation(libs.apollo.runtime)
 
+    // OkHttp
+    implementation(libs.okhttp)
+
     // security crypto
     implementation(libs.androidx.security.crypto)
 

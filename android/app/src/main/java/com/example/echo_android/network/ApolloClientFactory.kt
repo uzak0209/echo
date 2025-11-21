@@ -5,9 +5,11 @@ import android.util.Log
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.http.HttpRequest
 import com.apollographql.apollo.api.http.HttpResponse
+import com.apollographql.apollo.network.http.DefaultHttpEngine
 import com.apollographql.apollo.network.http.HttpInterceptor
 import com.apollographql.apollo.network.http.HttpInterceptorChain
 import com.example.echo_android.repository.TokenRepository
+import okhttp3.OkHttpClient
 
 lateinit var apolloClient: ApolloClient
     private set
@@ -17,11 +19,21 @@ object ApolloClientFactory {
 
     fun initialize(context: Context) {
         TokenRepository.init(context)
+
+        // PersistentCookieJarを使用してCookieを永続化
+        val cookieJar = PersistentCookieJar(context)
+
+        // OkHttpClientにCookieJarを設定
+        val okHttpClient = OkHttpClient.Builder()
+            .cookieJar(cookieJar)
+            .build()
+
         apolloClient = ApolloClient.Builder()
             .serverUrl(SERVER_URL)
+            .httpEngine(DefaultHttpEngine(okHttpClient))
             .addHttpInterceptor(AuthorizationInterceptor())
             .build()
-        Log.d("ApolloClientFactory", "Initialized")
+        Log.d("ApolloClientFactory", "Initialized with PersistentCookieJar")
     }
 }
 

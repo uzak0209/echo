@@ -4,19 +4,26 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.echo_android.network.ApolloClientFactory
 import com.example.echo_android.ui.feature.MainScreen
+import com.example.echo_android.ui.feature.auth.AuthViewModel
 import com.example.echo_android.ui.feature.auth.LoginScreen
 import com.example.echo_android.ui.feature.auth.SignupScreen
 import com.example.echo_android.ui.navigation.NavigationDestinations
@@ -41,12 +48,38 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun MainNavHost() {
+    val authViewModel: AuthViewModel = hiltViewModel()
+    val authState by authViewModel.authState.collectAsState()
+
+    // 認証状態チェック中はローディング表示
+    when (authState) {
+        is AuthViewModel.AuthState.Checking -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is AuthViewModel.AuthState.Authenticated -> {
+            AuthenticatedNavHost()
+        }
+        is AuthViewModel.AuthState.Unauthenticated -> {
+            UnauthenticatedNavHost()
+        }
+    }
+}
+
+@Composable
+private fun UnauthenticatedNavHost() {
     val navController = rememberNavController()
     NavHost(navController, startDestination = NavigationDestinations.LOGIN) {
         composable(route = NavigationDestinations.LOGIN) {
             LoginScreen(
                 navigateBack = {
-                    navController.navigate(NavigationDestinations.HOME)
+                    navController.navigate(NavigationDestinations.HOME) {
+                        popUpTo(NavigationDestinations.LOGIN) { inclusive = true }
+                    }
                 },
                 onSecondaryClick = {
                     navController.navigate(NavigationDestinations.SIGNUP)
@@ -57,7 +90,9 @@ private fun MainNavHost() {
         composable(route = NavigationDestinations.SIGNUP) {
             SignupScreen(
                 navigateBack = {
-                    navController.navigate(NavigationDestinations.HOME)
+                    navController.navigate(NavigationDestinations.HOME) {
+                        popUpTo(NavigationDestinations.SIGNUP) { inclusive = true }
+                    }
                 },
                 onSecondaryClick = {
                     navController.navigate(NavigationDestinations.LOGIN)
@@ -67,6 +102,42 @@ private fun MainNavHost() {
 
         composable(route = NavigationDestinations.HOME) {
             MainScreen()
+        }
+    }
+}
+
+@Composable
+private fun AuthenticatedNavHost() {
+    val navController = rememberNavController()
+    NavHost(navController, startDestination = NavigationDestinations.HOME) {
+        composable(route = NavigationDestinations.HOME) {
+            MainScreen()
+        }
+
+        composable(route = NavigationDestinations.LOGIN) {
+            LoginScreen(
+                navigateBack = {
+                    navController.navigate(NavigationDestinations.HOME) {
+                        popUpTo(NavigationDestinations.LOGIN) { inclusive = true }
+                    }
+                },
+                onSecondaryClick = {
+                    navController.navigate(NavigationDestinations.SIGNUP)
+                }
+            )
+        }
+
+        composable(route = NavigationDestinations.SIGNUP) {
+            SignupScreen(
+                navigateBack = {
+                    navController.navigate(NavigationDestinations.HOME) {
+                        popUpTo(NavigationDestinations.SIGNUP) { inclusive = true }
+                    }
+                },
+                onSecondaryClick = {
+                    navController.navigate(NavigationDestinations.LOGIN)
+                }
+            )
         }
     }
 }

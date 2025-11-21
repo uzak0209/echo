@@ -3,7 +3,6 @@ package com.example.echo_android.ui.feature.timeline
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.util.copy
 import com.example.echo_android.network.ApolloWrapper
 import com.example.echo_android.network.Lce
 import com.example.echo_android.network.toLce
