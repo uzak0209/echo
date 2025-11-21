@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -46,7 +45,7 @@ private fun MainNavHost() {
         composable(route = NavigationDestinations.LOGIN) {
             LoginScreen(
                 navigateBack = {
-                    navController.navigate(NavigationDestinations.HOME)
+                    navController.navigate(NavigationDestinations.MAIN)
                 },
                 onSecondaryClick = {
                     navController.navigate(NavigationDestinations.SIGNUP)
@@ -57,7 +56,7 @@ private fun MainNavHost() {
         composable(route = NavigationDestinations.SIGNUP) {
             SignupScreen(
                 navigateBack = {
-                    navController.navigate(NavigationDestinations.HOME)
+                    navController.navigate(NavigationDestinations.MAIN)
                 },
                 onSecondaryClick = {
                     navController.navigate(NavigationDestinations.LOGIN)
@@ -65,15 +64,8 @@ private fun MainNavHost() {
             )
         }
 
-        composable(route = NavigationDestinations.HOME) {
+        composable(route = NavigationDestinations.MAIN) {
             MainScreen()
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    EchoandroidTheme {
     }
 }

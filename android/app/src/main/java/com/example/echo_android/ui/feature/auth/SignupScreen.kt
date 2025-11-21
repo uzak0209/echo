@@ -1,14 +1,10 @@
 package com.example.echo_android.ui.feature.auth
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.echo_android.repository.TokenRepository
-import com.example.echo_android.network.apolloClient
-import com.example.rocketreserver.SignupMutation
 
 @Composable
 fun SignupScreen(
@@ -27,7 +23,7 @@ fun SignupScreen(
         buttonText = "登録",
         onAuthClick = { username, password ->
             viewModel.signup(username, password)
-            success
+            true
         },
         onSecondaryClick = { onSecondaryClick() },
         secondaryText = "ログインはこちら"

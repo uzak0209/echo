@@ -24,9 +24,7 @@ data class ReactionEvent(
 
 class SSEClient(
     private val baseUrl: String = "http://10.0.2.2:8000"
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
-    private val scope = CoroutineScope(ioDispatcher + SupervisorJob())
     private var backgroundEventSource: BackgroundEventSource? = null
     private var reconnectJob: Job? = null
     private var onReactionReceived: ((ReactionEvent) -> Unit)? = null
@@ -92,7 +90,7 @@ class SSEClient(
 
     private fun scheduleReconnect() {
         reconnectJob?.cancel()
-        reconnectJob = scope.launch {
+        reconnectJob = CoroutineScope(Dispatchers.IO).launch {
             delay(55000) // 55秒後
             Log.d("SSEClient", "SSE再接続を開始...")
 
@@ -111,7 +109,7 @@ class SSEClient(
     }
 
     fun disconnect() {
-        scope.cancel()
+        reconnectJob?.cancel()
         reconnectJob = null
         backgroundEventSource?.close()
         backgroundEventSource = null
