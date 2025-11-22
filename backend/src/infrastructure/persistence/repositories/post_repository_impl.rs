@@ -8,7 +8,8 @@ use crate::{
     infrastructure::persistence::models::{post, user},
 };
 use async_trait::async_trait;
-use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder, QuerySelect, Set};
+use sea_orm::sea_query::Expr;
 use uuid::Uuid;
 
 pub struct PostRepositoryImpl {
@@ -86,7 +87,12 @@ impl PostRepository for PostRepositoryImpl {
             query = query.filter(post::Column::UserId.ne(user_id));
         }
 
-        let models = query.all(&self.db).await?;
+        // DBレベルでランダムソートし、limitを適用
+        let models = query
+            .order_by(Expr::cust("RANDOM()"), sea_orm::Order::Asc)
+            .limit(limit as u64)
+            .all(&self.db)
+            .await?;
 
         let results: Vec<(Post, User)> = models
             .into_iter()
@@ -96,7 +102,6 @@ impl PostRepository for PostRepositoryImpl {
                 let user = Self::user_model_to_entity(user_model);
                 Some((post, user))
             })
-            .take(limit)
             .collect();
 
         Ok(results)
