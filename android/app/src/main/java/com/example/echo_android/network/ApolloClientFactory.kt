@@ -20,7 +20,7 @@ lateinit var apolloClient: ApolloClient
 private lateinit var refreshClient: ApolloClient
 
 object ApolloClientFactory {
-    private const val SERVER_URL = "http://10.0.2.2:8000/graphql"
+    private const val SERVER_URL = "http://10.2.0.92:8000/graphql"
 
     fun initialize(context: Context) {
         TokenRepository.init(context)
