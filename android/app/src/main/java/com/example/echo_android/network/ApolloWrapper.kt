@@ -12,6 +12,7 @@ import com.apollographql.apollo.api.Mutation
 import com.example.echo_android.repository.TokenRepository
 import com.example.rocketreserver.AddReactionMutation
 import com.example.rocketreserver.CreatePostMutation
+import com.example.rocketreserver.GenerateSseTokenMutation
 import com.example.rocketreserver.RemoveReactionMutation
 import com.example.rocketreserver.type.ReactionTypeGql
 import kotlinx.coroutines.flow.Flow
@@ -52,6 +53,30 @@ class ApolloWrapper(
 
         return response
     }
+    suspend fun generateSseToken(): String? {
+        val response = client.mutation(GenerateSseTokenMutation()).execute()
+
+        return try {
+            when {
+                response.exception != null -> {
+                    Log.e("ApolloWrapper", "generateSseToken failed", response.exception)
+                    return null
+                }
+                response.hasErrors() -> {
+                    Log.e("ApolloWrapper", "generateSseToken GraphQL error: ${response.errors?.firstOrNull()?.message}")
+                    return null
+                }
+                else -> {
+                    Log.d("ApolloWrapper", "generateSseToken success")
+                    response.data?.generateSseToken
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("ApolloWrapper", "generateSseToken error", e)
+            null
+        }
+    }
+
     fun fetchTimeline(): Flow<GetTimelineQuery.Data> {
         return client.query(GetTimelineQuery())
             .toFlow()

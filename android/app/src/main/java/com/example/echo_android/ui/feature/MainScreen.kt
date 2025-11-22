@@ -19,6 +19,7 @@ import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -29,18 +30,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.echo_android.ui.feature.post.CreatePostDialog
 import com.example.echo_android.ui.feature.timeline.TimelineScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    viewModel: MainViewModel = hiltViewModel(),
     onLogout: () -> Unit = {}
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Timeline", "Avatar")
 
     var showDialog by remember { mutableStateOf(false) }
+
+    val avatarExpression by viewModel.avatarExpression.collectAsState()
 
     Scaffold(
         topBar = {
@@ -102,8 +107,8 @@ fun MainScreen(
             contentAlignment = Alignment.Center
         ) {
             when (selectedTabIndex) {
-                0 -> TimelineScreen()
-                1 -> AvatarScreen()
+                0 -> TimelineScreen(viewModel = viewModel)
+                1 -> AvatarScreen(expression = avatarExpression)
             }
         }
 
