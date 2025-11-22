@@ -15,10 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.echo_android.ui.feature.MainViewModel
 
 @Composable
 fun AvatarScreen(
-    expression: String? = null
+    expression: String? = null,
+    viewModel: MainViewModel = hiltViewModel()
 ) {
     // TODO: MainViewModelが追加されたら、viewModel.avatarExpression.collectAsState()に戻す
     val avatarExpression = expression

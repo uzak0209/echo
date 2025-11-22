@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.apollo)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.0"
 }
 
 android {
@@ -90,6 +91,9 @@ dependencies {
     // OkHttp EventSource (SSE)
     implementation(libs.okhttp.eventsource)
     implementation(libs.kotlinx.serialization.json)
+
+    //serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 }
 
 apollo {

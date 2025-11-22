@@ -28,11 +28,22 @@ class MainViewModel @Inject constructor(
 
     private val _timelineState = MutableStateFlow(ViewState.INITIAL)
     val timelineState = _timelineState.asStateFlow()
+    private var isSseConnected = false
 
     // SSE接続とtimeline取得
     init {
-        startRealtimeUpdates()
         fetchTimeline()
+    }
+
+    fun onAppResumed() {
+        if (!isSseConnected) {
+            startRealtimeUpdates()
+        }
+    }
+
+    fun onAppPaused() {
+        sseClient.disconnect()
+        isSseConnected = false
     }
 
     private fun startRealtimeUpdates() {
