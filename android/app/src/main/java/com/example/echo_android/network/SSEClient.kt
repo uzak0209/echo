@@ -23,7 +23,7 @@ data class ReactionEvent(
 )
 
 class SSEClient(
-    private val baseUrl: String = "http://10.0.2.2:8000",
+    private val baseUrl: String = "http://10.2.0.92:8000",
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     private val scope = CoroutineScope(ioDispatcher + SupervisorJob())
