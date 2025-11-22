@@ -14,18 +14,26 @@ import javax.inject.Inject
 class SignupViewModel @Inject constructor(
     private val apollo: ApolloWrapper
 ): ViewModel(){
-    private val _state = MutableStateFlow(false)
+    private val _state = MutableStateFlow<AuthResult>(AuthResult.Idle)
     val state = _state.asStateFlow()
 
     fun signup(username: String, password: String) {
         viewModelScope.launch {
+            _state.value = AuthResult.Loading
             val token = apollo.signup(username, password)
             if (token != null) {
                 TokenRepository.setToken(token)
-                _state.value = true
+                _state.value = AuthResult.Success
             } else {
-                _state.value = false
+                _state.value = AuthResult.Error("ログインに失敗しました。ユーザー名が既に使用されている可能性があります。")
             }
         }
+    }
+
+    sealed class AuthResult {
+        data object Idle : AuthResult()
+        data object Loading : AuthResult()
+        data object Success : AuthResult()
+        data class Error(val message: String) : AuthResult()
     }
 }

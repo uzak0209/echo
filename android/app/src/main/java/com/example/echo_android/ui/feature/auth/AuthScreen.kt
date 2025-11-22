@@ -22,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,14 +42,23 @@ fun AuthScreen(
     buttonText: String,
     onAuthClick: suspend (username: String, password: String) -> Boolean,
     onSecondaryClick: () -> Unit,
-    secondaryText: String
-    ) {
+    secondaryText: String,
+    externalError: String? = null
+) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+
+    // 外部エラーを反映
+    LaunchedEffect(externalError) {
+        if (externalError != null) {
+            errorMessage = externalError
+            loading = false
+        }
+    }
 
     Column(
         modifier = Modifier

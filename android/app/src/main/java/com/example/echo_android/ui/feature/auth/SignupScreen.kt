@@ -5,6 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.echo_android.repository.TokenRepository
 import com.example.echo_android.network.apolloClient
@@ -16,10 +19,17 @@ fun SignupScreen(
     onSecondaryClick: () -> Unit,
     viewModel: SignupViewModel = hiltViewModel()
 ) {
-    val success by viewModel.state.collectAsState()
+    val authResult by viewModel.state.collectAsState()
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(success) {
-        if (success) navigateBack()
+    LaunchedEffect(authResult) {
+        when (authResult) {
+            is SignupViewModel.AuthResult.Success -> navigateBack()
+            is SignupViewModel.AuthResult.Error -> {
+                errorMessage = (authResult as SignupViewModel.AuthResult.Error).message
+            }
+            else -> {}
+        }
     }
 
     AuthScreen(
@@ -27,9 +37,10 @@ fun SignupScreen(
         buttonText = "登録",
         onAuthClick = { username, password ->
             viewModel.signup(username, password)
-            success
+            true
         },
         onSecondaryClick = { onSecondaryClick() },
-        secondaryText = "ログインはこちら"
+        secondaryText = "ログインはこちら",
+        externalError = errorMessage
     )
 }
