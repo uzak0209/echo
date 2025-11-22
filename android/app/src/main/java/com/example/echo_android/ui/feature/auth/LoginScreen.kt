@@ -29,7 +29,7 @@ fun LoginScreen(
     }
 
     AuthScreen(
-        title = "Login",
+        title = "ログイン",
         buttonText = "ログイン",
         onAuthClick = { username, password ->
             errorMessage = null
@@ -37,7 +37,7 @@ fun LoginScreen(
             true
         },
         onSecondaryClick = { onSecondaryClick()},
-        secondaryText = "アカウント作成",
+        secondaryText = "アカウント作成はこちら",
         externalError = errorMessage
     )
 }

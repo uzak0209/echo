@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.echo_android.ui.feature.avatar.AvatarScreen
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -45,7 +46,7 @@ fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
     onLogout: () -> Unit = {}
 ) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Timeline", "Avatar")
 
     var showDialog by remember { mutableStateOf(false) }
@@ -192,7 +193,7 @@ fun LogoutConfirmDialog(
         },
         title = {
             Text(
-                text = "logout",
+                text = "ログアウト",
                 style = MaterialTheme.typography.headlineSmall
             )
         },

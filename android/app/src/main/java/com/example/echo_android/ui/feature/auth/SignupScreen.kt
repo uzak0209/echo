@@ -29,7 +29,7 @@ fun SignupScreen(
     }
 
     AuthScreen(
-        title = "Signup",
+        title = "アカウント作成",
         buttonText = "登録",
         onAuthClick = { username, password ->
             viewModel.signup(username, password)
