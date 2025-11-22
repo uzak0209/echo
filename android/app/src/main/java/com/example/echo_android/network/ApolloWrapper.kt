@@ -55,17 +55,34 @@ class ApolloWrapper(
         return response
     }
     suspend fun generateSseToken(): String? {
-        val response = client.mutation(GenerateSseTokenMutation()).execute()
-
         return try {
+            val mutation = GenerateSseTokenMutation()
+            var response = client.mutation(mutation).execute()
+
+            // Unauthorizedエラーの場合、トークンをリフレッシュしてリトライ
+            if (isUnauthorizedError(response)) {
+                Log.d("ApolloWrapper", "generateSseToken: Unauthorized error detected, attempting token refresh")
+
+                val newToken = refreshToken()
+                if (newToken != null) {
+                    TokenRepository.setToken(newToken)
+                    Log.d("ApolloWrapper", "generateSseToken: Token refreshed, retrying")
+                    response = client.mutation(mutation).execute()
+                } else {
+                    Log.e("ApolloWrapper", "generateSseToken: Token refresh failed")
+                    TokenRepository.removeToken()
+                    return null
+                }
+            }
+
             when {
                 response.exception != null -> {
                     Log.e("ApolloWrapper", "generateSseToken failed", response.exception)
-                    return null
+                    null
                 }
                 response.hasErrors() -> {
                     Log.e("ApolloWrapper", "generateSseToken GraphQL error: ${response.errors?.firstOrNull()?.message}")
-                    return null
+                    null
                 }
                 else -> {
                     Log.d("ApolloWrapper", "generateSseToken success")
@@ -77,6 +94,7 @@ class ApolloWrapper(
             null
         }
     }
+
 
     fun fetchTimeline(): Flow<GetTimelineQuery.Data> {
         return client.query(GetTimelineQuery())
@@ -113,6 +131,28 @@ class ApolloWrapper(
                 }
             }
     }
+
+    suspend fun fetchTimelineOnce(): GetTimelineQuery.Data? {
+        return try {
+            val response = client.query(GetTimelineQuery()).execute()
+
+            when {
+                response.exception != null -> {
+                    Log.e("ApolloWrapper", "fetchTimelineOnce failed", response.exception)
+                    null
+                }
+                response.hasErrors() -> {
+                    Log.e("ApolloWrapper", "fetchTimelineOnce GraphQL error: ${response.errors?.firstOrNull()?.message}")
+                    null
+                }
+                else -> response.data
+            }
+        } catch (e: Exception) {
+            Log.e("ApolloWrapper", "fetchTimelineOnce error", e)
+            null
+        }
+    }
+
 
     private fun isUnauthorizedError(message: String): Boolean {
         return message.contains("Unauthorized", ignoreCase = true) ||
