@@ -13,6 +13,7 @@ import com.example.echo_android.repository.TokenRepository
 import com.example.rocketreserver.AddReactionMutation
 import com.example.rocketreserver.CreatePostMutation
 import com.example.rocketreserver.GenerateSseTokenMutation
+import com.example.rocketreserver.LogoutMutation
 import com.example.rocketreserver.RemoveReactionMutation
 import com.example.rocketreserver.type.ReactionTypeGql
 import kotlinx.coroutines.flow.Flow
@@ -142,6 +143,15 @@ class ApolloWrapper(
         if (response.hasErrors()) return null
 
         return response.data?.signup?.accessToken
+    }
+
+    suspend fun logout(): Boolean {
+        return try {
+            val response = apolloClient.mutation(LogoutMutation()).execute()
+            response.data?.logout == true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     suspend fun refreshToken(): String? {

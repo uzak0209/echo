@@ -64,16 +64,10 @@ fun MainScreen(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.align(Alignment.Center)
                     )
-                    IconButton(
+                    LogoutButton(
                         onClick = onLogout,
                         modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                            contentDescription = "Logout",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    )
                 }
 
                 Spacer(modifier = Modifier.padding(vertical = 8.dp))
@@ -120,8 +114,26 @@ fun MainScreen(
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun MainScreenPreview() {
-    MainScreen()
+fun LogoutButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+            contentDescription = "Logout",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }
+
+
+//@Preview(showBackground = true)
+//@Composable
+//fun MainScreenPreview() {
+//    MainScreen()
+//}
