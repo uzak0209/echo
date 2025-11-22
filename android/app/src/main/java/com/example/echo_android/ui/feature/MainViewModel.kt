@@ -1,6 +1,8 @@
 package com.example.echo_android.ui.feature
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.echo_android.network.ApolloWrapper
@@ -9,6 +11,7 @@ import com.example.echo_android.network.toLce
 import com.example.rocketreserver.GetTimelineQuery
 import com.example.rocketreserver.type.ReactionTypeGql
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.compose.runtime.getValue
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -29,6 +33,8 @@ class MainViewModel @Inject constructor(
     private val _timelineState = MutableStateFlow(ViewState.INITIAL)
     val timelineState = _timelineState.asStateFlow()
     private var isSseConnected = false
+    var isLoadingMore by mutableStateOf(false)
+        private set
 
     // SSE接続とtimeline取得
     init {
@@ -87,6 +93,38 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    fun loadMorePosts() {
+        if (isLoadingMore) return
+
+        isLoadingMore = true
+        viewModelScope.launch {
+            try {
+                val response = apolloWrapper.fetchTimelineOnce()
+                response?.timeline?.let { newPosts ->
+                    _timelineState.update { state ->
+                        val currentPosts = state.content?.timeline.orEmpty()
+                        val existingIds = currentPosts.map { it.id }.toSet()
+
+                        // 重複を除外して追加
+                        val uniqueNewPosts = newPosts.filter { it.id !in existingIds }
+                        val mergedPosts = currentPosts + uniqueNewPosts
+
+                        state.copy(
+                            content = GetTimelineQuery.Data(
+                                timeline = mergedPosts
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "追加読み込みに失敗", e)
+            } finally {
+                delay(500) // 連続発火を防ぐ
+                isLoadingMore = false
+            }
+        }
+    }
+
     fun toggleReaction(postId: String, reaction: ReactionTypeGql, isActive: Boolean) {
         viewModelScope.launch {
             _timelineState.update { it.copy(isLoading = true, throwable = null) }
@@ -124,7 +162,7 @@ class MainViewModel @Inject constructor(
         val isLoading: Boolean = false,
         val throwable: Throwable?,
         val content: GetTimelineQuery.Data?,
-        val userReactions: Map<String, ReactionTypeGql> = emptyMap()
+        val userReactions: Map<String, ReactionTypeGql> = emptyMap(),
     ) {
         companion object {
             val INITIAL = ViewState(
