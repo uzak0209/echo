@@ -15,20 +15,27 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private  val apollo: ApolloWrapper
 ): ViewModel() {
-    private  val _state = MutableStateFlow(false)
+    private  val _state = MutableStateFlow<AuthResult>(AuthResult.Idle)
     val state = _state.asStateFlow()
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
+            _state.value = AuthResult.Loading
             val token = apollo.login(username, password)
             if (token != null) {
                 TokenRepository.setToken(token)
                 Log.d("LoginViewModel", "Success to login")
-                _state.value = true
+                _state.value = AuthResult.Success
             } else {
                 Log.d("LoginViewModel", "Failed to login")
-                _state.value = false
+                _state.value = AuthResult.Error("アカウントの作成に失敗しました。ユーザー名またはパスワードが正しくありません。")
             }
         }
+    }
+    sealed class AuthResult {
+        data object Idle : AuthResult()
+        data object Loading : AuthResult()
+        data object Success : AuthResult()
+        data class Error(val message: String) : AuthResult()
     }
 }

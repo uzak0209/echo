@@ -67,9 +67,13 @@ class AuthViewModel @Inject constructor(
      * ログアウト処理
      */
     fun logout() {
-        Log.d("AuthViewModel", "Logging out...")
-        TokenRepository.removeToken()
-        _authState.value = AuthState.Unauthenticated
+        viewModelScope.launch {
+            Log.d("AuthViewModel", "Logging out...")
+            val success = apolloWrapper.logout()
+            Log.d("AuthViewModel", "Logout mutation success=$success")
+            TokenRepository.removeToken()
+            _authState.value = AuthState.Unauthenticated
+        }
     }
 
     sealed class AuthState {

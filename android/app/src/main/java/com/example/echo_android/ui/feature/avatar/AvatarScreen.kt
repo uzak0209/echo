@@ -1,5 +1,11 @@
 package com.example.echo_android.ui.feature.avatar
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,13 +18,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.echo_android.ui.feature.MainViewModel
 
 @Composable
 fun AvatarScreen(
-    expression: String? = null
+    expression: String? = null,
+    viewModel: MainViewModel = hiltViewModel()
 ) {
     // TODO: MainViewModelが追加されたら、viewModel.avatarExpression.collectAsState()に戻す
     val avatarExpression = expression
@@ -49,10 +62,28 @@ fun AvatarDisplay(
     expression: String,
     modifier: Modifier = Modifier
 ) {
+    val infiniteTransition = rememberInfiniteTransition()
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 0.95f,
+        targetValue = 1.05f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+    )
+
+    val backgroundColor = when (expression) {
+        "laugh" -> Color(0xFFFFF9C4)
+        "sad" -> Color(0xFFBBDEFB)
+        "surprise" -> Color(0xFFFFCCBC)
+        "empathy" -> Color(0xFFF8BBD0)
+        "confused" -> Color(0xFFD7CCC8)
+        else -> MaterialTheme.colorScheme.surfaceVariant
+    }
 
     Surface(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = backgroundColor,
         shape = MaterialTheme.shapes.large
     ) {
         Box(
@@ -64,11 +95,12 @@ fun AvatarDisplay(
                     "laugh" -> "😄"
                     "sad" -> "😢"
                     "surprise" -> "😮"
-                    "empathy" -> "🤗"
+                    "empathy" -> "🥺"
                     "confused" -> "😕"
                     else -> "😐"
                 },
-                style = MaterialTheme.typography.displayLarge
+                style = MaterialTheme.typography.displayLarge.copy(fontSize = 100.sp),
+                modifier = Modifier.scale(pulseScale)
             )
         }
     }

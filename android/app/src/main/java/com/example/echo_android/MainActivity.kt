@@ -62,7 +62,12 @@ private fun MainNavHost() {
             }
         }
         is AuthViewModel.AuthState.Authenticated -> {
-            AuthenticatedNavHost(onLogout = { authViewModel.logout() })
+            AuthenticatedNavHost(
+                onLogout = {
+                    authViewModel.logout()
+                    authViewModel.recheckAuthentication()
+                }
+            )
         }
         is AuthViewModel.AuthState.Unauthenticated -> {
             UnauthenticatedNavHost()
@@ -72,14 +77,13 @@ private fun MainNavHost() {
 
 @Composable
 private fun UnauthenticatedNavHost() {
+    val authViewModel: AuthViewModel = hiltViewModel()
     val navController = rememberNavController()
     NavHost(navController, startDestination = NavigationDestinations.LOGIN) {
         composable(route = NavigationDestinations.LOGIN) {
             LoginScreen(
                 navigateBack = {
-                    navController.navigate(NavigationDestinations.HOME) {
-                        popUpTo(NavigationDestinations.LOGIN) { inclusive = true }
-                    }
+                    authViewModel.recheckAuthentication()
                 },
                 onSecondaryClick = {
                     navController.navigate(NavigationDestinations.SIGNUP)
@@ -90,9 +94,7 @@ private fun UnauthenticatedNavHost() {
         composable(route = NavigationDestinations.SIGNUP) {
             SignupScreen(
                 navigateBack = {
-                    navController.navigate(NavigationDestinations.HOME) {
-                        popUpTo(NavigationDestinations.SIGNUP) { inclusive = true }
-                    }
+                    authViewModel.recheckAuthentication()
                 },
                 onSecondaryClick = {
                     navController.navigate(NavigationDestinations.LOGIN)
@@ -112,32 +114,6 @@ private fun AuthenticatedNavHost(onLogout: () -> Unit) {
     NavHost(navController, startDestination = NavigationDestinations.HOME) {
         composable(route = NavigationDestinations.HOME) {
             MainScreen(onLogout = onLogout)
-        }
-
-        composable(route = NavigationDestinations.LOGIN) {
-            LoginScreen(
-                navigateBack = {
-                    navController.navigate(NavigationDestinations.HOME) {
-                        popUpTo(NavigationDestinations.LOGIN) { inclusive = true }
-                    }
-                },
-                onSecondaryClick = {
-                    navController.navigate(NavigationDestinations.SIGNUP)
-                }
-            )
-        }
-
-        composable(route = NavigationDestinations.SIGNUP) {
-            SignupScreen(
-                navigateBack = {
-                    navController.navigate(NavigationDestinations.HOME) {
-                        popUpTo(NavigationDestinations.SIGNUP) { inclusive = true }
-                    }
-                },
-                onSecondaryClick = {
-                    navController.navigate(NavigationDestinations.LOGIN)
-                }
-            )
         }
     }
 }
