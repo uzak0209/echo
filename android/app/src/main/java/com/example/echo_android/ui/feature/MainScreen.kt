@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -18,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +46,7 @@ fun MainScreen(
     val tabs = listOf("Timeline", "Avatar")
 
     var showDialog by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     val avatarExpression by viewModel.avatarExpression.collectAsState()
 
@@ -65,7 +68,7 @@ fun MainScreen(
                         modifier = Modifier.align(Alignment.Center)
                     )
                     LogoutButton(
-                        onClick = onLogout,
+                        onClick = {showLogoutDialog = true },
                         modifier = Modifier.align(Alignment.CenterEnd)
                     )
                 }
@@ -122,6 +125,16 @@ fun MainScreen(
                 onDismiss = { showDialog = false }
             )
         }
+
+        if (showLogoutDialog) {
+            LogoutConfirmDialog(
+                onDismiss = { showLogoutDialog = false },
+                onConfirm = {
+                    onLogout()
+                    showLogoutDialog = false
+                }
+            )
+        }
     }
 }
 
@@ -141,6 +154,51 @@ fun LogoutButton(
         )
     }
 }
+
+@Composable
+fun LogoutConfirmDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
+        title = {
+            Text(
+                text = "logout",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
+        text = {
+            Text(
+                text = "ログアウトしますか?",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
+                colors = androidx.compose.material3.ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text("ログアウト")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("キャンセル")
+            }
+        }
+    )
+}
+
 
 
 //@Preview(showBackground = true)
