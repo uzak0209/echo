@@ -72,12 +72,23 @@ fun MainScreen(
 
                 Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-                SecondaryTabRow(selectedTabIndex = selectedTabIndex) {
+                SecondaryTabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ) {
                     tabs.forEachIndexed { index, title ->
                         Tab(
                             selected = selectedTabIndex == index,
                             onClick = { selectedTabIndex = index },
-                            text = { Text(title) }
+                            text = {
+                                Text(
+                                    text = title,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                            },
+                            selectedContentColor = MaterialTheme.colorScheme.primary,
+                            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -126,7 +137,7 @@ fun LogoutButton(
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
             contentDescription = "Logout",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = MaterialTheme.colorScheme.primary
         )
     }
 }
