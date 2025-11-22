@@ -143,7 +143,7 @@ fun ReactionButton(
             text = when (reaction) {
                 ReactionTypeGql.SURPRISE -> "😲"
                 ReactionTypeGql.EMPATHY -> "🥺"
-                ReactionTypeGql.LAUGH -> "😂"
+                ReactionTypeGql.LAUGH -> "😄"
                 ReactionTypeGql.SAD -> "😢"
                 ReactionTypeGql.CONFUSED -> "😕"
                 else -> "???"
